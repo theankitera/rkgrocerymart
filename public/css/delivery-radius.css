@@ -1,0 +1,551 @@
+/**
+ * delivery-radius.css
+ * Rinku Kirana Store — Smart Delivery Radius UI Styles
+ *
+ * Design: Mobile-first, dark-mode aware, glassmorphism cards.
+ * All selectors prefixed dr- (delivery-radius), rk-loc- (location button),
+ * mu- (maps-utils), rk-ds- (delivery status).
+ */
+
+/* ────────────────────────────────────────────────────────────────────
+   1. "Use Current Location" Button
+──────────────────────────────────────────────────────────────────── */
+
+.rk-loc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--primary, #1BA672);
+  background: var(--primary-light, #E8F8F1);
+  color: var(--primary-dark, #158A5E);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s, opacity 0.2s;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.rk-loc-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.rk-loc-btn:hover:not(:disabled) {
+  background: var(--primary, #1BA672);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(27, 166, 114, 0.3);
+  transform: translateY(-1px);
+}
+
+.rk-loc-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.rk-loc-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* Loading pulse */
+.rk-loc-btn--loading {
+  background: linear-gradient(
+    90deg,
+    var(--primary-light, #E8F8F1) 0%,
+    rgba(27, 166, 114, 0.15) 50%,
+    var(--primary-light, #E8F8F1) 100%
+  );
+  background-size: 200% 100%;
+  animation: rk-loc-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes rk-loc-pulse {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Success state */
+.rk-loc-btn--success {
+  background: var(--primary, #1BA672);
+  color: #fff;
+  border-color: var(--primary, #1BA672);
+  box-shadow: 0 4px 14px rgba(27, 166, 114, 0.28);
+}
+
+/* Denied / error state */
+.rk-loc-btn--denied {
+  background: #FFF7ED;
+  color: #C2410C;
+  border-color: #FED7AA;
+}
+
+.rk-loc-btn--denied:hover:not(:disabled) {
+  background: #FF6B35;
+  color: #fff;
+  border-color: #FF6B35;
+  box-shadow: 0 4px 18px rgba(255, 107, 53, 0.3);
+}
+
+/* ────────────────────────────────────────────────────────────────────
+   2. Delivery Status Card — base + animated reveal
+──────────────────────────────────────────────────────────────────── */
+
+.rk-ds-container {
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  margin-bottom: 14px;
+}
+
+.rk-ds-container.rk-ds-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dr-status-card {
+  border-radius: 16px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+
+  /* Glassmorphism base */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Shimmer highlight */
+.dr-status-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0) 55%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ── Free tier ─── */
+.dr-badge--free {
+  background: linear-gradient(135deg, #E8F8F1 0%, #D1FAE5 100%);
+  border-color: rgba(27, 166, 114, 0.3);
+  box-shadow: 0 4px 20px rgba(27, 166, 114, 0.12);
+}
+
+/* ── Paid tier ─── */
+.dr-badge--paid {
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.12);
+}
+
+/* ── Unavailable ─── */
+.dr-badge--unavail {
+  background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+  border-color: rgba(229, 62, 62, 0.25);
+  box-shadow: 0 4px 20px rgba(229, 62, 62, 0.1);
+}
+
+/* ── Warning (permission denied) ─── */
+.dr-status-card--warn {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.1);
+}
+
+/* ── Header row ─── */
+.dr-status-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.dr-status-emoji {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+}
+
+.dr-status-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.dr-status-label {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--dark, #0F172A);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.dr-status-sub {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--gray, #64748B);
+  margin-top: 3px;
+}
+
+.dr-status-sub--warn {
+  color: #92400E;
+}
+
+.dr-free-tag {
+  display: inline-block;
+  background: var(--primary, #1BA672);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 50px;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+  margin-left: 3px;
+}
+
+.dr-charge-val {
+  font-weight: 800;
+  color: #1D4ED8;
+}
+
+/* ── Meta row (distance / charge / eta) ─── */
+.dr-meta-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dr-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 8px 11px;
+  flex: 1;
+  min-width: 80px;
+  backdrop-filter: blur(6px);
+}
+
+.dr-meta-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.dr-meta-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--gray, #64748B);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dr-meta-val {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--dark, #0F172A);
+  margin-top: 1px;
+}
+
+/* ── Unavailable message ─── */
+.dr-unavail-msg {
+  margin-top: 12px;
+  background: rgba(254, 226, 226, 0.55);
+  border: 1px solid rgba(229, 62, 62, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #B91C1C;
+  line-height: 1.6;
+}
+
+/* ── Permission hint ─── */
+.dr-perm-hint {
+  margin-top: 10px;
+  background: rgba(255, 251, 235, 0.8);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 0.72rem;
+  color: #92400E;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* ── Fallback minimal badge ─── */
+.rk-ds-fallback {
+  background: var(--primary-light, #E8F8F1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary-dark, #158A5E);
+}
+
+/* ────────────────────────────────────────────────────────────────────
+   3. Admin panel — maps-utils
+──────────────────────────────────────────────────────────────────── */
+
+.mu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.mu-btn--view {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #DBEAFE;
+}
+
+.mu-btn--view:hover {
+  background: #DBEAFE;
+}
+
+.mu-btn--nav {
+  background: #E8F8F1;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.mu-btn--nav:hover {
+  background: var(--primary, #1BA672);
+  color: #fff;
+  border-color: var(--primary, #1BA672);
+}
+
+/* Distance badge in admin order rows */
+.mu-dist-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 9px;
+  min-width: 72px;
+  text-align: center;
+}
+
+.mu-dist-km {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.mu-dist-charge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.mu-dist--free {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.mu-dist--paid {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.mu-dist--unavail {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.mu-dist-unknown {
+  color: var(--gray, #64748B);
+  font-size: 0.75rem;
+}
+
+.mu-static-map {
+  width: 100%;
+  max-width: 320px;
+  height: 180px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1.5px solid var(--border, #E2E8F0);
+  display: block;
+}
+
+/* ────────────────────────────────────────────────────────────────────
+   4. Dark mode overrides
+──────────────────────────────────────────────────────────────────── */
+
+html[data-theme="dark"] .rk-loc-btn {
+  background: var(--primary-light, #163828);
+  color: #2ECC82;
+  border-color: rgba(46, 204, 130, 0.4);
+}
+
+html[data-theme="dark"] .rk-loc-btn:hover:not(:disabled) {
+  background: #2ECC82;
+  color: #0F1521;
+}
+
+html[data-theme="dark"] .rk-loc-btn--success {
+  background: #2ECC82;
+  color: #0F1521;
+  border-color: #2ECC82;
+}
+
+html[data-theme="dark"] .rk-loc-btn--denied {
+  background: #2A2010;
+  color: #FF8A5C;
+  border-color: rgba(255, 138, 92, 0.35);
+}
+
+html[data-theme="dark"] .rk-loc-btn--denied:hover:not(:disabled) {
+  background: #FF6B35;
+  color: #fff;
+}
+
+html[data-theme="dark"] .dr-status-card {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .dr-status-sub--warn {
+  color: #FFCB47;
+}
+
+html[data-theme="dark"] .dr-charge-val {
+  color: #60A5FA;
+}
+
+html[data-theme="dark"] .dr-badge--free {
+  background: linear-gradient(135deg, #11241C 0%, #1A3A2A 100%);
+  border-color: rgba(46, 204, 130, 0.25);
+  box-shadow: 0 4px 20px rgba(46, 204, 130, 0.08);
+}
+
+html[data-theme="dark"] .dr-badge--paid {
+  background: linear-gradient(135deg, #142A3D 0%, #1A3550 100%);
+  border-color: rgba(91, 157, 246, 0.25);
+  box-shadow: 0 4px 20px rgba(91, 157, 246, 0.08);
+}
+
+html[data-theme="dark"] .dr-badge--unavail {
+  background: linear-gradient(135deg, #2A1414 0%, #3A1818 100%);
+  border-color: rgba(255, 107, 107, 0.2);
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.07);
+}
+
+html[data-theme="dark"] .dr-status-card--warn {
+  background: linear-gradient(135deg, #2A2010 0%, #3A2A14 100%);
+  border-color: rgba(255, 203, 71, 0.25);
+}
+
+html[data-theme="dark"] .dr-status-label {
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .dr-meta-item {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .dr-meta-val {
+  color: #F1F5F9;
+}
+
+html[data-theme="dark"] .dr-unavail-msg {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.18);
+  color: #FF8A8A;
+}
+
+html[data-theme="dark"] .dr-perm-hint {
+  background: rgba(255, 203, 71, 0.08);
+  border-color: rgba(255, 203, 71, 0.18);
+  color: #FFCB47;
+}
+
+html[data-theme="dark"] .mu-btn--view {
+  background: #16243A;
+  color: #7CB4FF;
+  border-color: rgba(91, 157, 246, 0.25);
+}
+
+html[data-theme="dark"] .mu-btn--view:hover {
+  background: #1D4ED8;
+  color: #fff;
+}
+
+html[data-theme="dark"] .mu-btn--nav {
+  background: #11241C;
+  color: #2ECC82;
+  border-color: rgba(46, 204, 130, 0.25);
+}
+
+html[data-theme="dark"] .mu-btn--nav:hover {
+  background: #2ECC82;
+  color: #0F1521;
+}
+
+html[data-theme="dark"] .mu-dist--free  { background: #11241C; color: #2ECC82; }
+html[data-theme="dark"] .mu-dist--paid  { background: #142A3D; color: #7CB4FF; }
+html[data-theme="dark"] .mu-dist--unavail { background: #2A1414; color: #FF8A8A; }
+
+html[data-theme="dark"] .mu-static-map {
+  border-color: var(--border, #2D3B4E);
+}
+
+/* ────────────────────────────────────────────────────────────────────
+   5. Responsive tweaks
+──────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 380px) {
+  .dr-meta-row {
+    flex-direction: column;
+  }
+
+  .dr-meta-item {
+    min-width: unset;
+  }
+}
+
+@media (min-width: 600px) {
+  .dr-meta-item {
+    min-width: 100px;
+  }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .rk-loc-btn,
+  .rk-ds-container,
+  .rk-loc-btn--loading {
+    animation: none;
+    transition: none;
+  }
+}

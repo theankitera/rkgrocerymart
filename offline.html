@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Offline — RK Grocery Mart</title>
+<style>
+  /* Self-contained on purpose: no Google Fonts / CDN links here. This file
+     must render correctly with zero network, so it only uses system fonts
+     and inline styles. */
+  :root { --primary:#15803D; --bg:#0F172A; --card:#16213a; --muted:#94A3B8; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); color:#fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+    padding:24px; text-align:center;
+  }
+  .wrap { max-width:380px; }
+  .cart-icon {
+    width:84px; height:84px; margin:0 auto 18px; border-radius:22px;
+    background:var(--primary); display:flex; align-items:center; justify-content:center;
+    font-size:2.4rem;
+  }
+  h1 { font-size:1.3rem; font-weight:800; margin:0 0 8px; }
+  p { color:var(--muted); font-size:0.92rem; line-height:1.55; margin:0 0 22px; }
+  .retry-btn {
+    background:var(--primary); color:#fff; border:none; border-radius:12px;
+    padding:13px 22px; font-size:0.95rem; font-weight:700; cursor:pointer;
+    width:100%;
+  }
+  .retry-btn:active { transform:scale(0.98); }
+  .status { margin-top:14px; font-size:0.78rem; color:var(--muted); }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#E63946; margin-right:6px; }
+  .dot.online { background:#1BA672; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="cart-icon">🛒</div>
+    <h1>Internet Connection Nahi Hai</h1>
+    <p>
+      Lagta hai aap offline hain. Kuch pages pehle se save hain unhe dekh sakte hain,
+      lekin naya data load karne ke liye internet wapas chahiye.
+    </p>
+    <button class="retry-btn" onclick="window.location.reload()">🔄 Dobara Try Karein</button>
+    <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">Offline</span></div>
+  </div>
+
+  <script>
+    function updateStatus() {
+      var dot = document.getElementById('statusDot');
+      var text = document.getElementById('statusText');
+      if (navigator.onLine) {
+        dot.classList.add('online');
+        text.textContent = 'Connection wapas aa gaya — reload karein';
+      } else {
+        dot.classList.remove('online');
+        text.textContent = 'Offline';
+      }
+    }
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+  </script>
+  <!-- NOTE: Ananya AI widget intentionally NOT loaded here — it needs the
+       #ananya-inline container (support.html) and would crash without it. -->
+</body>
+</html>

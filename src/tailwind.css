@@ -1,0 +1,52 @@
+/* Tailwind utilities only — preflight/base is disabled in tailwind.config.js
+   so this never resets the existing hand-written design system.
+   Imported once from src/main.jsx (the index.html / App.jsx entry) in
+   Module 0. Other MPA entries (login-main.jsx, signup-main.jsx, etc.) will
+   import this same file once we start converting those pages, module by
+   module — no need to duplicate it. */
+@tailwind utilities;
+
+/* 💎 TitlePill — premium glass pill: shimmer sweep + hover glow + lift.
+   (Inline styles handle gradient/border/text; these handle position,
+   overflow, shadow, transition, animation.) */
+.title-pill{
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 6px 18px rgba(22,163,74,0.32), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.08);
+  transition:transform .25s ease, box-shadow .25s ease;
+}
+.title-pill:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 28px rgba(22,163,74,0.48), inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.08);
+}
+@keyframes titlePillShine{
+  0%{transform:translateX(-130%) skewX(-20deg);}
+  60%,100%{transform:translateX(280%) skewX(-20deg);}
+}
+.title-pill-shine{
+  position:absolute;
+  top:-15%;
+  bottom:-15%;
+  left:0;
+  width:45%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform:translateX(-130%) skewX(-20deg);
+  animation:titlePillShine 3.2s ease-in-out infinite;
+  pointer-events:none;
+}
+@media (prefers-reduced-motion: reduce){
+  .title-pill-shine{animation:none;}
+}
+
+/* ── scrollbar-hide — horizontal rails/ad strips ka scrollbar hide (CSS
+   standard + webkit + firefox). Ye class App.jsx me saari rails par use hoti
+   hai; pehle defined hi nahi thi isliye niche scrollbar dikhta tha. */
+.scrollbar-hide{
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.scrollbar-hide::-webkit-scrollbar{
+  display:none;
+  width:0;
+  height:0;
+}

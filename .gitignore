@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.vite/
+.env
+.vercel
+.env*
+!.env.example
+scripts/upload-results.json
+
+__pycache__/
+*.pyc
+
+# Supabase CLI temp/cache files (pura supabase/ dir — CLI artifacts, nested .temp bhi)
+supabase/

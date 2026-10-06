@@ -1,0 +1,1185 @@
+/* ══════════════════════════════════════════════════════════
+   ANANYA AI — Premium Design System v3.0
+   WhatsApp-style Chat | Glassmorphism | Mobile-First
+   ══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── CSS Variables ── */
+:root {
+  /* Brand — matched to Rinku Kirana site palette (green primary, yellow accent) */
+  --an-primary:        #16A34A;
+  --an-primary-light:  #4ECB99;
+  --an-primary-dark:   #15803D;
+  --an-accent:         #FF9933;
+
+  /* Light Theme */
+  --an-bg:             #FFFFFF;
+  --an-surface:        #F7F8FA;
+  --an-surface2:       #EEF0F4;
+  --an-border:         rgba(0,0,0,0.07);
+  --an-text:           #1A1A2E;
+  --an-text-2:         #6B7280;
+  --an-text-3:         #9CA3AF;
+  --an-shadow:         0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  --an-shadow-lg:      0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10);
+
+  /* Bot bubble (incoming — left, light grey like WhatsApp) */
+  --an-bot-bg:         #F0F0F0;
+  --an-bot-text:       #1A1A2E;
+
+  /* User bubble (outgoing — right, brand green like WhatsApp) */
+  --an-user-bg:        #25D366;
+  --an-user-text:      #FFFFFF;
+
+  /* Header */
+  --an-header-bg:      linear-gradient(135deg, #1BA672 0%, #15803D 50%, #0EA86B 100%);
+
+  /* Tabs */
+  --an-tab-active:     #1BA672;
+
+  /* Input */
+  --an-input-bg:       #F7F8FA;
+  --an-input-border:   #E5E7EB;
+  --an-send-bg:        #25D366;
+
+  /* Radius */
+  --an-r-sm:   8px;
+  --an-r-md:   14px;
+  --an-r-lg:   20px;
+  --an-r-xl:   24px;
+  --an-r-full: 9999px;
+
+  /* Transition */
+  --an-ease:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --an-ease2:  cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ── Dark Theme ── */
+[data-ananya-theme="dark"] {
+  --an-primary:      #4ADE80;
+  --an-primary-light:#5FE0A8;
+  --an-primary-dark: #16A34A;
+  --an-accent:       #FFCB47;
+  --an-bg:           #1C1C1E;
+  --an-surface:      #2C2C2E;
+  --an-surface2:     #3A3A3C;
+  --an-border:       rgba(255,255,255,0.08);
+  --an-text:         #F2F2F7;
+  --an-text-2:       #AEAEB2;
+  --an-text-3:       #6C6C70;
+  --an-shadow:       0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  --an-shadow-lg:    0 20px 60px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.4);
+  --an-bot-bg:       #2C2C2E;
+  --an-bot-text:     #F2F2F7;
+  --an-input-bg:     #2C2C2E;
+  --an-input-border: #3A3A3C;
+  --an-header-bg:    linear-gradient(135deg, #16A34A 0%, #15803D 50%, #2ECC82 100%);
+  --an-tab-active:   #2ECC82;
+}
+
+/* ══════════════════════════════════════════════════════════
+   FLOATING TRIGGER BUTTON
+   ══════════════════════════════════════════════════════════ */
+#ananya-trigger {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000005;
+  width: 62px;
+  height: 62px;
+  border-radius: var(--an-r-full);
+  background: linear-gradient(135deg, var(--an-primary), var(--an-accent));
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(22,163,74,0.45), 0 0 0 0 rgba(22,163,74,0.3);
+  transition: transform 0.3s var(--an-ease), box-shadow 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  animation: an-pulse-ring 2.5s ease-in-out infinite;
+}
+
+#ananya-trigger:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 30px rgba(22,163,74,0.55), 0 0 0 8px rgba(22,163,74,0.12);
+}
+
+#ananya-trigger:active {
+  transform: scale(0.95);
+}
+
+.ananya-trigger-hidden {
+  transform: scale(0) !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ananya-avatar-emoji {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+  transition: transform 0.3s var(--an-ease);
+}
+
+#ananya-trigger:hover .ananya-avatar-emoji {
+  transform: rotate(-10deg) scale(1.1);
+}
+
+.ananya-avatar-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: var(--an-r-full);
+  border: 2px solid rgba(22,163,74,0.4);
+  animation: an-ring-spin 3s linear infinite;
+}
+
+@keyframes an-ring-spin {
+  0%   { transform: rotate(0deg); border-color: rgba(22,163,74,0.4); }
+  50%  { border-color: rgba(255,184,0,0.6); }
+  100% { transform: rotate(360deg); border-color: rgba(22,163,74,0.4); }
+}
+
+@keyframes an-pulse-ring {
+  0%   { box-shadow: 0 4px 20px rgba(22,163,74,0.45), 0 0 0 0 rgba(22,163,74,0.3); }
+  50%  { box-shadow: 0 4px 20px rgba(22,163,74,0.45), 0 0 0 12px rgba(22,163,74,0); }
+  100% { box-shadow: 0 4px 20px rgba(22,163,74,0.45), 0 0 0 0 rgba(22,163,74,0); }
+}
+
+/* ── Notification Badge ── */
+.ananya-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: var(--an-r-full);
+  background: #EF4444;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid #fff;
+  animation: an-badge-pop 0.3s var(--an-ease);
+}
+
+.ananya-badge.hidden { display: none; }
+
+@keyframes an-badge-pop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+/* ── Hover Label ── */
+.ananya-trigger-label {
+  position: fixed;
+  bottom: 35px;
+  right: 96px;
+  z-index: 1000004;
+  background: var(--an-bg, #fff);
+  color: var(--an-text, #1A1A2E);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--an-r-full);
+  box-shadow: var(--an-shadow);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(10px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s var(--an-ease));
+}
+
+.ananya-trigger-label.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.ananya-trigger-label::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: var(--an-bg, #fff);
+  border-right-width: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MAIN WIDGET WINDOW
+   ══════════════════════════════════════════════════════════ */
+#ananya-widget {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  z-index: 1000006;
+  width: 390px;
+  max-width: calc(100vw - 32px);
+  height: 620px;
+  max-height: calc(100vh - 130px);
+  max-height: calc(100dvh - 130px);
+  background: var(--an-bg);
+  border-radius: var(--an-r-xl);
+  box-shadow: var(--an-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  border: 1px solid var(--an-border);
+
+  /* Hidden by default */
+  opacity: 0;
+  transform: scale(0.85) translateY(20px);
+  transform-origin: bottom right;
+  pointer-events: none;
+  transition: opacity 0.35s var(--an-ease2), transform 0.35s var(--an-ease);
+  will-change: transform, opacity;
+}
+
+#ananya-widget.ananya-open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: all;
+}
+
+/* ══════════════════════════════════════════════════════════
+   HEADER
+   ══════════════════════════════════════════════════════════ */
+.ananya-header {
+  background: var(--an-header-bg);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle shimmer on header */
+.ananya-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+  animation: an-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes an-shimmer {
+  0%   { transform: translateX(-100%) rotate(45deg); }
+  60%  { transform: translateX(100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+.ananya-header-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--an-r-full);
+  background: rgba(255,255,255,0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.4);
+  backdrop-filter: blur(4px);
+  position: relative;
+}
+
+/* Online dot */
+.ananya-header-avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 11px;
+  height: 11px;
+  border-radius: var(--an-r-full);
+  background: #22C55E;
+  border: 2px solid #fff;
+  animation: an-online-pulse 2s ease-in-out infinite;
+}
+
+@keyframes an-online-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+  50%       { box-shadow: 0 0 0 4px rgba(34,197,94,0); }
+}
+
+.ananya-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ananya-header-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ananya-header-status {
+  font-size: 12px;
+  color: rgba(255,255,255,0.82);
+  margin-top: 2px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ananya-header-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: var(--an-r-full);
+  background: #4ADE80;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.ananya-header-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ananya-header-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--an-r-full);
+  border: none;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(4px);
+}
+
+.ananya-header-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.1);
+}
+
+/* ══════════════════════════════════════════════════════════
+   TABS
+   ══════════════════════════════════════════════════════════ */
+.ananya-tabs {
+  display: flex;
+  background: var(--an-bg);
+  border-bottom: 1px solid var(--an-border);
+  padding: 0 4px;
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+.ananya-tab {
+  flex: 1;
+  padding: 11px 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--an-text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-bottom: 2.5px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+  position: relative;
+}
+
+.ananya-tab .tab-icon { font-size: 14px; }
+
+.ananya-tab.active {
+  color: var(--an-tab-active);
+  border-bottom-color: var(--an-tab-active);
+  font-weight: 600;
+}
+
+.ananya-tab:hover:not(.active) {
+  color: var(--an-text);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANELS
+   ══════════════════════════════════════════════════════════ */
+.ananya-panel {
+  display: none;
+  flex: 1;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+.ananya-panel.active {
+  display: flex;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CHAT — WhatsApp Style
+   ══════════════════════════════════════════════════════════ */
+.ananya-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  /* WhatsApp-style background pattern */
+  background-color: #ECE5DD;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8b8a2' fill-opacity='0.2'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+[data-ananya-theme="dark"] .ananya-messages {
+  background-color: #0B141A;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* scrollbar */
+.ananya-messages::-webkit-scrollbar { width: 4px; }
+.ananya-messages::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: var(--an-r-full);
+}
+
+/* ── Single message row ── */
+.ananya-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+  animation: an-msg-in 0.28s var(--an-ease) both;
+  margin-bottom: 2px;
+}
+
+@keyframes an-msg-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Bot = left aligned */
+.ananya-msg.bot {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+/* User = right aligned */
+.ananya-msg.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+/* ── Bubble ── */
+.ananya-bubble {
+  padding: 8px 12px;
+  border-radius: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  position: relative;
+  max-width: 100%;
+}
+
+/* Bot bubble — top-left corner flat (WhatsApp style) */
+.ananya-msg.bot .ananya-bubble {
+  background: #FFFFFF;
+  color: #1A1A1A;
+  border-radius: 0 12px 12px 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.13);
+}
+
+[data-ananya-theme="dark"] .ananya-msg.bot .ananya-bubble {
+  background: #1F2C34;
+  color: #E9EBF0;
+}
+
+/* Tail for bot bubble */
+.ananya-msg.bot .ananya-bubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 8px 8px 0;
+  border-color: transparent #FFFFFF transparent transparent;
+}
+
+[data-ananya-theme="dark"] .ananya-msg.bot .ananya-bubble::before {
+  border-color: transparent #1F2C34 transparent transparent;
+}
+
+/* User bubble — top-right corner flat */
+.ananya-msg.user .ananya-bubble {
+  background: #DCF8C6;
+  color: #1A1A1A;
+  border-radius: 12px 0 12px 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.13);
+}
+
+[data-ananya-theme="dark"] .ananya-msg.user .ananya-bubble {
+  background: #005C4B;
+  color: #E9EBF0;
+}
+
+/* Tail for user bubble */
+.ananya-msg.user .ananya-bubble::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 8px 0 0;
+  border-color: #DCF8C6 transparent transparent transparent;
+}
+
+[data-ananya-theme="dark"] .ananya-msg.user .ananya-bubble::after {
+  border-color: #005C4B transparent transparent transparent;
+}
+
+/* ── Timestamp + tick row ── */
+.ananya-msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  padding: 0 2px;
+}
+
+.ananya-msg-time {
+  font-size: 11px;
+  color: rgba(0,0,0,0.45);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+}
+
+[data-ananya-theme="dark"] .ananya-msg-time {
+  color: rgba(255,255,255,0.4);
+}
+
+/* WhatsApp-style ticks */
+.ananya-ticks {
+  font-size: 13px;
+  line-height: 1;
+  color: rgba(0,0,0,0.4);
+}
+
+.ananya-ticks.seen {
+  color: #53BDEB; /* WhatsApp blue ticks */
+}
+
+/* ── Date separator ── */
+.ananya-date-sep {
+  align-self: center;
+  background: rgba(0,0,0,0.15);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--an-r-full);
+  margin: 6px 0;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.2px;
+}
+
+/* ── Typing indicator ── */
+.ananya-retry-row {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 10px;
+}
+.ananya-retry-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--ananya-primary, #25D366);
+  background: transparent;
+  color: var(--ananya-primary, #25D366);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ananya-retry-btn:hover {
+  background: var(--ananya-primary, #25D366);
+  color: #fff;
+}
+
+.ananya-typing {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  align-self: flex-start;
+  animation: an-msg-in 0.28s var(--an-ease) both;
+  margin-bottom: 4px;
+}
+
+.ananya-typing-bubble {
+  background: #fff;
+  border-radius: 0 12px 12px 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.13);
+  position: relative;
+}
+
+[data-ananya-theme="dark"] .ananya-typing-bubble {
+  background: #1F2C34;
+}
+
+.ananya-typing-bubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 8px 8px 0;
+  border-color: transparent #fff transparent transparent;
+}
+
+[data-ananya-theme="dark"] .ananya-typing-bubble::before {
+  border-color: transparent #1F2C34 transparent transparent;
+}
+
+.ananya-typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--an-r-full);
+  background: #9CA3AF;
+  animation: an-typing 1.3s ease-in-out infinite;
+}
+
+.ananya-typing-dot:nth-child(2) { animation-delay: 0.18s; }
+.ananya-typing-dot:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes an-typing {
+  0%, 60%, 100% { transform: translateY(0); background: #9CA3AF; }
+  30%            { transform: translateY(-6px); background: #1BA672; }
+}
+
+/* Avatar for typing — small emoji */
+.ananya-typing .ananya-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--an-r-full);
+  background: linear-gradient(135deg, var(--an-primary), var(--an-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+/* ── User message row: bubble + own DP ── */
+.ananya-msg-user-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+.ananya-msg-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.ananya-msg-avatar.user-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--an-r-full);
+  background: linear-gradient(135deg, var(--an-primary, #16A34A), var(--an-accent, #FF9933));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+  margin-bottom: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.ananya-msg-avatar.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Login gate — chat sirf logged-in users ke liye ── */
+.ananya-login-gate {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  padding: 32px 26px;
+  background: var(--an-bg);
+}
+
+#ananya-widget.ananya-guest .ananya-login-gate {
+  display: flex;
+}
+
+#ananya-widget.ananya-guest .ananya-messages,
+#ananya-widget.ananya-guest .ananya-input-area {
+  display: none;
+}
+
+.ananya-login-gate-icon {
+  font-size: 38px;
+  line-height: 1;
+}
+
+.ananya-login-gate-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--an-text);
+  font-family: 'Poppins', sans-serif;
+}
+
+.ananya-login-gate-sub {
+  font-size: 12.5px;
+  color: var(--an-text-2);
+  max-width: 240px;
+  line-height: 1.5;
+  font-family: 'Poppins', sans-serif;
+}
+
+.ananya-login-gate-btn {
+  margin-top: 6px;
+  background: linear-gradient(135deg, var(--an-primary, #1BA672), var(--an-primary-dark, #158A5E));
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--an-r-full);
+  font-weight: 700;
+  font-size: 13.5px;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(22,163,74,0.35);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.ananya-login-gate-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.94;
+}
+
+.ananya-login-gate-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ── Sender name (bot only) ── */
+.ananya-msg.bot .ananya-sender-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1BA672;
+  margin-bottom: 3px;
+  padding-left: 2px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ── WhatsApp Banner ── */
+.ananya-whatsapp-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: var(--an-r-md);
+  text-decoration: none;
+  margin: 8px 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  align-self: center;
+  width: calc(100% - 4px);
+  box-sizing: border-box;
+  animation: an-msg-in 0.3s var(--an-ease) both;
+}
+
+.ananya-whatsapp-banner:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.ananya-whatsapp-icon { font-size: 22px; flex-shrink: 0; }
+.ananya-whatsapp-text { flex: 1; }
+.ananya-whatsapp-text strong { display: block; font-size: 13.5px; margin-bottom: 2px; }
+.ananya-whatsapp-text span { font-size: 12px; opacity: 0.88; }
+.ananya-whatsapp-arrow { font-size: 16px; opacity: 0.8; }
+
+/* ══════════════════════════════════════════════════════════
+   INPUT AREA
+   ══════════════════════════════════════════════════════════ */
+.ananya-input-area {
+  background: #F0F2F5;
+  padding: 8px 12px;
+  border-top: 1px solid var(--an-border);
+  flex-shrink: 0;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+[data-ananya-theme="dark"] .ananya-input-area {
+  background: #1C1C1E;
+}
+
+.ananya-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.ananya-input {
+  flex: 1;
+  background: #FFFFFF;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 16px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14.5px;
+  color: var(--an-text);
+  resize: none;
+  outline: none;
+  max-height: 100px;
+  min-height: 44px;
+  line-height: 1.5;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s ease;
+  scrollbar-width: none;
+}
+
+.ananya-input::-webkit-scrollbar { display: none; }
+
+[data-ananya-theme="dark"] .ananya-input {
+  background: #2A3942;
+  color: #E9EBF0;
+}
+
+.ananya-input:focus {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.ananya-input::placeholder {
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+.ananya-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--an-r-full);
+  background: #25D366;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.2s var(--an-ease);
+  box-shadow: 0 2px 8px rgba(37,211,102,0.4);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ananya-send-btn:hover {
+  background: #22C55E;
+  transform: scale(1.08);
+}
+
+.ananya-send-btn:active {
+  transform: scale(0.92);
+}
+
+/* ══════════════════════════════════════════════════════════
+   FAQ PANEL
+   ══════════════════════════════════════════════════════════ */
+.ananya-faq-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ananya-faq-list::-webkit-scrollbar { width: 4px; }
+.ananya-faq-list::-webkit-scrollbar-thumb {
+  background: var(--an-surface2);
+  border-radius: var(--an-r-full);
+}
+
+.ananya-faq-item {
+  background: var(--an-surface);
+  border-radius: var(--an-r-md);
+  overflow: hidden;
+  border: 1px solid var(--an-border);
+  transition: box-shadow 0.2s ease;
+}
+
+.ananya-faq-item:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.ananya-faq-q {
+  padding: 13px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--an-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1.4;
+}
+
+.faq-icon {
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--an-primary);
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.ananya-faq-item.open .faq-icon { transform: rotate(45deg); }
+
+.ananya-faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s var(--an-ease2), padding 0.25s ease;
+  font-size: 13px;
+  color: var(--an-text-2);
+  line-height: 1.6;
+  padding: 0 14px;
+}
+
+.ananya-faq-item.open .ananya-faq-a {
+  max-height: 300px;
+  padding: 0 14px 14px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   INFO PANEL
+   ══════════════════════════════════════════════════════════ */
+.ananya-info-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ananya-info-panel::-webkit-scrollbar { width: 4px; }
+.ananya-info-panel::-webkit-scrollbar-thumb {
+  background: var(--an-surface2);
+  border-radius: var(--an-r-full);
+}
+
+.ananya-info-card {
+  background: var(--an-surface);
+  border-radius: var(--an-r-md);
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid var(--an-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ananya-info-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+}
+
+.ananya-info-card-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--an-r-sm);
+  background: linear-gradient(135deg, rgba(22,163,74,0.12), rgba(255,184,0,0.12));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.ananya-info-card-body strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--an-text);
+  margin-bottom: 4px;
+}
+
+.ananya-info-card-body p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--an-text-2);
+  line-height: 1.55;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  #ananya-widget {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    height: var(--ananya-vh, 100dvh);
+    max-height: 100vh;
+    max-height: 100dvh;
+    max-height: var(--ananya-vh, 100dvh);
+    border-radius: 0;
+    border: none;
+    /* widget ke andar content bottom nav se upar rahe */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* input area kabhi bottom nav ke peeche na chhupi rahe */
+  #ananya-widget .ananya-input-area {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    flex-shrink: 0;
+  }
+
+  #ananya-trigger {
+    bottom: 100px;
+    right: 20px;
+  }
+
+  .ananya-trigger-label {
+    bottom: 168px;
+    right: 30px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  #ananya-widget {
+    width: 370px;
+    height: 580px;
+  }
+}
+
+/* Safe areas for iPhone */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .ananya-input-area {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+
+  @media (max-width: 480px) {
+    #ananya-widget {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SUPPORT PAGE — INLINE (embedded) MODE
+   V4.1: the floating round button is gone; the chat now renders embedded
+   inside #ananya-inline on support.html. Overrides win via specificity
+   (#ananya-inline #ananya-widget.ananya-inline-mode > #ananya-widget).
+   ══════════════════════════════════════════════════════════ */
+#ananya-inline {
+  position: relative;
+  height: 100%;
+  min-height: 460px;
+}
+
+#ananya-inline #ananya-widget.ananya-inline-mode {
+  position: relative;
+  bottom: auto;
+  right: auto;
+  left: auto;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 460px;
+  max-height: none;
+  border-radius: var(--an-r-xl);
+  opacity: 1;
+  transform: none;
+  pointer-events: all;
+}
+
+@media (max-width: 480px) {
+  #ananya-inline {
+    min-height: 420px;
+  }
+  #ananya-inline #ananya-widget.ananya-inline-mode {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: none;
+    border-radius: var(--an-r-xl);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   UTILITY
+   ══════════════════════════════════════════════════════════ */
+.an-hidden { display: none !important; }
+.an-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}

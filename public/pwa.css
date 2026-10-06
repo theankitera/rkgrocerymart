@@ -1,0 +1,179 @@
+/* ============================================
+   RINKU KIRANA — PWA.CSS
+   Install banner, update banner, skeleton
+   loaders, touch/native-app feel utilities.
+   All classes prefixed rk-pwa- — safe to load
+   on every page alongside your existing CSS.
+   ============================================ */
+
+:root {
+  /* Aligned to the shared design tokens (Module 1) — these vars already
+     flip automatically with the html[data-theme="dark"] toggle on every
+     page, so pwa.css never needs its own dark-mode media query for them. */
+  --rk-pwa-primary: var(--primary, #16A34A);
+  --rk-pwa-primary-dark: var(--primary-dark, #15803D);
+  --rk-pwa-bg: #0F172A;
+}
+
+/* ── Native-app feel ─────────────────────────── */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  overscroll-behavior-y: contain; /* no rubber-band "pull to see browser chrome" */
+}
+button, a, .rk-pwa-touch {
+  touch-action: manipulation; /* removes 300ms tap delay on old mobile browsers */
+}
+
+/* ── Install banner ──────────────────────────── */
+.rk-pwa-install-banner {
+  position: fixed;
+  top: calc(var(--header-h, 96px) + 6px);
+  left: 12px;
+  right: 12px;
+  z-index: 1000010;
+  background: #111827;
+  color: #fff;
+  border-radius: 14px;
+  padding: 12px 14px 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.28);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(.22,1,.36,1);
+  font-family: inherit;
+  box-sizing: border-box;
+  max-width: 540px;
+  margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .rk-pwa-install-banner {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(-10px);
+    width: calc(100% - 48px);
+  }
+  .rk-pwa-install-banner.rk-pwa-show {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+.rk-pwa-install-banner.rk-pwa-show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Mobile: slim version */
+@media (max-width: 767px) {
+  .rk-pwa-install-banner {
+    padding: 8px 10px 8px 12px;
+    gap: 8px;
+    border-radius: 12px;
+    /* JS se actual .header height set hogi, fallback ~116px */
+    top: 116px;
+  }
+}
+.rk-pwa-install-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink:0;
+  background: var(--rk-pwa-primary);
+  display:flex; align-items:center; justify-content:center; font-size:1.15rem;
+}
+@media (max-width: 767px) {
+  .rk-pwa-install-icon { width: 30px; height: 30px; border-radius: 8px; font-size:0.95rem; }
+}
+.rk-pwa-install-text { flex:1; min-width:0; }
+.rk-pwa-install-title { font-size:0.86rem; font-weight:700; margin:0 0 2px; }
+.rk-pwa-install-sub { font-size:0.73rem; color:#9CA3AF; margin:0; }
+@media (max-width: 767px) {
+  .rk-pwa-install-title { font-size:0.78rem; margin:0 0 1px; }
+  .rk-pwa-install-sub { font-size:0.66rem; }
+}
+
+/* Dark mode: banner white background, black text. Keyed off the app's
+   manual html[data-theme="dark"] toggle only — a `prefers-color-scheme`
+   duplicate used to sit here too, which would flip the banner based on
+   OS preference even when the in-app toggle was set to light. */
+html[data-theme="dark"] .rk-pwa-install-banner {
+  background: #FFFFFF;
+  color: #111827;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+}
+html[data-theme="dark"] .rk-pwa-install-sub { color: #6B7280; }
+html[data-theme="dark"] .rk-pwa-btn-ghost { color: #6B7280; }
+.rk-pwa-install-actions { display:flex; gap:8px; flex-shrink:0; }
+.rk-pwa-btn {
+  border:none; border-radius:9px; padding:8px 13px; font-size:0.8rem; font-weight:700;
+  cursor:pointer; font-family:inherit;
+}
+@media (max-width: 767px) {
+  .rk-pwa-btn { border-radius:7px; padding:5px 10px; font-size:0.72rem; }
+}
+.rk-pwa-btn-primary { background: var(--rk-pwa-primary); color:#fff; }
+.rk-pwa-btn-ghost { background:transparent; color:#9CA3AF; padding:8px 6px; }
+
+/* ── Update banner ───────────────────────────── */
+.rk-pwa-update-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000002;
+  background: var(--rk-pwa-primary);
+  color: #fff;
+  padding: 11px 16px;
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  font-size: 0.84rem; font-weight: 600;
+  transform: translateY(-110%);
+  transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+}
+.rk-pwa-update-banner.rk-pwa-show { transform: translateY(0); }
+.rk-pwa-update-banner .rk-pwa-btn {
+  background:#fff; color:var(--rk-pwa-primary); padding:6px 12px; border-radius:8px;
+}
+
+/* ── iOS "Add to Home Screen" instructions sheet ─ */
+.rk-pwa-ios-sheet {
+  position: fixed; inset: 0; z-index: 1000003;
+  background: rgba(0,0,0,0.55);
+  display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none; transition: opacity 0.25s ease;
+}
+.rk-pwa-ios-sheet.rk-pwa-show { opacity:1; pointer-events:auto; }
+.rk-pwa-ios-card {
+  /* Theme-aware now (was forced white/black regardless of the app's
+     dark mode toggle) — uses the same vars every page already defines. */
+  background: var(--card-bg, #fff); color: var(--dark, #111827);
+  width:100%; max-width:420px;
+  border-radius:18px 18px 0 0; padding:20px 20px 28px; text-align:center;
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+}
+.rk-pwa-ios-sheet.rk-pwa-show .rk-pwa-ios-card { transform: translateY(0); }
+.rk-pwa-ios-card h3 { margin:0 0 10px; font-size:1.02rem; font-weight:800; }
+.rk-pwa-ios-card p { margin:0 0 14px; font-size:0.86rem; color: var(--gray, #475569); line-height:1.55; }
+.rk-pwa-ios-card .rk-pwa-btn-primary { width:100%; padding:12px; }
+
+/* ── Skeleton loaders (apply class="rk-pwa-skeleton" to any placeholder) ─
+   Driven by var(--border)/var(--light), which already flip with the
+   html[data-theme="dark"] toggle — replaces the old hardcoded dark
+   default + `prefers-color-scheme` override, which followed the OS
+   setting instead of the app's manual toggle and could show the wrong
+   shimmer color when a user's OS and in-app theme disagreed. */
+.rk-pwa-skeleton {
+  background: linear-gradient(90deg, var(--border, #E2E8F0) 25%, var(--light, #F7FAFC) 37%, var(--border, #E2E8F0) 63%);
+  background-size: 400% 100%;
+  animation: rk-pwa-shimmer 1.4s ease infinite;
+  border-radius: 8px;
+}
+@keyframes rk-pwa-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rk-pwa-skeleton { animation: none; }
+  .rk-pwa-install-banner, .rk-pwa-update-banner, .rk-pwa-ios-sheet, .rk-pwa-ios-card {
+    transition: none;
+  }
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>My Account — RK Grocery Mart</title>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#15803D" id="rk-theme-color"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="RK Grocery Mart"/>
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png"/>
+<link rel="shortcut icon" href="/icons/favicon.ico"/><link rel="icon" type="image/svg+xml" href="/icons/rk-logo.svg"/>
+<link rel="stylesheet" href="/pwa.css"/>
+<link rel="stylesheet" href="/css/account.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>
+/* Pre-paint theme: apply saved theme before first render to avoid flash */
+(function(){
+  var t=localStorage.getItem('rk_theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  window.__RK_CONFIG__={
+    supabaseUrl:"https://pffaflasgwhydkmxwkky.supabase.co",
+    supabaseAnonKey:"sb_publishable__tFDYhkM3blZ0pIVT0YxLA_YvkKq79L"
+  };
+})();
+</script>
+<!-- Supabase CDN for cart.js/profile.js/orders.js vanilla scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="account-root"></div>
+<script src="/js/sync-queue.js"></script>
+<script src="/js/cart.js"></script>
+<script src="/js/profile.js"></script>
+<script src="/js/orders.js"></script>
+<script src="/js/push.js"></script>
+<script type="module" src="/src/pages/account/account-main.jsx"></script>
+<script src="/pwa.js?v=1"></script>
+<script src="/js/analytics.js" defer></script>
+<script src="/js/location-service.js"></script>
+<script src="/js/delivery-radius.js"></script>
+<script src="/js/maps-utils.js"></script>
+<script src="/js/checkout-location.js"></script>
+<script src="/js/account-location-patch.js"></script>
+</body>
+</html>

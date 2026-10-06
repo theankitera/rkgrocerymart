@@ -1,0 +1,31 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--green:#16a34a;--green-dark:#15803d;--green-light:#dcfce7;--green-ring:#bbf7d0;--text-dark:#1f2937;--text-mid:#4b5563;--text-soft:#9ca3af;--bg:#f8fafc;--white:#ffffff;--shadow:0 20px 60px rgba(22,163,74,.10),0 4px 16px rgba(0,0,0,.07);}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4 0%,#f8fafc 45%,#eff6ff 100%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--text-dark);padding:24px 16px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(0.4);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes drawCheck{from{stroke-dashoffset:60}to{stroke-dashoffset:0}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.35)}50%{box-shadow:0 0 0 14px rgba(22,163,74,0)}}
+@keyframes countShrink{from{transform:scale(1.2);opacity:.6}to{transform:scale(1);opacity:1}}
+@keyframes drain{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.card{background:var(--white);border-radius:20px;box-shadow:var(--shadow);max-width:460px;width:100%;padding:52px 40px 44px;text-align:center;animation:fadeUp .55s cubic-bezier(.22,.68,0,1.2) both;}
+.icon-wrap{display:inline-flex;align-items:center;justify-content:center;width:88px;height:88px;border-radius:50%;background:var(--green-light);margin-bottom:28px;animation:popIn .5s .2s cubic-bezier(.22,.68,0,1.2) both,pulse 2.4s 1s ease-in-out infinite;}
+.icon-wrap svg{width:44px;height:44px;}
+.check-circle{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+.check-mark{fill:none;stroke:var(--green);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:drawCheck .45s .55s ease forwards;}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green-dark);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:999px;border:1px solid var(--green-ring);margin-bottom:20px;}
+.badge::before{content:'';display:block;width:7px;height:7px;border-radius:50%;background:var(--green);}
+h1{font-size:1.6rem;font-weight:800;color:var(--text-dark);line-height:1.25;margin-bottom:14px;letter-spacing:-.02em;}
+.desc{font-size:.97rem;color:var(--text-mid);line-height:1.65;max-width:340px;margin:0 auto 32px;}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 24px;border-radius:12px;border:none;background:var(--green);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;transition:background .18s,transform .15s,box-shadow .18s;box-shadow:0 4px 14px rgba(22,163,74,.35);margin-bottom:12px;}
+.btn-primary:hover{background:var(--green-dark);transform:translateY(-2px);box-shadow:0 8px 22px rgba(22,163,74,.4);}
+.btn-primary:active{transform:translateY(0);}
+.btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:13px 24px;border-radius:12px;border:1.5px solid #e5e7eb;background:transparent;color:var(--text-mid);font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none;transition:background .18s,border-color .18s,color .18s,transform .15s;margin-bottom:28px;}
+.btn-secondary:hover{background:#f9fafb;border-color:#d1d5db;color:var(--text-dark);transform:translateY(-1px);}
+.countdown-wrap{display:flex;align-items:center;justify-content:center;gap:10px;font-size:.85rem;color:var(--text-soft);}
+#countdown-num{font-variant-numeric:tabular-nums;font-weight:700;color:var(--green);display:inline-block;animation:countShrink .35s ease;}
+.progress-track{width:100%;height:4px;background:#f1f5f9;border-radius:999px;margin:18px 0 24px;overflow:hidden;}
+.progress-fill{height:100%;width:100%;background:linear-gradient(90deg,var(--green-light),var(--green));border-radius:999px;transform-origin:left;animation:drain 5s linear forwards;}
+footer{margin-top:32px;font-size:.78rem;color:var(--text-soft);letter-spacing:.03em;}
+footer span{font-weight:700;color:var(--green);}
+@media(max-width:480px){.card{padding:40px 24px 36px;}h1{font-size:1.35rem;}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;}}
