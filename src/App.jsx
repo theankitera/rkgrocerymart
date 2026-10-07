@@ -76,7 +76,7 @@ function CategoryRail({cats,catsLoading,catEmoji,onClick,activeCatId=null,headin
         </div>
       )}
       <div className="relative">
-        {arrow(-1,canLeft,'left-0 -ml-3')}
+        {arrow(-1,canLeft,'left-0 md:-ml-3')}
         <div ref={ref} className="flex flex-nowrap gap-3 md:gap-4 overflow-x-auto pb-1 snap-x scrollbar-hide">
           {catsLoading
             ?[...Array(8)].map((_,i)=>(
@@ -110,7 +110,7 @@ function CategoryRail({cats,catsLoading,catEmoji,onClick,activeCatId=null,headin
           }
         </div>
         {canRight&&<div className="pointer-events-none absolute inset-y-0 right-0 w-8 md:w-12 rounded-r-2xl" style={{background:`linear-gradient(90deg,transparent,${fadeColor})`}}/>}
-        {arrow(1,canRight,'right-0 -mr-3')}
+        {arrow(1,canRight,'right-0 md:-mr-3')}
       </div>
     </div>
   );
@@ -334,7 +334,7 @@ function Footer({shopSettings,onNav}){
 
 function HomeContent({homepageSections,banners,bannersLoading,bannerIdx,setBannerIdx,bannerWrapRef,handleBannerClick,homeSections,homeLoading,cart,addToCart,updQty,onDetail,cats,catsLoading,catEmoji,sectionProds,sectionProdsReady,featLoading,featuredProds,dbReviews,shopSettings,showToast,setPage,onPickCategory,wishlistIds,onWishlist,adStrips,onAdClick}){
   return(
-    <div className="max-w-site mx-auto px-0 md:px-8 pt-4 pb-6 md:pb-8">
+    <div className="max-w-site mx-auto px-2 md:px-8 pt-4 pb-6 md:pb-8">
       {/* Admin Homepage Builder: sections configured order mein + sirf enabled walay */}
       {(() => {
         // Hook ab saare rows (enabled + disabled) deta hai — yahan rendering ke
