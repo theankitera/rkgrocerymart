@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
-import { Search, ShoppingCart, User, Download, Home, ShoppingBag, SlidersHorizontal, X, Zap, Leaf, BadgePercent, ShieldCheck, Package, Headphones, Send, MessageCircle } from 'lucide-react';
+import { Search, ShoppingCart, User, Download, Home, ShoppingBag, SlidersHorizontal, X, Zap, Leaf, BadgePercent, ShieldCheck, Package, Headphones, Send, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from './lib/supabaseClient';
 import { TICKER, calcDiscount, catEmoji } from './lib/helpers';
 import { useCategories, useBanners, useProducts, useSearch, useHomeSections, useHomepageConfig, useReviews, useAdStrips, useShopSettings, DEFAULT_HOMEPAGE_SECTIONS } from './hooks/dataHooks';
@@ -181,57 +181,108 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
 
 
 
-// 🎯 AdStripSection — homepage builder ki "Ad Images" strips. Mobile par EK
-// fixed image + crossfade (koi sliding/scroll nahi — side me next image ya
-// scroll jaisa kuch nahi dikhta) aur image ke NICHE dots (hero carousel jaisa
-// active indicator). Desktop par flex row me saari images ek saath.
+// 🎯 AdStripSection — homepage builder ki "Ad Images" strips.
+// • Large devices (md+): 3 images ek saath + dono side circular arrows —
+//   auto-scroll ek-ek image right→left chalti rehti hai. Jab last images
+//   right end par aa jati hain to bina kisi flash ke initial state par
+//   reset ho kar loop dobara shuru hota hai (clone-based seamless loop).
+// • Small devices: ek time me EK image — scroll behaviour same, arrows nahi.
+// • Koi dots ya active indicator nahi (requirement).
 // Har image click karne par category ya product khulta hai.
 function AdStripSection({strip,onAdClick}){
-  const [idx,setIdx]=useState(0);
-  const n=strip.images.length;
+  const imgs=strip.images||[];
+  const n=imgs.length;
+  const GAP=12;
+  // md (768px) = large-device cut. Breakpoint switch par visible window
+  // 3 ↔ 1 ho jati hai aur position initial par reset.
+  const [visible,setVisible]=useState(()=>typeof window!=='undefined'&&window.matchMedia('(min-width:768px)').matches?3:1);
+  const [pos,setPos]=useState(0);
+  const [anim,setAnim]=useState(true);
+  const pausedRef=useRef(false);
   useEffect(()=>{
-    if(n<2)return;
-    const t=setInterval(()=>setIdx(i=>(i+1)%n),3500);
+    const mq=window.matchMedia('(min-width:768px)');
+    const apply=()=>{setVisible(mq.matches?3:1);setPos(0);};
+    mq.addEventListener('change',apply);
+    return()=>mq.removeEventListener('change',apply);
+  },[]);
+  const canLoop=n>visible;
+  // Auto-scroll: 3.5s per step, hover par pause, reduced-motion par band.
+  // pos===n par ruk jata hai (reset effect wahin se 0 par le jata hai).
+  useEffect(()=>{
+    if(!canLoop||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const t=setInterval(()=>{
+      if(pausedRef.current)return;
+      setPos(p=>p<n?p+1:p);
+    },3500);
     return()=>clearInterval(t);
-  },[n]);
+  },[canLoop,n]);
+  // pos===n → track exactly -n steps khisak chuka hai, jahan first images
+  // ke CLONES wahi position dikhate hain jo originals ne pos 0 par dikhayi
+  // thi. Transition khatam (750ms) hone ke baad transition OFF karke pos=0
+  // — user ko koi jump nahi dikhta, bas loop restart ho jata hai.
+  useEffect(()=>{
+    if(!canLoop||pos<n)return;
+    const t=setTimeout(()=>{
+      setAnim(false);
+      setPos(0);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>setAnim(true)));
+    },750);
+    return()=>clearTimeout(t);
+  },[pos,n,canLoop]);
+  const step=dir=>setPos(p=>Math.max(0,Math.min(n,p+(dir<0?-1:1))));
+  if(n===0)return null;
+  // Loop ke liye aage first `visible` images ke clone (unhi par "initial
+  // state" dikhta hai). n<=visible par static row — scroll ki zaroorat nahi.
+  const div=canLoop?visible:Math.max(n,1);
+  const track=canLoop?[...imgs,...imgs.slice(0,visible)]:imgs;
   return(
-    <div>
-      {/* Mobile: fixed image area — absolutely stacked + opacity crossfade,
-          horizontal scroll/sliding bilkul nahi. Image ekdum fix rehti hai. */}
-      <div className="md:hidden relative w-full h-24">
-        {strip.images.map((img,i)=>(
-          <button key={img.id} type="button" onClick={()=>onAdClick(img)} aria-label={strip.title||'Ad image'}
-            aria-hidden={i!==idx} tabIndex={i===idx?0:-1}
-            className={`absolute inset-0 rounded-2xl overflow-hidden text-left transition-opacity duration-500 ${i===idx?'opacity-100':'opacity-0 pointer-events-none'}`}
-            style={{border:'1.5px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
-            <img src={img.image_url} alt={strip.title} loading="lazy" className="w-full h-full object-cover"/>
-          </button>
-        ))}
-      </div>
-      {/* Dots — image ke niche, mobile only (desktop me saari images ek saath
-          dikhti hain isliye wahan dots ki zaroorat nahi). Hero jaisa: active
-          lamba pill, baaki chhote. */}
-      {n>1&&(
-        <div className="flex justify-center gap-1.5 mt-2 md:hidden">
-          {strip.images.map((img,i)=>(
-            <button key={img.id} type="button" aria-label={`Ad image ${i+1}`} onClick={()=>setIdx(i)}
-              className={`h-1.5 rounded-full transition-all ${i===idx?'w-5':'w-1.5'}`}
-              style={{background:i===idx?'var(--primary)':'var(--border)'}}/>
-          ))}
+    <div className="relative" onMouseEnter={()=>{pausedRef.current=true;}}
+      onMouseLeave={()=>{pausedRef.current=false;}}>
+      {/* Track width = container + GAP: isse har card ke beech GAPpx ka
+          space bachta hai aur pehla/last card dono EDGE par flush dikhta
+          hai (na left me khali jagah, na right me). Item ka advance =
+          flexBasis (border-box, padding included) = step, jo translateX ke
+          % step se exactly match karta hai. */}
+      <div className="overflow-hidden">
+        <div className="flex" style={{width:`calc(100% + ${GAP}px)`,
+          transform:`translateX(-${(100/div)*pos}%)`,
+          transition:anim?'transform 700ms var(--ease-standard)':'none'}}>
+          {track.map((img,i)=>{
+            const clone=canLoop&&i>=n;
+            return(
+              <div key={`${img.id}-${i}`} aria-hidden={clone||undefined}
+                className="h-24 md:h-32 shrink-0 grow-0"
+                style={{flexBasis:`calc(100% / ${div})`,paddingRight:GAP}}>
+                <button type="button" onClick={()=>onAdClick(img)} aria-label={strip.title||'Ad image'}
+                  tabIndex={clone?-1:0}
+                  className="w-full h-full rounded-2xl overflow-hidden group text-left"
+                  style={{border:'1.5px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
+                  <img src={img.image_url} alt={strip.title} loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"/>
+                </button>
+              </div>
+            );
+          })}
         </div>
-      )}
-      {/* Desktop (md+): saari images ek row me — flex-basis 0 + grow se
-          barabar width, scroll ki zaroorat nahi (purana behaviour same). */}
-      <div className="hidden md:flex gap-4 flex-wrap">
-        {strip.images.map(img=>(
-          <button key={img.id} type="button" onClick={()=>onAdClick(img)}
-            className="md:flex-1 md:basis-0 md:min-w-0 rounded-2xl overflow-hidden group text-left"
-            style={{border:'1.5px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
-            <img src={img.image_url} alt={strip.title} loading="lazy"
-              className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-[1.04]"/>
-          </button>
-        ))}
       </div>
+      {/* Arrows — sirf large devices (md+) par, dono side (screenshot jaisa).
+          Clip container ke BAHAR sibling hain isliye edge par overlay hote
+          hain, overflow-hidden se clip nahi hote. Sirf tab dikhte hain jab
+          actually scroll ho (n > visible). */}
+      {canLoop&&(
+        <>
+          <button type="button" aria-label="Pichli ad" onClick={()=>step(-1)}
+            className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90"
+            style={{background:'var(--card-bg)',color:'var(--text)',border:'1px solid var(--border)'}}>
+            <ChevronLeft size={18}/>
+          </button>
+          <button type="button" aria-label="Agli ad" onClick={()=>step(1)}
+            className="hidden md:flex absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90"
+            style={{background:'var(--card-bg)',color:'var(--text)',border:'1px solid var(--border)'}}>
+            <ChevronRight size={18}/>
+          </button>
+        </>
+      )}
     </div>
   );
 }
