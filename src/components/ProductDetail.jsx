@@ -169,7 +169,7 @@ export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wis
     // pb-32 (128px) mobile: sticky add-to-cart bar (bottom:70px+bar height)
     // 'Aapko Ye Bhi Pasand Aa Sakta Hai' ke aakhri cards ko kabhi na chhupaye.
     // Desktop (md): normal pb-8 — wahan sticky bar hidden hai.
-    <div className="max-w-site mx-auto px-4 md:px-8 pt-4 pb-32 md:pb-8">
+    <div className="max-w-site mx-auto px-2 md:px-8 pt-4 pb-32 md:pb-8">
       <button onClick={onBack} className="flex items-center gap-1 text-sm font-poppins font-semibold mb-3" style={{color:'var(--gray)'}}>
         <ChevronLeft size={16}/> Wapas Jao
       </button>

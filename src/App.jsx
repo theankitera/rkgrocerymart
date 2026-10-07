@@ -174,38 +174,54 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
 
 
 
-// 🎯 AdStripSection — homepage builder ki "Ad Images" strips: auto-scroll wali
-// images, na text overlay na dots (user ki demand — sirf images scroll hoti
-// hain). Har image click karne par category ya product khulta hai.
+// 🎯 AdStripSection — homepage builder ki "Ad Images" strips. Mobile par EK
+// fixed image + crossfade (koi sliding/scroll nahi — side me next image ya
+// scroll jaisa kuch nahi dikhta) aur image ke NICHE dots (hero carousel jaisa
+// active indicator). Desktop par flex row me saari images ek saath.
+// Har image click karne par category ya product khulta hai.
 function AdStripSection({strip,onAdClick}){
-  const ref=useRef(null);
-  const idxRef=useRef(0);
+  const [idx,setIdx]=useState(0);
+  const n=strip.images.length;
   useEffect(()=>{
-    const el=ref.current;
-    if(!el)return;
-    const t=setInterval(()=>{
-      // Desktop par saari images flex-wrap se ek saath dikhti hain — scroll ki zaroorat nahi
-      if(el.scrollWidth<=el.clientWidth+1)return;
-      const children=Array.from(el.children);
-      if(children.length<2)return;
-      idxRef.current=(idxRef.current+1)%children.length;
-      const child=children[idxRef.current];
-      // scrollIntoView page-jump bug tha pehle — container.scrollTo use karo (banner jaisa fix)
-      el.scrollTo({left:child.offsetLeft,behavior:'smooth'});
-    },3500);
+    if(n<2)return;
+    const t=setInterval(()=>setIdx(i=>(i+1)%n),3500);
     return()=>clearInterval(t);
-  },[strip.images.length]);
+  },[n]);
   return(
     <div>
-      {/** Mobile: full-width EK image (snap-mandatory + auto-advance = carousel).
-          Desktop (md+): flex-basis 0 + flex-grow → saari images barabar width me ek saath (3 ya 4 jo bhi). */}
-      <div ref={ref} className="flex gap-3 md:gap-4 overflow-x-auto pb-1 snap-x snap-mandatory md:snap-none md:flex-wrap scrollbar-hide">
+      {/* Mobile: fixed image area — absolutely stacked + opacity crossfade,
+          horizontal scroll/sliding bilkul nahi. Image ekdum fix rehti hai. */}
+      <div className="md:hidden relative w-full h-24">
+        {strip.images.map((img,i)=>(
+          <button key={img.id} type="button" onClick={()=>onAdClick(img)} aria-label={strip.title||'Ad image'}
+            aria-hidden={i!==idx} tabIndex={i===idx?0:-1}
+            className={`absolute inset-0 rounded-2xl overflow-hidden text-left transition-opacity duration-500 ${i===idx?'opacity-100':'opacity-0 pointer-events-none'}`}
+            style={{border:'1.5px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
+            <img src={img.image_url} alt={strip.title} loading="lazy" className="w-full h-full object-cover"/>
+          </button>
+        ))}
+      </div>
+      {/* Dots — image ke niche, mobile only (desktop me saari images ek saath
+          dikhti hain isliye wahan dots ki zaroorat nahi). Hero jaisa: active
+          lamba pill, baaki chhote. */}
+      {n>1&&(
+        <div className="flex justify-center gap-1.5 mt-2 md:hidden">
+          {strip.images.map((img,i)=>(
+            <button key={img.id} type="button" aria-label={`Ad image ${i+1}`} onClick={()=>setIdx(i)}
+              className={`h-1.5 rounded-full transition-all ${i===idx?'w-5':'w-1.5'}`}
+              style={{background:i===idx?'var(--primary)':'var(--border)'}}/>
+          ))}
+        </div>
+      )}
+      {/* Desktop (md+): saari images ek row me — flex-basis 0 + grow se
+          barabar width, scroll ki zaroorat nahi (purana behaviour same). */}
+      <div className="hidden md:flex gap-4 flex-wrap">
         {strip.images.map(img=>(
           <button key={img.id} type="button" onClick={()=>onAdClick(img)}
-            className="flex-shrink-0 w-full snap-start md:flex-1 md:basis-0 md:min-w-0 rounded-2xl overflow-hidden group text-left"
+            className="md:flex-1 md:basis-0 md:min-w-0 rounded-2xl overflow-hidden group text-left"
             style={{border:'1.5px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
             <img src={img.image_url} alt={strip.title} loading="lazy"
-              className="w-full h-24 md:h-32 object-cover transition-transform duration-300 group-hover:scale-[1.04]"/>
+              className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-[1.04]"/>
           </button>
         ))}
       </div>
@@ -1340,13 +1356,13 @@ export default function App(){
               wishlistIds={wishlistIds} onWishlist={toggleWishlist}
             /></div>
             <div className="m-view">
-              <div className="px-4 pt-3" style={{background:'var(--card-bg)'}}>
+              <div className="px-2 pt-3" style={{background:'var(--card-bg)'}}>
                 {/* BUG FIX: labelClass me line-clamp-1 tha — "Dairy Products & Milk"
                     jaise lambi category names cut ho jaate the (… dikhta tha). Ab koi
                     clamp nahi — naam pura wrap hokar dikhta hai, user ko koi problem nahi. */}
                 <CategoryRail cats={allCats} catsLoading={catsLoading} activeCatId={activeCatId} catEmoji={catEmoji} fadeColor="var(--card-bg)" tileClass="w-[68px]" labelClass="text-[10px] leading-tight" onClick={id=>{setActiveCatId(id);setShopPage(1);setSearch('');}}/>
               </div>
-              <div className="px-4 pt-3 pb-2" style={{background:'var(--card-bg)'}}>
+              <div className="px-2 pt-3 pb-2" style={{background:'var(--card-bg)'}}>
                 <div className="flex items-center justify-between gap-2 mb-2.5">
                   <div className="min-w-0">
                     <div className="font-extrabold font-poppins text-sm" style={{color:'var(--dark)'}}>
