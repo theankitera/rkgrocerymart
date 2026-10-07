@@ -334,7 +334,7 @@ function Footer({shopSettings,onNav}){
 
 function HomeContent({homepageSections,banners,bannersLoading,bannerIdx,setBannerIdx,bannerWrapRef,handleBannerClick,homeSections,homeLoading,cart,addToCart,updQty,onDetail,cats,catsLoading,catEmoji,sectionProds,sectionProdsReady,featLoading,featuredProds,dbReviews,shopSettings,showToast,setPage,onPickCategory,wishlistIds,onWishlist,adStrips,onAdClick}){
   return(
-    <div className="max-w-site mx-auto px-4 md:px-8 pt-4 pb-6 md:pb-8">
+    <div className="max-w-site mx-auto px-0 md:px-8 pt-4 pb-6 md:pb-8">
       {/* Admin Homepage Builder: sections configured order mein + sirf enabled walay */}
       {(() => {
         // Hook ab saare rows (enabled + disabled) deta hai — yahan rendering ke
@@ -367,7 +367,7 @@ function HomeContent({homepageSections,banners,bannersLoading,bannerIdx,setBanne
           );
         };
         const sectionsMap = {
-          hero: <HeroBanner banners={banners} bannersLoading={bannersLoading} bannerIdx={bannerIdx} setBannerIdx={setBannerIdx} wrapRef={bannerWrapRef} handleBannerClick={handleBannerClick}/>,
+          hero: <div className="px-4 md:px-0"><HeroBanner banners={banners} bannersLoading={bannersLoading} bannerIdx={bannerIdx} setBannerIdx={setBannerIdx} wrapRef={bannerWrapRef} handleBannerClick={handleBannerClick}/></div>,
           flash_sale: <FlashSale prods={homeSections.flash} loading={homeLoading} cart={cart} addToCart={addToCart} updQty={updQty} onDetail={onDetail} wishlistIds={wishlistIds} onWishlist={onWishlist}/>,
           today_deals: <ProductRail title="🔥 Today's Deals" loading={homeLoading} products={homeSections.deals} onSeeAll={()=>setPage('shop')} cart={cart} addToCart={addToCart} updQty={updQty} onDetail={onDetail} wishlistIds={wishlistIds} onWishlist={onWishlist}/>,
           categories: <CategoryRail heading="Shop by Category" cats={cats} catsLoading={catsLoading} catEmoji={catEmoji} onClick={onPickCategory} onSeeAll={()=>setPage('shop')} tileClass="w-20 md:w-24"/>,
