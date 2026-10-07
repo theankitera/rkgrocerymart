@@ -146,15 +146,22 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
               {b.image_url&&<img src={b.image_url} alt={b.title} className="absolute inset-0 w-full h-full object-cover opacity-70"/>}
               {/* Fix #5 (preserved): decorative emoji only when there's no real banner image */}
               {!b.image_url&&<div className="absolute right-2 bottom-2 text-6xl opacity-20">🛒</div>}
-              <div className="absolute inset-0 p-4 md:p-10 flex flex-col justify-end md:justify-center max-w-md"
+              {/* NOTE: gradient overlay div par max-w-md NAHI lagana — woh inset-0 ke
+                  saath conflict karke overlay ko sirf left 448px tak cap kar deta tha,
+                  jisse large devices par ek vertical seam ban jaata tha (mobile par
+                  width < 448px isliye kabhi dikhta nahi tha). Width cap ab andar ke
+                  text wrapper par hai, gradient poore banner par uniform rahega. */}
+              <div className="absolute inset-0 p-4 md:p-10 flex flex-col justify-end md:justify-center"
                 style={{background:'linear-gradient(0deg, rgba(0,0,0,0.35), transparent 60%)'}}>
-                <span className="inline-block bg-white/20 text-white text-[10px] md:text-xs font-bold font-poppins px-2 py-1 rounded-lg mb-1 w-fit">LIMITED OFFER</span>
-                <p className="text-white font-bold text-base md:text-3xl font-poppins leading-tight">{b.title}</p>
-                {b.subtitle&&<p className="text-white/80 text-xs md:text-base mt-0.5">{b.subtitle}</p>}
-                <button onClick={e=>{e.stopPropagation();handleBannerClick(b);}}
-                  className="mt-2 md:mt-4 inline-flex w-fit items-center gap-1 bg-white text-charcoal text-xs md:text-sm font-bold font-poppins px-3 py-1.5 rounded-xl">
-                  {b.button_text||'Shop Now'} →
-                </button>
+                <div className="w-full max-w-md">
+                  <span className="inline-block bg-white/20 text-white text-[10px] md:text-xs font-bold font-poppins px-2 py-1 rounded-lg mb-1 w-fit">LIMITED OFFER</span>
+                  <p className="text-white font-bold text-base md:text-3xl font-poppins leading-tight">{b.title}</p>
+                  {b.subtitle&&<p className="text-white/80 text-xs md:text-base mt-0.5">{b.subtitle}</p>}
+                  <button onClick={e=>{e.stopPropagation();handleBannerClick(b);}}
+                    className="mt-2 md:mt-4 inline-flex w-fit items-center gap-1 bg-white text-charcoal text-xs md:text-sm font-bold font-poppins px-3 py-1.5 rounded-xl">
+                    {b.button_text||'Shop Now'} →
+                  </button>
+                </div>
               </div>
             </div>
           ))
