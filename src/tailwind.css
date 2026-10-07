@@ -50,3 +50,18 @@
   width:0;
   height:0;
 }
+
+/* Product cards need a visible, calm response to hover and keyboard focus.
+   The movement is deliberately small so a dense grocery grid remains easy to scan. */
+.product-card{
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.product-card:hover{
+  transform:translateY(-3px);
+  border-color:color-mix(in srgb,var(--primary) 35%,var(--border));
+  box-shadow:0 10px 24px rgba(15,23,42,.12) !important;
+}
+@media (prefers-reduced-motion: reduce){
+  .product-card{transition:none;}
+  .product-card:hover{transform:none;}
+}

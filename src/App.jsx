@@ -1241,11 +1241,12 @@ export default function App(){
                 </button>
               )}
 
-              <button onClick={()=>setCartOpen(true)} aria-label="Cart"
+              <button onClick={()=>setCartOpen(true)} aria-label={count?`Cart, ${count} items, ₹${total}`:'Cart is empty'}
                 className="relative flex items-center gap-1.5 px-3 h-9 rounded-xl text-white font-poppins font-bold text-sm"
                 style={{background:`linear-gradient(135deg, var(--primary), var(--primary-dark))`, boxShadow:'0 4px 12px rgba(22,163,74,0.3)'}}>
                 <ShoppingCart size={17}/>
                 <span className="hidden md:inline">Cart</span>
+                {count>0&&<span className="hidden lg:inline text-[10px] font-semibold opacity-90 border-l border-white/25 pl-1.5">₹{total}</span>}
                 {count>0&&<span className="absolute -top-1.5 -right-1.5 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)'}}>{count>9?'9+':count}</span>}
               </button>
 
@@ -1284,6 +1285,16 @@ export default function App(){
             ?[shopSettings.announcement,shopSettings.announcement]
             :[...TICKER,...TICKER]
           ).map((t,i)=><span key={i} className="ticker-item">✦ {t}</span>)}
+        </div>
+      </div>
+
+      {/* A quiet service-proof strip gives shoppers the reassurance they need
+          before browsing, without competing with the promotional ticker. */}
+      <div className="hidden sm:block" style={{background:'var(--card-bg)',borderBottom:'1px solid var(--border)'}}>
+        <div className="max-w-site mx-auto px-4 md:px-8 py-2 flex items-center justify-center gap-x-7 gap-y-1 flex-wrap text-[11px] font-semibold font-poppins" style={{color:'var(--gray)'}}>
+          <span className="flex items-center gap-1.5"><span aria-hidden="true">⚡</span> Fast local delivery</span>
+          <span className="flex items-center gap-1.5"><span aria-hidden="true">🥬</span> Freshness checked before dispatch</span>
+          <span className="flex items-center gap-1.5"><ShieldCheck size={13} style={{color:'var(--primary)'}}/> Secure payments</span>
         </div>
       </div>
 

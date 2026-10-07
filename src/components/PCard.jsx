@@ -16,15 +16,19 @@ export function PCard({p,cart,addToCart,updQty,onDetail,wishlistIds,onWishlist})
   const displayMrp=first?first.mrp:p.original_price;
   const displayStock=first?(typeof first.stock==='number'?first.stock:p.stock_quantity):p.stock_quantity;
   const disc=p.discount;
+  const savings=displayMrp&&displayPrice&&Number(displayMrp)>Number(displayPrice)
+    ?Math.round(Number(displayMrp)-Number(displayPrice)):0;
   const oos=displayStock<=0;
   const atMax=inC&&typeof displayStock==='number'&&inC.qty>=displayStock;
   const wished=wishlistIds&&wishlistIds.has(p.id);
   // ADD payload — selected variant ke saath (App.jsx addToCart _variant padhta hai)
   const addPayload=first?{...p,_variant:first.label,selling_price:first.price,unit_value:first.label,original_price:first.mrp??p.original_price,stock_quantity:displayStock}:p;
+  const openDetail=()=>onDetail&&onDetail(p);
   return(
-    <div className="rounded-2xl overflow-hidden cursor-pointer flex flex-col h-full"
-      style={{background:'var(--card-bg)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}
-      onClick={()=>onDetail&&onDetail(p)}>
+    <div
+      className="product-card rounded-2xl overflow-hidden cursor-pointer flex flex-col h-full"
+      style={{background:'var(--card-bg)',border:'1px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}
+      onClick={openDetail}>
       {/* Fix: overflow-hidden — image apni natural aspect-ratio se container ko
           kheench kar non-square (144x151/144x199) na bana de. Iske bina 3:4
           portrait images se cards alag-size dikhte the + detail page par
@@ -58,6 +62,8 @@ export function PCard({p,cart,addToCart,updQty,onDetail,wishlistIds,onWishlist})
           </button>
         )}
         <ProdImg src={p.primary_image} alt={p.name}/>
+        {!oos&&<span className="absolute bottom-2 left-2 text-[9px] font-bold font-poppins px-1.5 py-1 rounded-md"
+          style={{background:'rgba(255,255,255,0.9)',color:'var(--primary-dark)',backdropFilter:'blur(6px)'}}>⚡ Fast delivery</span>}
       </div>
       <div className="p-2.5 flex-1 flex flex-col">
         <div className="text-xs font-semibold font-poppins line-clamp-2 leading-snug" style={{color:'var(--dark)'}}>{p.name}</div>
@@ -72,7 +78,8 @@ export function PCard({p,cart,addToCart,updQty,onDetail,wishlistIds,onWishlist})
           </div>
           {!oos&&(!inC
             ?<button onClick={e=>{e.stopPropagation();addToCart(addPayload);}}
-              className="flex-shrink-0 text-[10px] font-bold font-poppins px-3 py-1.5 rounded-lg text-white"
+              aria-label={`${p.name} cart mein add karein`}
+              className="flex-shrink-0 text-[10px] font-bold font-poppins px-3 py-2 rounded-lg text-white transition-transform active:scale-95"
               style={{background:'var(--primary)'}}>ADD</button>
             :<div className="flex-shrink-0 flex items-center gap-1.5 rounded-lg px-1.5 py-1" style={{background:'var(--primary-light)'}} onClick={e=>e.stopPropagation()}>
               <button aria-label="Quantity kam karein" onClick={()=>updQty(p.id,-1,null,lineKey)}
@@ -83,6 +90,7 @@ export function PCard({p,cart,addToCart,updQty,onDetail,wishlistIds,onWishlist})
             </div>
           )}
         </div>
+        {savings>0&&<div className="text-[10px] font-semibold font-poppins mt-1" style={{color:'var(--primary-dark)'}}>You save ₹{savings}</div>}
         {atMax&&<div className="text-[10px] font-semibold font-poppins mt-1" style={{color:'var(--red)'}}>Sirf {displayStock} stock mein hai</div>}
       </div>
     </div>
