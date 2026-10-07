@@ -181,102 +181,177 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
 
 
 
+// 🔤 MultiColorName — Blinkit-jaisa multicolor shop name: words alternate
+// colors me (default orange/green — header jaisa). Dark surfaces par alag
+// pair pass kar sakte hain (footer: yellow/white — green gradient background
+// par green word gayab ho jata). Text size/typography parent ke classes se
+// hi aati hai — yeh sirf color split karta hai.
+function MultiColorName({name,colors=['var(--orange)','var(--primary)']}){
+  const words=String(name||'').trim().split(/\s+/).filter(Boolean);
+  return(
+    <>
+      {words.map((w,i)=>(
+        <span key={i} style={{color:colors[i%colors.length]}}>
+          {i>0?' ':''}{w}
+        </span>
+      ))}
+    </>
+  );
+}
+
 // 🎯 AdStripSection — homepage builder ki "Ad Images" strips.
-// • Large devices (md+): 3 images ek saath + dono side circular arrows —
-//   auto-scroll ek-ek image right→left chalti rehti hai. Jab last images
-//   right end par aa jati hain to bina kisi flash ke initial state par
-//   reset ho kar loop dobara shuru hota hai (clone-based seamless loop).
-// • Small devices: ek time me EK image — scroll behaviour same, arrows nahi.
-// • Koi dots ya active indicator nahi (requirement).
+// • Large devices (md+): 3 images ek saath (width bhar ke, flush) + dono
+//   side circular arrows.
+// • Small devices: ek time par EK puri ad center me + dono taraf halki
+//   peek (aage/piche ad ki jhalak) — user ko pata chalta hai ki strip
+//   aage-piche chalti hai aur ads limited hain.
+// • Motion: right→left EK-EK karke (step by step) chalta hai; last ad par
+//   pahunch kar wapas left→right EK HI animation me pura sweep hota hai
+//   (sab ek sath) — isse saaf pata chalta hai ki strip aage-piche chal rahi
+//   hai aur ads limited hain. Koi invisible/seamless reset nahi.
+// • Har strip instance STAGGERED time par chalta hai (alag start delay +
+//   alag speed) — saari strips ek saath sync hokar nahi chalti, warna poora
+//   page ek saath hilta hua lagta tha.
+// • Hover par pause, prefers-reduced-motion par auto-scroll band.
 // Har image click karne par category ya product khulta hai.
+
+// Module-level counter: strips ke stagger ke liye har instance ka unique
+// sequence number (App re-render par stable rehta hai).
+let AD_STRIP_SEQ=0;
+
 function AdStripSection({strip,onAdClick}){
   const imgs=strip.images||[];
   const n=imgs.length;
-  const GAP=12;
+  const seqRef=useRef(null);
+  if(seqRef.current===null)seqRef.current=AD_STRIP_SEQ++;
+  const GAP=12;   // do cards ke beech ka gap
+  const PEEK=18;  // mobile: dono taraf itni si jhalak dikhe
+  const wrapRef=useRef(null);
+  const pausedRef=useRef(false);
+  const posRef=useRef(0);
   // md (768px) = large-device cut. Breakpoint switch par visible window
   // 3 ↔ 1 ho jati hai aur position initial par reset.
-  const [visible,setVisible]=useState(()=>typeof window!=='undefined'&&window.matchMedia('(min-width:768px)').matches?3:1);
+  const [md,setMd]=useState(()=>typeof window!=='undefined'&&window.matchMedia('(min-width:768px)').matches);
+  const [W,setW]=useState(0);
   const [pos,setPos]=useState(0);
-  const [anim,setAnim]=useState(true);
-  const pausedRef=useRef(false);
+  const [tdur,setTdur]=useState(700); // transition: step vs full return sweep
   useEffect(()=>{
     const mq=window.matchMedia('(min-width:768px)');
-    const apply=()=>{setVisible(mq.matches?3:1);setPos(0);};
+    const apply=()=>{setMd(mq.matches);posRef.current=0;setTdur(700);setPos(0);};
     mq.addEventListener('change',apply);
     return()=>mq.removeEventListener('change',apply);
   },[]);
-  const canLoop=n>visible;
-  // Auto-scroll: 3.5s per step, hover par pause, reduced-motion par band.
-  // pos===n par ruk jata hai (reset effect wahin se 0 par le jata hai).
+  // Container width naap lo — layout sab PX me calculate hota hai (edges
+  // exact flush + dono taraf symmetric peek). useLayoutEffect + initial
+  // getBoundingClientRect → first paint se pehle width mil jati hai,
+  // isliye koi blank flash nahi dikhta.
+  useLayoutEffect(()=>{
+    const el=wrapRef.current;
+    if(!el)return;
+    setW(el.getBoundingClientRect().width);
+    const ro=new ResizeObserver(entries=>setW(entries[0].contentRect.width));
+    ro.observe(el);
+    return()=>ro.disconnect();
+  },[n]);
+  const visible=md?3:1;
+  const canScroll=n>visible;
+  const maxPos=canScroll?n-visible:0;
+  // Layout maths (sab px me):
+  //  • static row (scroll nahi chahiye): saari cards evenly, flush.
+  //  • md: 3 cards poori width bhar dete hain (inset 0, clone 0).
+  //  • mobile: center card + dono taraf PEEK px jhalak — dono taraf ke
+  //    neighbour ko edge tak fill karne ke liye start/end par 1-1 clone.
+  const ready=W>4;
+  const slotCount=Math.max(n,1);
+  const cardW=Math.max(0,!canScroll
+    ?(W-(slotCount-1)*GAP)/slotCount
+    :md?(W-2*GAP)/3
+       :W-2*(GAP+PEEK));
+  const step=cardW+GAP;              // ek card + uska aage ka gap
+  const inset=canScroll&&!md?GAP+PEEK:0;
+  const clones=canScroll&&!md?1:0;
+  const shift=ready?inset-(pos+clones)*step:0;
+  // Images kam ho jayein (ya breakpoint badle) to position clamp.
   useEffect(()=>{
-    if(!canLoop||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-    const t=setInterval(()=>{
-      if(pausedRef.current)return;
-      setPos(p=>p<n?p+1:p);
-    },3500);
-    return()=>clearInterval(t);
-  },[canLoop,n]);
-  // pos===n → track exactly -n steps khisak chuka hai, jahan first images
-  // ke CLONES wahi position dikhate hain jo originals ne pos 0 par dikhayi
-  // thi. Transition khatam (750ms) hone ke baad transition OFF karke pos=0
-  // — user ko koi jump nahi dikhta, bas loop restart ho jata hai.
+    if(posRef.current>maxPos){posRef.current=maxPos;setPos(maxPos);}
+    if(posRef.current<0){posRef.current=0;setPos(0);}
+  },[maxPos]);
+  // Auto-scroll = right→left ek-ek karke + last ad par EK BAR ME puri
+  // left→right sweep + stagger. Har strip alag delay aur alag speed se
+  // start hota hai (seq) — saari strips ek saath sync nahi chalti.
   useEffect(()=>{
-    if(!canLoop||pos<n)return;
-    const t=setTimeout(()=>{
-      setAnim(false);
-      setPos(0);
-      requestAnimationFrame(()=>requestAnimationFrame(()=>setAnim(true)));
-    },750);
-    return()=>clearTimeout(t);
-  },[pos,n,canLoop]);
-  const step=dir=>setPos(p=>Math.max(0,Math.min(n,p+(dir<0?-1:1))));
+    if(!canScroll)return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const seq=seqRef.current||0;
+    const delay=(seq%5)*1200;        // strips aage-piche start hon
+    const dur=3500+(seq%3)*500;      // strips ka step-time bhi thoda alag
+    let iv=null;
+    const boot=setTimeout(()=>{
+      iv=setInterval(()=>{
+        if(pausedRef.current)return;
+        // Last ad par ho to step nahi — ek hi animation me pos 0 par wapas
+        // (poori list left→right ek sath), warna ek-ek step aage.
+        const sweep=posRef.current>=maxPos;
+        // Sweep duration distance ke hisaab se (thoda tez, par dikhe bhi).
+        const sweepDur=Math.min(1500,Math.max(700,350*maxPos));
+        const np=sweep?0:posRef.current+1;
+        setTdur(sweep?sweepDur:700);
+        posRef.current=np;
+        setPos(np);
+      },dur);
+    },delay);
+    return()=>{clearTimeout(boot);if(iv!==null)clearInterval(iv);};
+  },[canScroll,maxPos]);
+  // Manual arrows — user ko dono taraf ek-ek karke chalana hai; auto
+  // sequence wahin se continue hota hai jahan user chhoda.
+  const stepBy=dir=>{
+    if(!canScroll)return;
+    const np=Math.max(0,Math.min(maxPos,posRef.current+dir));
+    posRef.current=np;
+    setTdur(700);
+    setPos(np);
+  };
   if(n===0)return null;
-  // Loop ke liye aage first `visible` images ke clone (unhi par "initial
-  // state" dikhta hai). n<=visible par static row — scroll ki zaroorat nahi.
-  const div=canLoop?visible:Math.max(n,1);
-  const track=canLoop?[...imgs,...imgs.slice(0,visible)]:imgs;
+  // Track: [start clones] + originals + [end clones] — mobile peeks ke
+  // liye dono taraf ek-1 neighbour chahiye (start/end par blank na aaye).
+  const track=[];
+  for(let i=n-clones;i<n;i++)track.push({img:imgs[i],i,clone:true});
+  for(let i=0;i<n;i++)track.push({img:imgs[i],i,clone:false});
+  for(let i=0;i<clones;i++)track.push({img:imgs[i],i,clone:true});
   return(
     <div className="relative" onMouseEnter={()=>{pausedRef.current=true;}}
       onMouseLeave={()=>{pausedRef.current=false;}}>
-      {/* Track width = container + GAP: isse har card ke beech GAPpx ka
-          space bachta hai aur pehla/last card dono EDGE par flush dikhta
-          hai (na left me khali jagah, na right me). Item ka advance =
-          flexBasis (border-box, padding included) = step, jo translateX ke
-          % step se exactly match karta hai. */}
-      <div className="overflow-hidden">
-        <div className="flex" style={{width:`calc(100% + ${GAP}px)`,
-          transform:`translateX(-${(100/div)*pos}%)`,
-          transition:anim?'transform 700ms var(--ease-standard)':'none'}}>
-          {track.map((img,i)=>{
-            const clone=canLoop&&i>=n;
-            return(
-              <div key={`${img.id}-${i}`} aria-hidden={clone||undefined}
-                className="h-24 md:h-32 shrink-0 grow-0"
-                style={{flexBasis:`calc(100% / ${div})`,paddingRight:GAP}}>
-                <button type="button" onClick={()=>onAdClick(img)} aria-label={strip.title||'Ad image'}
-                  tabIndex={clone?-1:0}
-                  className="w-full h-full rounded-2xl overflow-hidden group text-left"
-                  style={{border:'1.5px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
-                  <img src={img.image_url} alt={strip.title} loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"/>
-                </button>
-              </div>
-            );
-          })}
+      <div ref={wrapRef} className="overflow-hidden">
+        <div className="flex" style={{transform:`translateX(${shift}px)`,
+          transition:ready?`transform ${tdur}ms var(--ease-standard)`:'none',
+          visibility:ready?'visible':'hidden'}}>
+          {track.map(({img,i,clone})=>(
+            <div key={`${clone?'c':'o'}-${i}`} aria-hidden={clone||undefined}
+              className="h-24 md:h-32 shrink-0 grow-0"
+              style={{flexBasis:`${step}px`,paddingRight:GAP}}>
+              <button type="button" onClick={()=>onAdClick(img)} aria-label={strip.title||'Ad image'}
+                tabIndex={clone?-1:0}
+                className="w-full h-full rounded-2xl overflow-hidden group text-left"
+                style={{border:'1.5px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
+                <img src={img.image_url} alt={strip.title} loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"/>
+              </button>
+            </div>
+          ))}
         </div>
       </div>
       {/* Arrows — sirf large devices (md+) par, dono side (screenshot jaisa).
           Clip container ke BAHAR sibling hain isliye edge par overlay hote
           hain, overflow-hidden se clip nahi hote. Sirf tab dikhte hain jab
           actually scroll ho (n > visible). */}
-      {canLoop&&(
+      {canScroll&&(
         <>
-          <button type="button" aria-label="Pichli ad" onClick={()=>step(-1)}
+          <button type="button" aria-label="Pichli ad" onClick={()=>stepBy(-1)}
             className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90"
             style={{background:'var(--card-bg)',color:'var(--text)',border:'1px solid var(--border)'}}>
             <ChevronLeft size={18}/>
           </button>
-          <button type="button" aria-label="Agli ad" onClick={()=>step(1)}
+          <button type="button" aria-label="Agli ad" onClick={()=>stepBy(1)}
             className="hidden md:flex absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90"
             style={{background:'var(--card-bg)',color:'var(--text)',border:'1px solid var(--border)'}}>
             <ChevronRight size={18}/>
@@ -374,7 +449,7 @@ function Footer({shopSettings,onNav}){
       <div className="flex items-center justify-center gap-2.5" style={{marginBottom:8}}>
         <img src={s.logo_url||'/icons/rk-logo.svg'} alt={s.shop_name||'RK Grocery Mart'} style={{width:38,height:38,borderRadius:12}}/>
         <div className="text-left">
-          <div className="text-white font-extrabold font-poppins" style={{fontSize:'1.15rem',lineHeight:1.1}}>{s.shop_name||'RK Grocery Mart'}</div>
+          <div className="text-white font-extrabold font-poppins" style={{fontSize:'1.15rem',lineHeight:1.1}}><MultiColorName name={s.shop_name||'RK Grocery Mart'} colors={['var(--yellow)','#FFFFFF']}/></div>
           <div className="text-white/75 font-poppins" style={{fontSize:'0.7rem'}}>{s.footer_text||'हर घर की पसंद'}</div>
         </div>
       </div>
@@ -1286,7 +1361,7 @@ export default function App(){
               <button onClick={()=>setPage('home')} className="flex items-center gap-2 text-left" style={{background:'none'}}>
                 <img src={shopSettings.logo_url||'/icons/rk-logo.svg'} alt={shopSettings.shop_name||'RK Grocery Mart'} className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex-shrink-0"/>
                 <span className="flex flex-col min-w-0">
-                  <span className="text-[13px] sm:text-base md:text-lg font-extrabold font-poppins leading-none truncate" style={{color:'var(--dark)'}}>{shopSettings.shop_name||'RK Grocery Mart'}</span>
+                  <span className="text-[13px] sm:text-base md:text-lg font-extrabold font-poppins leading-none truncate" style={{color:'var(--dark)'}}><MultiColorName name={shopSettings.shop_name||'RK Grocery Mart'}/></span>
                   <span className="text-[8px] sm:text-[9px] md:text-[10px] font-poppins font-medium mt-0.5 truncate" style={{color:'var(--primary)'}}>{shopSettings.footer_text||'हर घर की पसंद'}</span>
                 </span>
               </button>
