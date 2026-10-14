@@ -35,8 +35,8 @@ const CACHE_NAME = `rk-cache-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline.html";
 
 // Supabase REST replay ke liye (page ke against nahi — SW khud call karta hai)
-const SUPABASE_URL = "https://pffaflasgwhydkmxwkky.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable__tFDYhkM3blZ0pIVT0YxLA_YvkKq79L";
+const SUPABASE_URL = "https://fheewnarnocdzcvvshrj.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_u5a41INjYZJ81r7QGCiLaQ_B3PxsTm9";
 
 const PRECACHE_URLS = [
   "/offline.html",

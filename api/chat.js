@@ -9,7 +9,7 @@
  * mein upgrade karna chahiye agar AI costs problem ban jaayein.
  */
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://pffaflasgwhydkmxwkky.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://fheewnarnocdzcvvshrj.supabase.co';
 // BUG FIX (Critical #1 — shop side): Key env variable se aata hai.
 // Vercel Dashboard mein SUPABASE_ANON_KEY environment variable set karein.
 // Fallback sirf local dev ke liye (production mein env var honi chahiye).

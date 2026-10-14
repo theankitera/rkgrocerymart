@@ -11,8 +11,8 @@
   const CONFIG = {
     storeName:      'RK Grocery Mart',
     whatsappNumber: '916393196765',
-    supabaseUrl:    'https://pffaflasgwhydkmxwkky.supabase.co',
-    supabaseKey:    'sb_publishable__tFDYhkM3blZ0pIVT0YxLA_YvkKq79L',
+    supabaseUrl:    'https://fheewnarnocdzcvvshrj.supabase.co',
+    supabaseKey:    'sb_publishable_u5a41INjYZJ81r7QGCiLaQ_B3PxsTm9',
 
     storeInfo: {
       timings:   'Monday–Saturday: 8 AM – 9 PM | Sunday: 9 AM – 7 PM',

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-export const SUPABASE_URL      = 'https://pffaflasgwhydkmxwkky.supabase.co';
-export const SUPABASE_ANON_KEY = 'sb_publishable__tFDYhkM3blZ0pIVT0YxLA_YvkKq79L';
+export const SUPABASE_URL      = 'https://fheewnarnocdzcvvshrj.supabase.co';
+export const SUPABASE_ANON_KEY = 'sb_publishable_u5a41INjYZJ81r7QGCiLaQ_B3PxsTm9';
 
 // ── Remember-me (real behavior, fix 2026-08-13) ──────────────────────────
 // "Yaad rakhein" checkbox ab sach mein kaam karta hai:

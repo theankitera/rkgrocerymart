@@ -64,8 +64,8 @@ except Exception:
     pass
 
 # ── Defaults ─────────────────────────────────────────────────────────────
-SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://pffaflasgwhydkmxwkky.supabase.co')
-SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', 'sb_publishable__tFDYhkM3blZ0pIVT0YxLA_YvkKq79L')
+SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://fheewnarnocdzcvvshrj.supabase.co')
+SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', 'sb_publishable_u5a41INjYZJ81r7QGCiLaQ_B3PxsTm9')
 CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'delf8iyzt')
 CLOUDINARY_FOLDER = os.environ.get('CLOUDINARY_FOLDER', 'myshop/products')
 OUTPUT_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'upload-results.json')
