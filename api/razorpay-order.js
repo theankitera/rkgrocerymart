@@ -108,6 +108,10 @@ module.exports = async (req, res) => {
   if (!Number.isFinite(amount) || amount <= 0) {
     return res.status(400).json({ error: 'Invalid amount' });
   }
+  // Razorpay minimum order amount = 100 paise (₹1)
+  if (amount < 100) {
+    return res.status(400).json({ error: 'Minimum amount is 100 paise (₹1)' });
+  }
 
   // ── SECURITY: client-supplied amount par trust nahi — DB se verify ──
   const orderId = String(body.orderId || '');
@@ -147,6 +151,10 @@ module.exports = async (req, res) => {
     const data = await r.json().catch(() => ({}));
     if (!r.ok) {
       console.error('[razorpay-order] upstream error:', r.status, JSON.stringify(data).slice(0, 300));
+      // 401 = bad key id/secret → surface it distinctly (config problem, not server error)
+      if (r.status === 401) {
+        return res.status(401).json({ error: 'Razorpay authentication failed — check KEY_ID/KEY_SECRET' });
+      }
       return res.status(502).json({ error: data?.error?.description || 'Razorpay order create failed' });
     }
     return res.status(200).json({
