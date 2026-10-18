@@ -137,3 +137,12 @@ html[data-theme="dark"] .btn-secondary{background:var(--light);border-color:var(
 html[data-theme="dark"] .bottom-nav{background:#151B26;border-top-color:var(--border);}
 
 html[data-theme="dark"] .toggle{background:#3A4658;}
+
+/* Desktop account sidebar — Tailwind preflight is disabled in this project, so
+   buttons without an explicit background show the browser's default gray face.
+   Inactive items: flat on the card; soft pill only on hover. Active item keeps
+   its inline var(--primary-light) style, which overrides this base. */
+.acct-side-btn{background:transparent;color:var(--dark);transition:background .15s,color .15s;}
+.acct-side-btn:hover{background:var(--light);color:var(--primary);}
+html[data-theme="dark"] .acct-side-btn{color:var(--gray);}
+html[data-theme="dark"] .acct-side-btn:hover{color:var(--primary);}

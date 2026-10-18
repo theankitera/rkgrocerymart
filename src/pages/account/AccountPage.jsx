@@ -1054,8 +1054,8 @@ export default function AccountPage() {
                 const Icon=t.icon; const active=activeTab===t.id;
                 return (
                   <button key={t.id} onClick={()=>switchTab(t.id)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-poppins font-semibold transition-colors"
-                    style={active?{background:'var(--primary-light)',color:'var(--primary)'}:{color:'var(--dark)'}}>
+                    className="acct-side-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-poppins font-semibold transition-colors"
+                    style={active?{background:'var(--primary-light)',color:'var(--primary)'}:{}}>
                     <Icon size={17}/> {t.label}
                   </button>
                 );
