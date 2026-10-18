@@ -24,6 +24,14 @@ import {
    deleted — but this file itself no longer references them.)
 ══════════════════════════════════════════════════════════ */
 
+// Touch-capable devices (phone/tablet/touchscreen laptop): Chrome :hover ko
+// last-tapped element par chipka deta hai — sidebar me har tap par ek aur pill
+// chhoot jati thi. html.has-touch par CSS hover-pill disable kar deta hai
+// (account.css); pure-mouse desktop par hover rehta hai.
+if ('ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0) {
+  document.documentElement.classList.add('has-touch');
+}
+
 /* ─── helpers (unchanged) ─────────────────── */
 const fmt      = n => '₹' + Number(n).toLocaleString('en-IN');
 const fmtDate  = d => new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
@@ -1092,7 +1100,7 @@ export default function AccountPage() {
 
       {/* Mobile bottom nav — KEEPS the "bottom-nav" class (ananya-ai.js
           does querySelector('.bottom-nav') to position the chat widget). */}
-      <nav className="bottom-nav flex" style={{background:'var(--card-bg)'}}>
+      <nav className="bottom-nav md:hidden" style={{background:'var(--card-bg)'}}>
         {/* Fix: index.html#shop / #cart ab App.jsx hash-routing se kaam karte hain (pehle dead links the) */}
         <a href="index.html" className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" style={{color:'var(--gray)'}}><Home size={20} strokeWidth={1.8}/><span className="text-[10px] font-medium font-poppins">Home</span></a>
         <a href="index.html#shop" className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" style={{color:'var(--gray)'}}><Package size={20} strokeWidth={1.8}/><span className="text-[10px] font-medium font-poppins">Shop</span></a>

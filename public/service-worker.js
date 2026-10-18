@@ -30,7 +30,7 @@ importScripts("/js/sync-queue.js");
 
 // BUG FIX (Info #13): Version string ab comments mein clearly marked hai.
 // Har deploy par yahan ka number badhao agar OPTION C use kar rahe ho.
-const CACHE_VERSION = "v1792350872561"; // ← 2026-08-13: fixes bundle (auth.css precache fix, offline page cleanup, etc.)
+const CACHE_VERSION = "v1792352230222"; // ← 2026-08-13: fixes bundle (auth.css precache fix, offline page cleanup, etc.)
 const CACHE_NAME = `rk-cache-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline.html";
 

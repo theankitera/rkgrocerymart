@@ -140,9 +140,26 @@ html[data-theme="dark"] .toggle{background:#3A4658;}
 
 /* Desktop account sidebar — Tailwind preflight is disabled in this project, so
    buttons without an explicit background show the browser's default gray face.
-   Inactive items: flat on the card; soft pill only on hover. Active item keeps
-   its inline var(--primary-light) style, which overrides this base. */
+   Inactive items: flat on the card; soft pill only on real mouse hover. Active
+   item keeps its inline var(--primary-light) style, which overrides this base.
+   Touch/hybrid screens: Chrome sticks :hover to the last-tapped element, which
+   left a pill behind on every sidebar item the user tapped one after another —
+   so hover is neutralized where hover is unreliable, and tap-focus also clears
+   the pill (previous item loses :focus as soon as the next one is tapped). */
 .acct-side-btn{background:transparent;color:var(--dark);transition:background .15s,color .15s;}
 .acct-side-btn:hover{background:var(--light);color:var(--primary);}
+.acct-side-btn:focus{background:transparent;color:var(--dark);}
 html[data-theme="dark"] .acct-side-btn{color:var(--gray);}
 html[data-theme="dark"] .acct-side-btn:hover{color:var(--primary);}
+html[data-theme="dark"] .acct-side-btn:focus{color:var(--gray);}
+@media (hover:none){
+  .acct-side-btn:hover{background:transparent;color:var(--dark);}
+  html[data-theme="dark"] .acct-side-btn:hover{color:var(--gray);}
+}
+/* Hybrid devices (touchscreen laptops): (hover:none) match nahi hota, par tap
+   par bhi Chrome :hover chipka rehta hai — isliye JS touch-detect karke
+   html.has-touch lagata hai (AccountPage.jsx) aur yahan hover-pill hata di. */
+html.has-touch .acct-side-btn:hover{background:transparent;color:var(--dark);}
+html.has-touch[data-theme="dark"] .acct-side-btn:hover{color:var(--gray);}
+/* outline:none (account.css global) ke baad keyboard users ke liye focus ring */
+.acct-side-btn:focus-visible{outline:2px solid var(--primary);outline-offset:1px;}
