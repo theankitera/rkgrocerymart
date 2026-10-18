@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react
 import { Search, ShoppingCart, User, Download, Home, ShoppingBag, SlidersHorizontal, X, Zap, Leaf, BadgePercent, ShieldCheck, Package, Headphones, Send, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from './lib/supabaseClient';
 import { TICKER, calcDiscount, catEmoji } from './lib/helpers';
+import { openAppDownload } from './lib/appDownload';
 import { useCategories, useBanners, useProducts, useSearch, useHomeSections, useHomepageConfig, useReviews, useAdStrips, useShopSettings, DEFAULT_HOMEPAGE_SECTIONS } from './hooks/dataHooks';
 import { SkelCard, SkelBanner } from './components/Skeletons';
 import { PCard } from './components/PCard';
@@ -529,7 +530,7 @@ function HomeContent({homepageSections,banners,bannersLoading,bannerIdx,setBanne
 
           why_choose_us: <WhyChooseUs productCount={sectionProdsReady?Object.values(sectionProds).reduce((s,l)=>s+(l||[]).length,0):0} catCount={cats.length}/>,
           reviews: <CustomerReviews reviews={dbReviews}/>,
-          download_app: <DownloadApp onInstall={()=>{if(window.RKPwa?.promptInstall){window.RKPwa.promptInstall();}else{showToast('Browser ke ⋮ menu se “Add to Home Screen” chunein 📱');}}}/>,
+          download_app: <DownloadApp onInstall={()=>openAppDownload(showToast)}/>,
           newsletter: <Newsletter showToast={showToast}/>,
           how_it_works: (
             <div className="rounded-2xl p-5 md:p-6" style={{background:'var(--card-bg)'}}>
@@ -796,9 +797,9 @@ function DownloadApp({onInstall}){
         </ul>
         <div className="mt-4 flex flex-wrap gap-2.5 justify-center md:justify-start">
           <button onClick={onInstall} className="flex items-center gap-2 bg-white text-[#15803D] font-extrabold font-poppins text-xs md:text-sm px-4 md:px-5 py-2.5 rounded-xl shadow-lg hover:scale-[1.03] active:scale-95 transition-transform">
-            <Download size={16}/> Get the App
+            <Download size={16}/> Download App
           </button>
-          <span className="text-white/70 text-[10px] md:text-xs font-poppins self-center">Android • iOS • Desktop</span>
+          <span className="text-white/70 text-[10px] md:text-xs font-poppins self-center">Android APK • Free • 1-tap install</span>
         </div>
       </div>
       <div className="text-7xl md:text-8xl select-none" aria-hidden="true">🛒</div>
@@ -1383,7 +1384,7 @@ export default function App(){
             {/* Right actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
               {!isPWA&&(
-                <button onClick={()=>window.RKPwa&&window.RKPwa.promptInstall()}
+                <button onClick={()=>openAppDownload(showToast)}
                   className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold font-poppins whitespace-nowrap"
                   style={{background:'var(--primary-light)',color:'var(--primary-dark)'}}>
                   <Download size={14}/> Get App
@@ -1706,7 +1707,7 @@ export default function App(){
           <span className="text-[10px] font-medium font-poppins" style={{color:'var(--gray)'}}>Help</span>
         </div>
         {!isPWA&&(
-          <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" onClick={()=>window.RKPwa&&window.RKPwa.promptInstall()}>
+          <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" onClick={()=>openAppDownload(showToast)}>
             <Download size={21} strokeWidth={1.8} style={{color:'var(--primary)'}}/>
             <span className="text-[10px] font-bold font-poppins" style={{color:'var(--primary)'}}>Get App</span>
           </div>

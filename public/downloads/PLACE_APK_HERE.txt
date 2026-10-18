@@ -1,0 +1,8 @@
+Is folder me APK rakhna hai:
+  rinku-kirana.apk
+
+- APK EAS se banegi (myshop-app folder): eas build --profile preview --platform android
+- Build complete hone par APK download karo aur yahan (public/downloads/) rakho.
+- Site "Get App" button isi /downloads/rinku-kirana.apk URL se download karegi
+  (src/lib/appDownload.js me APP_APK_PATH).
+- Agar file missing hogi to button automatically PWA install par fallback kar dega.
