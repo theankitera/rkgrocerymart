@@ -4,6 +4,27 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"/>
 <title>RK Grocery Mart - Online Grocery Delivery</title>
+<script>
+/* Dark Reader shield (dynamic): lock only while this page renders its own dark
+   theme, so the extension never double-inverts our dark styles — yet still
+   darkens the page for users who keep the site in light mode. Runs before any
+   stylesheet is parsed so the meta exists when the extension scans the page. */
+(function(){
+  try{
+    var saved=localStorage.getItem('rk_theme');
+    var dark=(saved==='dark')||(saved!=='light'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+    document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+    var sync=function(){
+      var isDark=document.documentElement.getAttribute('data-theme')==='dark';
+      var lock=document.head.querySelector('meta[name="darkreader-lock"]');
+      if(isDark&&!lock){var m=document.createElement('meta');m.name='darkreader-lock';document.head.appendChild(m);}
+      else if(!isDark&&lock){lock.remove();}
+    };
+    sync();
+    new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  }catch(e){}
+})();
+</script>
 <!-- Fast-connect to third-party origins so font/CDN requests start sooner, without blocking the splash paint -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -485,6 +506,64 @@ html[data-theme="dark"] .payment-wait-hint{background:#3A2A14;border-color:#6B4A
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   DARK MODE ISOLATION BLOCK
+   Appended at the very bottom. Fires ONLY when the environment reports a
+   dark scheme AND the site has not been explicitly set to light
+   (html[data-theme="light"]), so the light theme is never touched.
+   All values use the site's own dark tokens (#0F1521 / #151B26 / green
+   accent), so the existing dark design stays pixel-identical.
+   ══════════════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: dark){
+
+  /* 0. Native-dark signal — browser + extensions see this page is dark on purpose */
+  html:not([data-theme="light"]){color-scheme:dark !important;}
+
+  /* 1. GLOBAL SCOPE PROTECTION */
+  html:not([data-theme="light"]),
+  html:not([data-theme="light"]) body{
+    background-color:#0F1521 !important;
+    color:#F1F5F9 !important;
+  }
+
+  /* 2. COMPONENT & CARD CONTAINERS — solid dark surfaces, never transparent */
+  html:not([data-theme="light"]) :is(
+    .product-card,.card,.container-box,.prod-card,.co-card,.addr-card,
+    .cart-drawer,.how-section,.header,.desktop-header,.desktop-sidebar,
+    .desktop-cats-wrap,.bottom-nav,.pdp-info,.pdp-gallery,.pdp-add-section,
+    .qr-fs-header,.upi-pay-body,.glass-card
+  ):not(.on,.sel,.has-file){
+    background-color:#151B26 !important;
+    border-color:#2D3B4E !important;
+  }
+  html[data-theme]:not([data-theme="light"]) .product-card:hover{
+    border-color:color-mix(in srgb,var(--primary) 35%,var(--border)) !important;
+  }
+
+  /* 3. TEXT ACCESSIBILITY & CONTRAST LOCK */
+  html:not([data-theme="light"]) :is(p,span,h1,h2,h3,label):not([style]):not([class*="text-white"]){
+    color:#F1F5F9 !important;
+  }
+  html[data-theme]:not([data-theme="light"]) .success-page h2{color:var(--primary) !important;}
+  html[data-theme]:not([data-theme="light"]) .success-page p{color:var(--gray) !important;}
+  html[data-theme]:not([data-theme="light"]) [style*="color"] > :is(p,span,h1,h2,h3,label){color:inherit !important;}
+
+  /* 4. LINKS & PRICE ACCENT — on-brand, high visibility */
+  html:not([data-theme="light"]) :is(.price,.ci-price){color:var(--primary) !important;}
+  html:not([data-theme="light"]) a:not(.home-btn):not([class]):not([style*="color"]){color:var(--primary) !important;}
+
+  /* 5. EXTENSION SHIELD — higher specificity than Dark Reader's injected
+        [data-darkreader-*] rules, so ours win at equal !important. */
+  html[data-darkreader-inline-invert],
+  html [data-darkreader-inline-invert]{filter:none !important;}
+  html[data-darkreader-inline-bgcolor],
+  html[data-darkreader-inline-bgcolor] body,
+  body[data-darkreader-inline-bgcolor]{background-color:#0F1521 !important;}
+  html[data-darkreader-inline-color],
+  html[data-darkreader-inline-color] body,
+  body[data-darkreader-inline-color]{color:#F1F5F9 !important;}
 }
 </style>
 <script>

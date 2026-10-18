@@ -39,55 +39,67 @@ async function fetchJson(path, opts = {}) {
   return data;
 }
 
-// ── SECURITY (2026-08-09): Order total server-side verify ──────────────────
-// Client cart + order insert dono tamper karke "₹1 par ₹500 ka order" ka
-// loophole bnd karna hai. Hum order_items ko products table ke CURRENT
-// selling_price se recompute karte hain + coupon discount coupons table se
-// + delivery charge order row se. Mismatch → order create reject.
-async function verifyOrderTotal(orderId, requestedPaise) {
-  const order = await fetchJson(`orders?select=subtotal,discount,promo_code,delivery_charge,final_amount,rewards_discount&id=eq.${encodeURIComponent(orderId)}`);
+// ── SECURITY (2026-08-09 → 2026-10-18 refactor) ────────────────────────────
+// Ab amount ka SOURCE OF TRUTH orders.final_amount hai, jo create_order_draft()
+// (SECURITY DEFINER RPC, supabase/migrations/20261018_payment_lifecycle.sql)
+// server-side products/coupons/loyalty se recompute karke likhta hai.
+// Yahan sirf 3 cheezein verify hoti hain:
+//   1. order DRAFT state me hai (pending_payment / paid nahi)
+//   2. client ka requested amount = DB final_amount (±1 paise)
+//   3. razorpay order id draft par attach (webhook correlation) + retry reset
+// (Purana code dobara se prices recompute karta tha jo variant-priced items par
+//  selling_price se mismatch karke legit orders reject kar deta tha.)
+async function preparePaymentAttempt(orderId, requestedPaise) {
+  const order = await fetchJson(
+    `orders?select=final_amount,status,payment_status,razorpay_order_id&id=eq.${encodeURIComponent(orderId)}`
+  );
   const orderRow = Array.isArray(order) ? order[0] : null;
   if (!orderRow) return { ok: false, status: 404, error: 'Order not found' };
 
-  const items = await fetchJson(`order_items?select=product_id,qty,price&order_id=eq.${encodeURIComponent(orderId)}`);
-  const itemList = Array.isArray(items) ? items : [];
-  const ids = itemList.map((i) => i.product_id).filter(Boolean);
-  const priceMap = {};
-  if (ids.length) {
-    const prods = await fetchJson(`products?select=id,selling_price&id=in.(${ids.join(',')})`);
-    (Array.isArray(prods) ? prods : []).forEach((p) => { priceMap[p.id] = Number(p.selling_price) || 0; });
+  // State machine guard: sirf DRAFT orders payment ke liye eligible hain.
+  // (COD/UPI wale real orders yahan se pay nahi karwa sakte, na hi paid order
+  //  dobara initiate hoga — duplicate capture ka rasta band.)
+  if (orderRow.status !== 'pending_payment') {
+    return {
+      ok: false,
+      status: 409,
+      error: `Order state invalid (${orderRow.status}/${orderRow.payment_status}) — naya checkout karein`,
+    };
+  }
+  if (orderRow.payment_status === 'paid') {
+    return { ok: false, status: 409, error: 'Order pehle se paid hai' };
   }
 
-  // DB ka CURRENT selling_price source of truth hai (client-supplied price nahi)
-  let subtotal = 0;
-  itemList.forEach((it) => {
-    const price = priceMap[it.product_id] != null ? priceMap[it.product_id] : Number(it.price) || 0;
-    subtotal += price * (Number(it.qty) || 1);
-  });
-
-  // Coupon discount — coupons table se hi (client ka discount value ignore)
-  let discount = 0;
-  if (orderRow.promo_code) {
-    const coupon = await fetchJson(`coupons?select=discount_type,discount_value,is_active&code=eq.${encodeURIComponent(orderRow.promo_code)}`);
-    const row = Array.isArray(coupon) ? coupon[0] : null;
-    if (row && row.is_active) {
-      discount = row.discount_type === 'percent'
-        ? Math.round(subtotal * (Number(row.discount_value) || 0) / 100)
-        : (Number(row.discount_value) || 0);
-      discount = Math.min(discount, subtotal);
-    }
-  }
-
-  // Reward points discount — order par create_order RPC ne server-side compute
-  // kiya tha (100 pts = ₹10). Client ka koi value trust nahi karte.
-  const rewardsDiscount = Number(orderRow.rewards_discount) || 0;
-
-  const expected = Math.max(0, subtotal - discount - rewardsDiscount + (Number(orderRow.delivery_charge) || 0));
-  const expectedPaise = Math.round(expected * 100);
-  if (Math.abs(expectedPaise - requestedPaise) > 1) {
-    return { ok: false, status: 400, error: `Amount mismatch (expected ₹${(expectedPaise / 100).toFixed(2)}) — order total refresh karke dobara try karein` };
+  const dbAmountPaise = Math.round(Number(orderRow.final_amount || 0) * 100);
+  if (Math.abs(dbAmountPaise - requestedPaise) > 1) {
+    return {
+      ok: false,
+      status: 400,
+      error: `Amount mismatch (expected ₹${(dbAmountPaise / 100).toFixed(2)}) — order total refresh karke dobara try karein`,
+    };
   }
   return { ok: true };
+}
+
+// Server-side Supabase RPC call (service role) — payment lifecycle functions
+// (finalize/fail/init) sirf server se call ho sakte hain, client se nahi.
+async function callRpc(fn, payload) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(10000),
+  });
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+  if (!res.ok) throw new Error(`rpc/${fn} ${res.status}: ${String(data || '').slice(0, 160)}`);
+  return data;
 }
 
 module.exports = async (req, res) => {
@@ -119,13 +131,13 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Missing order id' });
   }
   try {
-    const check = await verifyOrderTotal(orderId, amount);
+    const check = await preparePaymentAttempt(orderId, amount);
     if (!check.ok) {
-      console.warn('[razorpay-order] total verify rejected:', check.error);
+      console.warn('[razorpay-order] attempt rejected:', check.error);
       return res.status(check.status).json({ error: check.error });
     }
   } catch (err) {
-    console.error('[razorpay-order] total verify failed:', err?.message || err);
+    console.error('[razorpay-order] attempt verify failed:', err?.message || err);
     return res.status(500).json({ error: 'Order verify nahi ho paya — thodi der baad try karein' });
   }
 
@@ -157,6 +169,21 @@ module.exports = async (req, res) => {
       }
       return res.status(502).json({ error: data?.error?.description || 'Razorpay order create failed' });
     }
+    // Razorpay order bana — ABHI draft par attach karo (state guard ke saath).
+    // init_payment_attempt:
+    //   • orders.razorpay_order_id = rzp id  → webhook/payment yahi order se
+    //     correlate karega (fake completion ka rasta band)
+    //   • failed/cancelled draft retry par wapas 'pending' ho jaata hai
+    //   • PAID / non-draft order par false laata hai → yahan hi reject
+    const attempt = await callRpc('init_payment_attempt', {
+      p_order_id: orderId,
+      p_razorpay_order_id: data.id,
+    });
+    if (!attempt || attempt.ok !== true) {
+      console.warn('[razorpay-order] init_payment_attempt rejected:', JSON.stringify(attempt));
+      return res.status(409).json({ error: `Order state invalid (${attempt?.state || 'unknown'}) — naya checkout karein` });
+    }
+
     return res.status(200).json({
       orderId: data.id,
       keyId: RAZORPAY_KEY_ID,

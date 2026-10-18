@@ -180,7 +180,8 @@
   }
 
   /**
-   * Create a new order.
+   * createOrder — REAL order (COD / UPI-QR verification flow).
+   * (Razorpay flow ke liye createDraft() use hota hai — neeche.)
    * SECURITY (audit follow-up, 2026-08-09): ab order SIRF create_order() RPC se
    * banta hai — server-side DB selling_price se subtotal recompute hota hai aur
    * coupon server-side validate hota hai. Client cart total/price tamper karne
@@ -261,11 +262,86 @@
     }
   }
 
+  /**
+   * createDraft — Razorpay (online payment) ke liye DRAFT order.
+   *
+   * STATE MACHINE (supabase/migrations/20261018_payment_lifecycle.sql):
+   *   status='pending_payment', payment_status='pending' → ye asar mein order
+   *   NAHI hai: stock cut nahi hota, coupon use nahi hota, reward points burn
+   *   nahi hote, cart clear nahi hota. Payment SUCCESS hone par hi server
+   *   (finalize_paid_order — ACID transaction) ye sab karta hai.
+   *
+   * Payment cancel/fail hone par order row draft hi rehti hai (customer
+   * history se hide) — retry par wahi draft reuse hota hai, duplicate rows nahi.
+   *
+   * @returns {{orderId, orderNumber, finalAmount, ...} | {migrationRequired:true} | null}
+   */
+  async function createDraft(userId, opts) {
+    const { cart, address, paymentMethod = 'razorpay', promoCode = null } = opts;
+    if (!cart?.length) { console.error('[RKOrders] createDraft: empty cart'); return null; }
+    if (!userId) { console.error('[RKOrders] createDraft: login required'); return null; }
+
+    const isBlocked = await _checkUserBlocked(userId);
+    if (isBlocked) { console.warn('[RKOrders] createDraft: user is blocked'); return { blocked: true }; }
+
+    try {
+      const { data, error } = await getDB().rpc('create_order_draft', {
+        p_user_id        : userId,
+        p_cart           : cart.map(i => ({ id: i.id, qty: i.qty, e: i.e || null, unit: i.unit || i.variant || null })),
+        p_address        : {
+          name    : address.name,
+          phone   : address.phone,
+          line1   : address.line1,
+          line2   : address.line2 || '',
+          city    : address.city || 'Prayagraj',
+          pincode : address.pincode || '',
+        },
+        p_payment_method : paymentMethod,
+        p_promo_code     : promoCode || null,
+        p_latitude       : opts.latitude ?? null,
+        p_longitude      : opts.longitude ?? null,
+        p_distance_km    : opts.distance_km ?? null,
+        p_delivery_charge: opts.delivery_charge || 0,
+        p_delivery_status: opts.delivery_status || 'unknown',
+        p_maps_link      : opts.maps_link || null,
+        p_maps_nav_link  : opts.maps_nav_link || null,
+        p_location_accuracy: opts.location_accuracy ?? null,
+        p_rewards_points : opts.rewardsPoints || 0,
+      });
+
+      if (error) {
+        // Migration pending hai (function abhi DB me nahi) — fallback createOrder
+        // BILKUL nahi chalayenge (wahi to stock-cut bug tha). Clear error do.
+        if (String(error.code) === '42883' || String(error.code) === 'PGRST202') {
+          console.error('[RKOrders] create_order_draft RPC missing — run supabase/migrations/20261018_payment_lifecycle.sql');
+          return { migrationRequired: true };
+        }
+        console.error('[RKOrders] createDraft (rpc):', error.message);
+        return null;
+      }
+
+      return {
+        orderId      : data.order_id,
+        orderNumber  : data.order_number,
+        subtotal     : Number(data.subtotal),
+        discount     : Number(data.discount),
+        finalAmount  : Number(data.final_amount), // SERVER total — Razorpay amount isi se banna chahiye
+        draft        : true,
+      };
+    } catch (e) {
+      console.error('[RKOrders] createDraft (exception):', e.message);
+      return null;
+    }
+  }
+
   async function loadOrderHistory(userId, limit = 20) {
     if (!userId) return [];
     const { data, error } = await getDB()
       .from('orders')
+      // pending_payment drafts = abhi asli order nahi (payment pending) —
+      // history me dikhakar customer confuse mat karo.
       .select('id, order_number, status, payment_method, final_amount, created_at')
+      .neq('status', 'pending_payment')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -357,6 +433,7 @@
 
   window.RKOrders = {
     createOrder,
+    createDraft,
     loadOrderHistory,
     getOrderDetails,
     reorder,

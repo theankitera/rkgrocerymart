@@ -949,7 +949,8 @@ export default function AccountPage() {
           const { data: created } = await supabase.from('profiles').upsert(insert).select().maybeSingle();
           return created||insert;
         })(),
-        (async()=>{ const {data}=await supabase.from('orders').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(25); return data||[]; })(),
+        // pending_payment drafts = payment pending (asli order nahi) — history me hide
+        (async()=>{ const {data}=await supabase.from('orders').select('*').neq('status','pending_payment').eq('user_id',user.id).order('created_at',{ascending:false}).limit(25); return data||[]; })(),
         (async()=>{ if(window.RKProfile?.loadAddresses) return await window.RKProfile.loadAddresses(user.id); const {data}=await supabase.from('addresses').select('*').eq('user_id',user.id).order('is_default',{ascending:false}); return data||[]; })(),
         (async()=>{ const {data}=await supabase.from('wishlist').select('*').eq('user_id',user.id).order('created_at',{ascending:false}); return data||[]; })(),
         (async()=>{ const {data}=await supabase.from('notifications').select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(30); return data||[]; })(),

@@ -46,8 +46,13 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
   // Cart/amount badalne par ref invalidate ho jaata hai taaki purana (galat)
   // pending order dobara use na ho.
   const rzpOrderRef=useRef(null);
-  const rzpAmountRef=useRef(0);
-  useEffect(()=>{rzpOrderRef.current=null;rzpAmountRef.current=0;},[cart]);
+  // Draft reuse key = amount + address + location — in me se kuch bhi badle to
+  // purana (stale address wala) draft reuse NAHI hoga, naya draft banega.
+  const rzpKeyRef=useRef('');
+  // Razorpay handler success hone ke baad modal apne aap band hota hai —
+  // uske baad ondismiss fired to fake "cancelled" mark na ho jaye.
+  const rzpPaidRef=useRef(false);
+  useEffect(()=>{rzpOrderRef.current=null;rzpKeyRef.current='';rzpPaidRef.current=false;},[cart]);
   // GPS / delivery-radius state — GPS stays OPTIONAL. If the user denies or
   // it fails, checkout still works with the manually-entered/saved address.
   // It only auto-triggers (asks for permission) once an address is on screen.
@@ -207,28 +212,44 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       // Guest/session expired hone par order record ke bina payment na ho (paisa waste)
       if(!user){setOrderError('⚠️ Online payment ke liye login zaroori hai. Pehle login karein.');setRzpBusy(false);return;}
       await loadRazorpayScript();
-      // 1) Order DB mein save karo (payment_status 'pending') — SIRF pehli baar.
-      //    Retry/dismiss par wahi order reuse hota hai, duplicate rows nahi banti.
-      // Pehle se bana order sirf tabhi reuse karo jab amount bilkul same ho
-      // (cart ya delivery charge badal gaya ho to naya order banao).
-      const wantAmount=Math.round(finalAmount*100);
-      let result=(rzpAmountRef.current===wantAmount)?rzpOrderRef.current:null;
+      // ── 1) DRAFT order (status='pending_payment') — SIRF pehli baar.
+      //    createDraft: stock/coupon/rewards par KUCH bhi nahi chalta — sab
+      //    payment SUCCESS par server ka finalize_paid_order() ACID txn me
+      //    karta hai. Cancel/fail = draft rehta hai (history se hide), retry
+      //    par wahi draft reuse hota hai → duplicate rows nahi.
+      // Pehle se bana draft sirf tabhi reuse karo jab amount bilkul same ho
+      // (cart ya delivery charge badal gaya ho to naya draft banao).
+      const wantKey=JSON.stringify([Math.round(finalAmount*100),addressPayload,locationPayload]);
+      let result=(rzpKeyRef.current===wantKey)?rzpOrderRef.current:null;
       if(!result){
-        result=await window.RKOrders.createOrder(user.uid,{cart,total,address:addressPayload,paymentMethod:'razorpay',promoCode:appliedCoupon?.code||null,discount,rewardsPoints:rewardApplied,...locationPayload});
+        result=await window.RKOrders.createDraft(user.uid,{cart,total,address:addressPayload,paymentMethod:'razorpay',promoCode:appliedCoupon?.code||null,discount,rewardsPoints:rewardApplied,...locationPayload});
         if(!result){setRzpBusy(false);setOrderError('⚠️ Order save nahi hua. Kripya dobara try karein.');return;}
-        rzpOrderRef.current={orderId:result.orderId,orderNumber:result.orderNumber};
-        rzpAmountRef.current=wantAmount;
+        if(result.migrationRequired){setRzpBusy(false);setOrderError('⚠️ Payment system update pending — thodi der baad try karein ya UPI/COD chunein.');return;}
+        if(result.blocked){setRzpBusy(false);setOrderError('⚠️ Aapka account blocked hai — admin se sampark karein.');return;}
+        // Razorpay ka amount HAMESHA server ke final_amount se (client display
+        // se nahi) — 1-rupee rounding mismatch par payment reject na ho.
+        const serverPaise=Math.round(Number(result.finalAmount)*100);
+        rzpOrderRef.current={orderId:result.orderId,orderNumber:result.orderNumber,serverPaise};
+        rzpKeyRef.current=wantKey;
       }
       const {orderId,orderNumber}=result;
+      // Fresh draft: server ka final_amount; reused draft: pehle save kiya hua serverPaise.
+      const payPaise=(typeof result.serverPaise==='number')
+        ? result.serverPaise
+        : Math.round(Number(result.finalAmount||finalAmount)*100);
       // 2) Server se Razorpay order banao (secret server par hai)
       const r=await fetch('/api/razorpay-order',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        // orderId server ko bhi bhejo — server DB se total verify karta hai
-        // (security: client cart/amount tamper hone par order reject hota hai)
-        body:JSON.stringify({amount:Math.round(finalAmount*100),receipt:orderNumber,orderId,notes:{orderNumber,orderId:orderId||''}}),
+        // orderId server ko bhi bhejo — server DB ke final_amount se amount
+        // verify karta hai aur DRAFT state guard lagata hai (paid/non-draft
+        // order par dobara payment initiate hi nahi hoga)
+        body:JSON.stringify({amount:payPaise,receipt:orderNumber,orderId,notes:{orderNumber,orderId:orderId||''}}),
       });
       const o=await r.json().catch(()=>({}));
-      if(!r.ok||!o.orderId){setRzpBusy(false);setOrderError('⚠️ Online payment shuru nahi hua — thodi der baad try karein ya UPI/COD chunein.');return;}
+      if(!r.ok||!o.orderId){setRzpBusy(false);setOrderError(o.error?'⚠️ '+o.error:'⚠️ Online payment shuru nahi hua — thodi der baad try karein ya UPI/COD chunein.');return;}
+      const rzpOrderId=o.orderId;
+      // handler ke baad modal dismiss ho — fake "cancel" na mark ho jaye
+      rzpPaidRef.current=false;
       // 3) Razorpay checkout kholo
       const rzp=new window.Razorpay({
         key:o.keyId||RZP_KEY_ID,
@@ -236,9 +257,10 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         currency:o.currency||'INR',
         name:'RK Grocery Mart',
         description:`Order ${orderNumber}`,
-        order_id:o.orderId,
+        order_id:rzpOrderId,
         handler:async(resp)=>{
           // 4) Signature server par verify karo — sirf tabhi order PAID hoga
+          rzpPaidRef.current=true;
           const v=await fetch('/api/razorpay-verify',{
             method:'POST',headers:{'Content-Type':'application/json'},
             body:JSON.stringify({
@@ -246,21 +268,52 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
               razorpay_order_id:resp.razorpay_order_id,
               razorpay_payment_id:resp.razorpay_payment_id,
               razorpay_signature:resp.razorpay_signature,
-              amount:finalAmount,
+              amount:payPaise/100,
               userId:user?.uid||null,
               customer_name:f.name.trim(),
               mobile:f.phone.trim(),
             }),
           });
           const vr=await v.json().catch(()=>({}));
-          if(vr.verified){rzpOrderRef.current=null;rzpAmountRef.current=0;if(window.RKCart)window.RKCart.clearCart();setRzpBusy(false);onSuccess(orderNumber,'razorpay');}
-          else{setRzpBusy(false);setOrderError('⚠️ Payment verify nahi hua — order pending hai, admin se confirm karwayein.');}
+          if(vr.verified){
+            // Cart sirf VERIFIED payment ke baad clear hota hai (pehle nahi)
+            rzpOrderRef.current=null;rzpKeyRef.current='';
+            if(window.RKCart)window.RKCart.clearCart();
+            setRzpBusy(false);
+            onSuccess(orderNumber,'razorpay');
+          } else {
+            // Payment capture ho chuka hai par verify fail — webhook Razorpay se
+            // order ko khud confirm kar dega (tab tak draft pending_payment hai,
+            // koi asli order nahi bana). User ko galat success dikhana theek nahi.
+            rzpOrderRef.current=null;rzpKeyRef.current='';
+            setRzpBusy(false);
+            setOrderError('⚠️ Payment mila hai, confirm hone mein 1-2 min — order history me check karein.');
+          }
         },
-        modal:{ondismiss:()=>{setRzpBusy(false);showToast('Payment window band hua — order pending hai, dobara try kar sakte hain');}},
+        modal:{
+          ondismiss:()=>{
+            if(rzpPaidRef.current)return; // payment ho chuki — cancel mat mark karo
+            setRzpBusy(false);
+            // Server par draft ko 'cancelled' mark karo (state machine) —
+            // stock/coupon/rewards par koi asar nahi, retry par draft reuse hoga.
+            fetch('/api/razorpay-failed',{method:'POST',headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({orderId,razorpay_order_id:rzpOrderId,reason:'User dismissed payment window',event:'cancelled'})}).catch(()=>{});
+            showToast('Payment window band hua — order save nahi hua, dobara try kar sakte hain');
+          },
+        },
         theme:{color:'#15803D'},
         prefill:{name:f.name.trim(),contact:f.phone.trim(),email:user?.email||''},
       });
-      rzp.on('payment.failed',(resp)=>{setRzpBusy(false);setOrderError('⚠️ Payment fail hui — kripya dobara try karein.');});
+      rzp.on('payment.failed',(resp)=>{
+        if(rzpPaidRef.current)return;
+        setRzpBusy(false);
+        setOrderError('⚠️ Payment fail hui — kripya dobara try karein ya UPI/COD chunein.');
+        // DB me draft ko 'failed' mark karo (paid order par kabhi downgrade nahi hota)
+        fetch('/api/razorpay-failed',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({orderId,razorpay_order_id:rzpOrderId,
+            reason:resp?.error?.description||resp?.error?.reason||'Payment failed',
+            event:'failed'})}).catch(()=>{});
+      });
       rzp.open();
     }catch(err){
       console.error('[CheckoutForm] razorpay:',err?.message||err);
