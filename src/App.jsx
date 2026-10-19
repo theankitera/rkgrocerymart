@@ -842,14 +842,410 @@ function Newsletter({showToast}){
   );
 }
 
-// ℹ️ Static pages (About / Privacy / Terms / Shipping) — content admin Settings se
-function InfoPage({title,body}){
+// ── InfoPage building blocks ─────────────────────────────────
+function IHead({icon:Icon,children}){
   return(
-    <div className="max-w-site mx-auto px-4 md:px-8 py-8">
-      <div className="rounded-3xl p-6 md:p-8" style={{background:'var(--card-bg)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
-        <h1 className="font-extrabold font-poppins text-lg md:text-2xl mb-4" style={{color:'var(--dark)'}}>{title}</h1>
-        <div className="text-sm font-poppins leading-relaxed whitespace-pre-wrap" style={{color:'var(--text)'}}>{body||'Content abhi add nahi hua — admin Settings se update hota hai.'}</div>
+    <h2 className="flex items-center gap-2 font-extrabold font-poppins text-sm md:text-base mt-7 mb-2 first:mt-0" style={{color:'var(--dark)'}}>
+      {Icon&&<span className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{background:'var(--primary-light)'}}><Icon size={15} style={{color:'var(--primary)'}}/></span>}
+      <span>{children}</span>
+    </h2>
+  );
+}
+function IP({children}){
+  return <p className="text-[13px] md:text-sm font-poppins leading-relaxed mb-2.5" style={{color:'var(--text)'}}>{children}</p>;
+}
+function IBullets({items}){
+  return(
+    <ul className="my-2 space-y-1.5">
+      {items.map((it,i)=>(
+        <li key={i} className="flex gap-2.5 text-[13px] md:text-sm font-poppins leading-relaxed" style={{color:'var(--text)'}}>
+          <span className="mt-1 w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-bold" style={{background:'var(--primary)',color:'#fff'}}>✓</span>
+          <span dangerouslySetInnerHTML={{__html:it}}/>
+        </li>
+      ))}
+    </ul>
+  );
+}
+function IFeatures({items}){
+  return(
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
+      {items.map(x=>(
+        <div key={x.t} className="rounded-2xl p-4" style={{background:'var(--page-bg)',border:'1px solid var(--border)'}}>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg mb-2" style={{background:'var(--primary-light)'}}>{x.e}</div>
+          <div className="font-bold font-poppins text-[13px] md:text-sm" style={{color:'var(--dark)'}}>{x.t}</div>
+          <div className="font-poppins text-[11px] md:text-xs leading-snug mt-0.5" style={{color:'var(--gray)'}}>{x.d}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+function IStats({items}){
+  return(
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 my-4">
+      {items.map(x=>(
+        <div key={x.l} className="rounded-2xl p-3.5 text-center" style={{background:'var(--page-bg)',border:'1px solid var(--border)'}}>
+          <div className="font-extrabold font-poppins text-lg md:text-xl" style={{color:'var(--primary)'}}>{x.v}</div>
+          <div className="text-[10px] md:text-xs font-poppins font-medium mt-0.5" style={{color:'var(--gray)'}}>{x.l}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+function ITable({head,rows}){
+  return(
+    <div className="rounded-2xl overflow-hidden my-3" style={{border:'1px solid var(--border)'}}>
+      <div className="grid grid-cols-3 text-[11px] md:text-xs font-bold font-poppins" style={{background:'var(--primary-light)',color:'var(--primary-dark)'}}>
+        {head.map(h=><div key={h} className="px-3 py-2.5">{h}</div>)}
       </div>
+      {rows.map((r,i)=>(
+        <div key={i} className="grid grid-cols-3 text-[11px] md:text-[13px] font-poppins" style={{borderTop:'1px solid var(--border)',background:'var(--card-bg)',color:'var(--text)'}}>
+          {r.map((c,j)=><div key={j} className="px-3 py-2.5">{c}</div>)}
+        </div>
+      ))}
+    </div>
+  );
+}
+function ICall({title,children,icon:Icon=HelpCircle}){
+  return(
+    <div className="rounded-2xl p-4 mt-4 flex gap-3" style={{background:'var(--primary-light)',border:'1px solid var(--border)'}}>
+      <span className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center" style={{background:'var(--primary)'}}><Icon size={16} color="#fff"/></span>
+      <div>
+        <div className="font-bold font-poppins text-xs md:text-sm" style={{color:'var(--primary-dark)'}}>{title}</div>
+        <div className="font-poppins text-[12px] md:text-[13px] leading-relaxed mt-0.5" style={{color:'var(--text)'}}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Default page content (admin shop_settings se override hota hai) ──
+function AboutBody(){
+  return(
+    <div>
+      <IP><strong style={{color:'var(--dark)'}}>RK Grocery Mart</strong> ek modern online grocery store hai — jahan aapke mahine ke sabzi-fruits se lekar daily dairy, atta-dal, snacks aur ghar ke zaroori saman tak, sab kuch ek hi jagah milta hai aur seedha aapke ghar tak pahunchta hai. Humari maan-na hai ki grocery shopping boring nahi honi chahiye — na lambi queues, na bhaari bags uthana, na expiry date ka darr.</IP>
+      <IP>2024 mein ek chhoti si local kirana store se shuru hua hamara safar, aaj hazaron families ki monthly routine ban chuka hai. Rozana hazaron orders deliver karke hum sirf saman nahi bhejte — ek bharosa bhejte hain jo har fresh item, har on-time delivery aur har fair price ke saath mazboot hota hai.</IP>
+
+      <IHead icon={Store}>Hamari Kahani (Our Story)</IHead>
+      <IP>Sabki tarah hamari bhi shuruaat ek chhoti si problem se hui: mohalle ki dukaan band ho jaati thi, bazaar jaane ka time nahi milta tha, aur jo milta tha uski quality check karne ka mauka nahi milta. Isi problem ka solution banne ke liye RK Grocery Mart ka janam hua.</IP>
+      <IP>Humne decide kiya ki technology sirf bade logon ke liye nahi — har mohalle ki family ke liye honi chahiye. Aaj hamara platform aapko Blinkit-speed delivery nahi, balki <strong style={{color:'var(--dark)'}}>apne mohalle wali dukaan ka bharosa</strong> deta hai, sirf ek app-tap ki doori par.</IP>
+
+      <IHead icon={Star}>Jis Par Hamara Bharosa Hai (Our Values)</IHead>
+      <IFeatures items={[
+        {e:'🌿',t:'100% Fresh Promise',d:'Sabzi, fruits aur dairy daily fresh — 24 ghante ke andar kharab item free replacement.'},
+        {e:'🏷️',t:'Fair & Transparent Pricing',d:'Jo price dikhe wahi pay karo — koi hidden charge, koi last-minute surprise nahi.'},
+        {e:'⚡',t:'Lightning-Fast Delivery',d:'7 AM se 10 PM tak — average 60-90 minute mein order aapke darwaze par.'},
+      ]}/>
+
+      <IHead icon={Users}>Hamari Khaas Baat (Why Families Love Us)</IHead>
+      <IBullets items={[
+        '<strong style="color:var(--dark)">Har ghar ke liye poora store</strong> — 16 categories mein 5,000+ products: fresh fruits & vegetables, dairy & eggs, staples (atta, rice, dal), snacks, beverages, chocolates, personal care, home cleaning aur baby care.',
+        '<strong style="color:var(--dark)">Quality check har order par</strong> — har picking se pehle hamari team expiry date, packaging aur freshness verify karti hai.',
+        '<strong style="color:var(--dark)">Local vendors ka saath</strong> — jitna ho sakein hum local farmers aur distributors se leta hai, taaki aapko taaza samaan mile aur unhein fair price mile.',
+        '<strong style="color:var(--dark)">Easy payment</strong> — UPI, cards, netbanking, cash on delivery aur wallet — jo aapko convenient lage.',
+        '<strong style="color:var(--dark)">Ananya AI support</strong> — 24x7 chat assistant jo order status, products aur offers ka turant jawab deta hai.',
+      ]}/>
+
+      <IHead icon={Zap}>Numbers Mein</IHead>
+      <IStats items={[
+        {v:'5,000+',l:'Products'},
+        {v:'16',l:'Categories'},
+        {v:'60-90 min',l:'Avg. Delivery'},
+        {v:'7 AM–10 PM',l:'Daily Open'},
+      ]}/>
+
+      <IHead icon={ShieldCheck}>Hamara Waada (Our Promise)</IHead>
+      <IBullets items={[
+        'Har order par freshness ki guarantee — pasand na aaye to 24 ghante mein replacement ya full refund.',
+        'Kabhi bhi koi delivery charge ka surprise nahi — charges order confirm karne se pehle clearly dikhaye jaate hain.',
+        'Aapka data sirf order process karne ke liye — kabhi becha nahi jaata (details: Privacy Policy).',
+        'Koi bhi issue ho, hum 24x7 available hain — WhatsApp, call ya email, jaise aapko convenient ho.',
+      ]}/>
+
+      <ICall title="Hamse Baat Karein" icon={MessageCircle}>
+        Koi sawaal, feedback ya suggestion? Hamari team sunna chahti hai. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · ya seedha <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Help &amp; Support</a> page par Ananya AI se baat karein.
+      </ICall>
+    </div>
+  );
+}
+
+function PrivacyBody(){
+  return(
+    <div>
+      <IP><strong style={{color:'var(--dark)'}}>RK Grocery Mart</strong> ("hum", "hamara") aapki privacy ko seriously leta hai. Yeh Privacy Policy batati hai ki aapki site/app use karte waqt kaun si jaankari collect hoti hai, usse kaise use karte hain, aur usse kaise protect karte hain. Yeh policy har visitor, customer aur vendor par laagu hoti hai.</IP>
+
+      <IHead icon={Lock}>1. Hum Kaun Si Jaankari Collect Karte Hain</IHead>
+      <IBullets items={[
+        '<strong style="color:var(--dark)">Account details</strong> — naam, mobile number, email address, delivery address (jab aap sign up ya order karte hain).',
+        '<strong style="color:var(--dark)">Order information</strong> — aapne kya order kiya, order value, delivery slot, order history aur preferences.',
+        '<strong style="color:var(--dark)">Payment details</strong> — hum sirf payment status aur reference number rakhte hain. Card number, CVV ya UPI PIN humare servers par kabhi store nahi hote — payments trusted third-party payment gateways ke through process hote hain.',
+        '<strong style="color:var(--dark)">Technical data</strong> — device type, browser, IP address, app version aur crash logs (performance behtar karne ke liye).',
+        '<strong style="color:var(--dark)">Communications</strong> — WhatsApp, call, email ya chat (Ananya AI) par aapki humse hui baatcheet, taaki hum aapki history yaad rakhein aur behtar help kar sakein.',
+      ]}/>
+
+      <IHead icon={FileText}>2. Hum Jaankari Kaise Use Karte Hain</IHead>
+      <IBullets items={[
+        'Aapka order process karne, deliver karne aur status update dene ke liye.',
+        'Payment verify karne, refunds process karne aur invoice dene ke liye.',
+        'Account create karne, login karne aur fraud/unauthorized activity rokne ke liye.',
+        'Customer support dene — koi complaint ya refund request ho to hum aapka record dekh sakein.',
+        'Offers, coupons aur naye deals personalize karne (aap inbox se opt-out kar sakte hain).',
+        'Site/app ki performance, safety aur usability improve karne ke liye analytics.',
+        'Kanooni zarooraton ko poora karne ke liye (jaise taxation ya consumer law).',
+      ]}/>
+
+      <IHead icon={Wallet}>3. Payment Security</IHead>
+      <IP>Har payment PCI-DSS compliant payment partners ke through encrypted (SSL/TLS) hota hai. Hum aapke card ya UPI credentials apne system mein nahi rakhte — na hi hum unhein dekh sakte hain. UPI ID se pay karne par bhi hum sirf transaction reference store karte hain.</IP>
+
+      <IHead icon={ShieldCheck}>4. Cookies aur Local Storage</IHead>
+      <IP>Hum cookies aur browser local storage use karte hain taaki: login session, cart contents, theme preference (dark/light) aur location/area yaad rakha ja sake. Aap browser settings se cookies block kar sakte hain, lekin usse cart, login aur checkout jahi features kaam karna band kar sakte hain.</IP>
+
+      <IHead icon={Users}>5. Jaankari Kise Share Hoti Hai</IHead>
+      <IP>Hum aapki jaankari sirf in limited cases mein share karte hain:</IP>
+      <IBullets items={[
+        '<strong style="color:var(--dark)">Delivery partners</strong> — sirf naam, address aur phone number, taaki order deliver ho sake.',
+        '<strong style="color:var(--dark)">Payment gateways</strong> — payment process karne ke liye.',
+        '<strong style="color:var(--dark)">Analytics & hosting</strong> — service improve karne ke liye, anonymized data ke saath.',
+        '<strong style="color:var(--dark)">Kanoon</strong> — agar kisi court order ya kanooni process ke tehat jaankari maangi jaye.',
+      ]}/>
+      <IP>Hum aapki jaankari <strong style={{color:'var(--dark)'}}>kabhi bechte nahi</strong> ya spam ke liye third parties ko nahi dete.</IP>
+
+      <IHead icon={Clock}>6. Data Kitne Din Rakha Jaata Hai</IHead>
+      <IP>Order aur transaction records hum tax/compliance ke liye required samay tak (aam taur par 5 saal tak) rakhte hain. Account delete karne par aapki personal details 30 din ke andar deactivate/delete kar di jaati hain (jo records kanooni rup se rakhne zaroori hain, wo chhod kar).</IP>
+
+      <IHead icon={CheckCircle2}>7. Aapke Adhikar (Your Rights)</IHead>
+      <IBullets items={[
+        'Humare paas aapki kya jaankari hai uski copy maangna.',
+        'Galat details theek karwana.',
+        'Account aur associated personal data delete karwana.',
+        'Marketing emails/SMS se opt-out karna.',
+        'Koi bhi request: <strong style="color:var(--dark)">support@rkgrocerymart.com</strong> par email karein — hum 7 working days mein jawab dete hain.',
+      ]}/>
+
+      <IHead icon={ShieldCheck}>8. Bacchon Ki Privacy</IHead>
+      <IP>Hamari services 18 saal se kam bacchon ke liye nahi hain. Hum jaan-boojh kar bacchon se jaankari collect nahi karte. Agar aapko lagta hai ki humne galti se bacche ki jaankari le li hai, to humein batayein — hum turant delete kar denge.</IP>
+
+      <IHead icon={FileText}>9. Is Policy Mein Badlav</IHead>
+      <IP>Kabhi kabhi hum is policy ko update kar sakte hain. Bade badlav par hum site par prominent notice ya SMS se inform karenge. Continue karne ka matlab hai aap updated policy se sehmat hain.</IP>
+
+      <ICall title="Privacy Se Judi Koi Bhi Baat" icon={Mail}>
+        Data access, correction ya deletion chahiye? 📧 <strong>support@rkgrocerymart.com</strong> par likhein ya 📞 <strong>+91 63931 96765</strong> par call karein. Hum aapki request ka jawab 7 working days denge.
+      </ICall>
+    </div>
+  );
+}
+
+function TermsBody(){
+  return(
+    <div>
+      <IP>Yeh Terms &amp; Conditions ("Terms") <strong style={{color:'var(--dark)'}}>RK Grocery Mart</strong> ki website, app aur services ke use ko control karti hai. Site use karte ya koi order place karne se, aap in Terms se sehmat hote hain. Agar aap sehmat nahi hain, to kripya site/service use na karein.</IP>
+
+      <IHead icon={Users}>1. Account &amp; Registration</IHead>
+      <IBullets items={[
+        'Order place karne ke liye aapko valid mobile number aur delivery address dena zaroori hai.',
+        'Aapka account sirf aapke personal use ke liye hai — credentials share karna ya account transfer karna allowed nahi hai.',
+        'Aap responsible hain apne account par hone wali har activity ke liye. Koi suspicious activity dikhe to turant humein batayein.',
+        'Galat ya misleading jaankari (naam, number, address) dene par order cancel ho sakta hai.',
+      ]}/>
+
+      <IHead icon={Store}>2. Products &amp; Availability</IHead>
+      <IBullets items={[
+        'Humare product images representative hain — actual packaging/brand ka look thoda alag ho sakta hai (weight/quantity hamesha wahi hota hai jo order kiya hai).',
+        'Fresh items (sabzi, fruits, dairy) availability season aur daily stock par depend karti hai. Stock khatam hone par hum substitute ya refund dete hain — aapko pehle inform kiya jaata hai.',
+        'Hum kisi bhi order ko stock issue, pricing error ya suspected fraud ke kaaran cancel karne ka adhikar rakhte hain — us case mein full refund milta hai.',
+      ]}/>
+
+      <IHead icon={Wallet}>3. Pricing &amp; Payment</IHead>
+      <IBullets items={[
+        'Saari prices Indian Rupees (₹) mein hain aur GST include karti hain (jahan laagu ho).',
+        'Price order confirm karne par lock hoti hai. Pricing error ki wajah se cancel hone par full refund diya jaata hai.',
+        'Accepted: UPI, debit/credit cards, net banking, wallets aur Cash on Delivery (COD).',
+        'COD orders ke liye exact change ready rakhein — delivery partner change dene ki capacity mein nahi ho sakta.',
+        'Coupon/discount offers ke apne terms hote hain aur kabhi kabhi ek dusre ke saath combine nahi hote.',
+      ]}/>
+
+      <IHead icon={CheckCircle2}>4. Order Confirmation &amp; Cancellation</IHead>
+      <IBullets items={[
+        'Order place karte hi aapko confirmation milta hai — lekin order tab confirm hota hai jab hum stock verify karke accept karein.',
+        'Delivery se pehle tak aap kabhi bhi order cancel kar sakte hain — full refund, bina kisi charges ke.',
+        'Refund usually 3-5 working days mein original payment method par reflect hota hai (bank ke hisaab se).',
+        'Baar-baar orders cancel karne ya fake orders karne par account restrict ho sakta hai.',
+      ]}/>
+
+      <IHead icon={Truck}>5. Delivery</IHead>
+      <IBullets items={[
+        'Delivery time slots 7:00 AM se 10:00 PM (daily) available hain — slots aapke area ke hisaab se dikhte hain.',
+        'Estimated time ETA hota hai, guarantee nahi — traffic, weather ya rush mein delay ho sakta hai.',
+        'Ghar par koi na mile to delivery partner aapko call karega; 2 attempts ke baad order return ho jaata hai aur refund process hota hai.',
+        'Delivery charges aur free-delivery threshold <a href="index.html#shipping" style="color:var(--primary);font-weight:700;text-decoration:underline">Delivery &amp; Shipping</a> page par diye gaye hain.',
+      ]}/>
+
+      <IHead icon={RotateCcw}>6. Returns, Refunds &amp; Replacements</IHead>
+      <IBullets items={[
+        '<strong style="color:var(--dark)">Freshness guarantee:</strong> koi bhi sabzi, fruit ya dairy product kharab/milawati lage to delivery ke 24 ghante ke andar photo bhejein — 100% replacement ya refund.',
+        '<strong style="color:var(--dark)">Wrong/missing item:</strong> hum turant sahi item deliver karte hain ya uska paisa wapas dete hain.',
+        '<strong style="color:var(--dark)">Sealed personal care &amp; baby products:</strong> unused, seal intact condition mein 7 din ke andar return.',
+        'Kuch items returnable nahi hain: perishable fresh items (agar quality theek ho), personal care items jo open ho chuke ho, medicines aur innerwear.',
+        'Refund ya to replacement, ya original payment method par — jaisa aap choose karein.',
+      ]}/>
+
+      <IHead icon={ShieldCheck}>7. Acceptable Use</IHead>
+      <IBullets items={[
+        'Site/app ka use kisi illegal, fraudulent ya dusron ko nuksaan pahunchane wale tarike se nahi karein.',
+        'Automated bots, scraping, ya bina permission data extract karna strictly prohibited hai.',
+        'Reviews sirf genuine purchases par diye jaayein — fake reviews par action le sakte hain.',
+        'Humare logos, content ya branding bina written permission ke use karna allowed nahi hai.',
+      ]}/>
+
+      <IHead icon={ScrollText}>8. Intellectual Property</IHead>
+      <IP>Is site ka poora content — naam, logo, design, images, product descriptions, code aur graphics — RK Grocery Mart ki property hai ya licensed hai. Bina written permission ke copy, modify ya redistribute karna strictly prohibited hai.</IP>
+
+      <IHead icon={ShieldCheck}>9. Limitation of Liability</IHead>
+      <IBullets items={[
+        'Hum site aur services ko "jaisa hai" basis par provide karte hain — koi guarantee nahi ki hamesha bina ruke ya error-free chalegi.',
+        'Humari maximum liability hamesha us order value tak limited hogi jise aapne us specific order ke liye pay kiya hai.',
+        'Hum indirect, incidental ya consequential loss (jaise business loss, data loss) ke liye zimmedaar nahi honge.',
+        'Kuch cheezein humare control se bahar hain: network outage, natural disaster, strikes ya government restrictions — inmein delay ke liye hum zimmedaar nahi, lekin hum aapke paise hamesha safe rakhte hain.',
+      ]}/>
+
+      <IHead icon={FileText}>10. Termination</IHead>
+      <IP>Agar aap in Terms ka ulanghan karein, to hum bina notice ke aapka account aur orders suspend/terminate kar sakte hain. Aap bhi kabhi bhi apna account delete kar sakte hain (jo outstanding orders/refunds hain wo pehle settle ho jaayenge).</IP>
+
+      <IHead icon={FileText}>11. Governing Law &amp; Disputes</IHead>
+      <IP>Yeh Terms Bharat ke kanoon ke mutabik chalengi. Koi bhi dispute pehle friendly discussion se solve karne ki koshish hogi — humse <strong style={{color:'var(--dark)'}}>support@rkgrocerymart.com</strong> par contact karein. Settlement na ho to dispute jurisdiction ke relevant Indian courts mein jayega.</IP>
+
+      <IHead icon={FileText}>12. Changes in Terms</IHead>
+      <IP>Hum in Terms ko kabhi bhi update kar sakte hain. Naye changes site par publish hote hi laagu ho jaate hain. "Last updated" date dekh kar aap hamesha latest version check kar sakte hain. Continued use = updated Terms ki sehmati.</IP>
+
+      <ICall title="Terms Se Judi Koi Shak?" icon={HelpCircle}>
+        Koi bhi sawaal ho to order place karne se pehle poochh lein — hum khushi se explain karenge. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · ya <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Help &amp; Support</a>.
+      </ICall>
+    </div>
+  );
+}
+
+function ShippingBody(){
+  return(
+    <div>
+      <IP>RK Grocery Mart par hum chahte hain ki aapka samaan <strong style={{color:'var(--dark)'}}>time par, safe aur bilkul fresh</strong> pahunche. Yeh page hamari poori delivery policy clearly explain karta hai — charges se lekar tracking tak, sab kuch.</IP>
+
+      <IHead icon={Truck}>Delivery At A Glance</IHead>
+      <ITable
+        head={['Service','Details','Charges']}
+        rows={[
+          ['⏱️ Standard Delivery','60-90 min (avg.), 7 AM – 10 PM','Free above ₹499'],
+          ['🚀 Express Delivery','Jaldi chahiye? Slot select karein','₹29 flat'],
+          ['🛒 Below ₹499 orders','Any slot, same day delivery','₹29 handling'],
+          ['📅 Scheduled Delivery','Apna pasandeeda time slot chunein','Free above ₹499'],
+        ]}
+      />
+      <p className="text-[11px] font-poppins" style={{color:'var(--gray)'}}>Note: Charges aapke area, order value aur ongoing offers par depend kar sakte hain. Checkout par final amount clearly dikhaya jaata hai — koi hidden charge nahi.</p>
+
+      <IHead icon={Clock}>Order Kaise Process Hota Hai</IHead>
+      <IBullets items={[
+        '<strong style="color:var(--dark)">Step 1 — Order place:</strong> aap cart se order confirm karte hain aur payment ya COD select karte hain.',
+        '<strong style="color:var(--dark)">Step 2 — Smart picking:</strong> hamari trained team har item ka expiry date, batch aur freshness check karke pick karti hai.',
+        '<strong style="color:var(--dark)">Step 3 — Quality check &amp; packing:</strong> order double-check hokar insulated/safe packaging mein pack hota hai (dairy aur frozen ke liye alag handling).',
+        '<strong style="color:var(--dark)">Step 4 — On the way:</strong> delivery partner assign hota hai — aapko live status aur rider details milti rehti hain.',
+        '<strong style="color:var(--dark)">Step 5 — Delivered:</strong> OTP ya hand-to-hand delivery ke saath order aapke darwaze par. Invoice SMS/email par mil jaata hai.',
+      ]}/>
+
+      <IHead icon={MapPin}>Delivery Areas &amp; Slots</IHead>
+      <IBullets items={[
+        'Hum apne poore service area mein deliver karte hain — aap checkout par apna PIN code/area daal kar check kar sakte hain.',
+        'Daily slots: <strong style="color:var(--dark)">7:00 AM se 10:00 PM</strong> (subah, dopahar, shaam aur raat ke slots available).',
+        'Rush hours (shaam 6-9 PM aur weekend) mein slight delay ho sakta hai — hum aapko pehle inform karte hain.',
+        'Naye area mein shift ho rahe hain? WhatsApp karein — agar aapka area abhi list mein nahi hai to hum jaldi add karne ki koshish karenge.',
+      ]}/>
+
+      <IHead icon={Star}>Order Tracking</IHead>
+      <IBullets items={[
+        'Order confirm hote hi confirmation SMS/WhatsApp aata hai.',
+        'Picking → packed → out for delivery → delivered — har step par notification.',
+        'Koi delay dikhe to seedha <a href="support.html" style="color:var(--primary);font-weight:700;text-decoration:underline">Help &amp; Support</a> par jaake Ananya AI se live status poochhein, ya call karein.',
+      ]}/>
+
+      <IHead icon={ShieldCheck}>Agar Delivery Fail Ho Jaaye</IHead>
+      <IBullets items={[
+        'Delivery partner pehle aapko call karega — reachable rahiye assigned slot ke dauraan.',
+        'Ghar par koi na mile to partner dobara try karega (same slot ya agle slot mein).',
+        'Do attempts ke baad bhi delivery na ho paaye to order cancel ho jaata hai aur <strong style="color:var(--dark)">full refund 3-5 working days</strong> mein process ho jaata hai.',
+        'Agar aap order cancel karna chahte hain delivery se pehle to bina kisi charges ke kar sakte hain.',
+      ]}/>
+
+      <IHead icon={Leaf}>Freshness &amp; Substitutions</IHead>
+      <IBullets items={[
+        'Fresh items (sabzi, fruits, dairy) order ke waqt ya usse pehle hi select ki jaati hain — cold chain maintain rehta hai.',
+        'Agar koi item stock mein na ho to hum aapko <strong style="color:var(--dark)">pehle inform karte hain</strong> — aap substitute accept kar sakte hain, skip kar sakte hain ya refund le sakte hain.',
+        'Koi item pasand na aaye (quality, packaging, expiry) to delivery ke <strong style="color:var(--dark)">24 ghante</strong> ke andar bataayein — instant replacement ya full refund.',
+      ]}/>
+
+      <IHead icon={Clock}>Delay Kab Ho Sakti Hai</IHead>
+      <IBullets items={[
+        'Monsoon, heavy rain, traffic jams ya road blocks.',
+        'Festive season ya weekend rush (extra orders).',
+        'Extreme weather ya local bandh/jaat-aarandh.',
+        'Address galat ya phone unreachable hone par.',
+      ]}/>
+      <IP>Is tarah ki situations mein hum SMS/WhatsApp se update karte hain aur jaise hi normal hota hai, order priority par deliver hota hai. Bade delay par aap refund bhi le sakte hain — no questions asked.</IP>
+
+      <IHead icon={Wallet}>Cancellation &amp; Refund Policy</IHead>
+      <IBullets items={[
+        'Delivery se pehle cancel: <strong style="color:var(--dark)">full refund</strong>, zero charges.',
+        'Partial delivery: sirf delivered items ka pay karte hain, baaki ka refund turant.',
+        'Refund mode: original payment method (UPI/card/wallet) — COD orders ke liye bank transfer/UPI.',
+        'Refund timeline: <strong style="color:var(--dark)">3-5 working days</strong> (UPI usually same day).',
+      ]}/>
+
+      <ICall title="Delivery Se Judi Madad Chahiye?" icon={Truck}>
+        Order status, address change ya slot reschedule — sab kuch. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · 24x7 <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Ananya AI chat</a> par bhi poochh sakte hain.
+      </ICall>
+    </div>
+  );
+}
+
+// ℹ️ Static pages (About / Privacy / Terms / Shipping) — content admin
+// shop_settings (about_text / privacy_policy / terms_text / shipping_rules)
+// se aaye to wahi dikhega, warna neeche diya gaya rich default content.
+const LEGAL_TABS=[{k:'about',l:'About Us'},{k:'privacy',l:'Privacy Policy'},{k:'terms',l:'Terms & Conditions'},{k:'shipping',l:'Delivery & Shipping'}];
+function InfoPage({title,subtitle,body,fallback,onNav,activeKey,children}){
+  return(
+    <div className="max-w-site mx-auto px-4 md:px-8 py-6 md:py-8">
+      <button onClick={()=>onNav&&onNav('home')} aria-label="Back to home"
+        className="inline-flex items-center gap-1.5 mb-4 text-xs md:text-sm font-poppins font-bold rounded-xl px-3.5 py-2 transition-transform active:scale-95"
+        style={{background:'var(--card-bg)',color:'var(--primary-dark)',border:'1px solid var(--border)'}}>
+        <ChevronLeft size={15}/> Back to Home
+      </button>
+
+      {/* Legal tabs — in pages ke beech quick switching */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-1 -mx-1 px-1" style={{scrollbarWidth:'none'}}>
+        {LEGAL_TABS.map(t=>(
+          <button key={t.k} onClick={()=>onNav&&onNav(t.k)}
+            className="whitespace-nowrap rounded-full px-4 py-2 text-[11px] md:text-xs font-poppins font-bold transition-all"
+            style={activeKey===t.k
+              ?{background:'var(--primary)',color:'#fff',boxShadow:'0 4px 12px rgba(0,0,0,0.12)'}
+              :{background:'var(--card-bg)',color:'var(--text)',border:'1px solid var(--border)'}}>
+            {t.l}
+          </button>
+        ))}
+      </div>
+
+      <div className="rounded-3xl p-5 md:p-10 mt-2" style={{background:'var(--card-bg)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
+        <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-3 text-[10px] md:text-xs font-bold font-poppins uppercase tracking-wide"
+          style={{background:'var(--primary-light)',color:'var(--primary-dark)'}}>
+          RK Grocery Mart · Official
+        </div>
+        <h1 className="font-extrabold font-poppins text-xl md:text-3xl leading-tight" style={{color:'var(--dark)'}}>{title}</h1>
+        {subtitle&&<p className="text-xs md:text-sm font-poppins mt-1.5 mb-5 leading-relaxed" style={{color:'var(--gray)'}}>{subtitle}</p>}
+        <div className="mt-5 pt-6" style={{borderTop:'1px solid var(--border)'}}>
+          {body
+            ?<div className="text-sm font-poppins leading-relaxed whitespace-pre-wrap" style={{color:'var(--text)'}}>{body}</div>
+            :fallback}
+        </div>
+        <div className="mt-8 pt-4 text-[11px] font-poppins leading-relaxed" style={{borderTop:'1px solid var(--border)',color:'var(--gray)'}}>
+          Last updated: 19 October 2026 · Is page ko time-samay par update kiya ja sakta hai — continue karne ka matlab hai aap latest version se sehmat hain.
+        </div>
+      </div>
+
+      {children}
     </div>
   );
 }
@@ -934,6 +1330,9 @@ export default function App(){
   useEffect(()=>{
     if(window.location.hash==='#shop'){setPage('shop');setActiveCatId('all');setSearch('');setShopPage(1);}
     if(window.location.hash==='#cart'){setCartOpen(true);}
+    // Legal/info pages bhi deep-link ho sakte hain (index.html#about etc.)
+    const legalHash=window.location.hash.replace('#','');
+    if(['about','privacy','terms','shipping'].includes(legalHash)) setPage(legalHash);
   },[]);
 
   // Shop products (filtered)
@@ -1470,10 +1869,26 @@ export default function App(){
           wishlistIds={wishlistIds} onWishlist={toggleWishlist}
           adStrips={adStrips} onAdClick={handleAdClick}
         />}
-        {page==='about'&&<InfoPage title="About Us" body={shopSettings.about_text}/>}
-        {page==='privacy'&&<InfoPage title="Privacy Policy" body={shopSettings.privacy_policy}/>}
-        {page==='terms'&&<InfoPage title="Terms & Conditions" body={shopSettings.terms_text}/>}
-        {page==='shipping'&&<InfoPage title="Delivery & Shipping" body={shopSettings.shipping_rules}/>}
+        {page==='about'&&<InfoPage title="About Us" activeKey="about" onNav={setPage}
+          subtitle="Hamari kahani, mission aur woh promises jo har order ke saath poore hote hain."
+          body={shopSettings.about_text} fallback={<AboutBody/>}>
+          <div className="mt-6 md:mt-8"><Footer shopSettings={shopSettings} onNav={setPage}/></div>
+        </InfoPage>}
+        {page==='privacy'&&<InfoPage title="Privacy Policy" activeKey="privacy" onNav={setPage}
+          subtitle="Aapki jaankari hamari zimmedari hai — hum kya collect karte hain, kaise use aur protect karte hain."
+          body={shopSettings.privacy_policy} fallback={<PrivacyBody/>}>
+          <div className="mt-6 md:mt-8"><Footer shopSettings={shopSettings} onNav={setPage}/></div>
+        </InfoPage>}
+        {page==='terms'&&<InfoPage title="Terms & Conditions" activeKey="terms" onNav={setPage}
+          subtitle="Order, payment, delivery aur returns — RK Grocery Mart ke saath shopping ke saare niyam."
+          body={shopSettings.terms_text} fallback={<TermsBody/>}>
+          <div className="mt-6 md:mt-8"><Footer shopSettings={shopSettings} onNav={setPage}/></div>
+        </InfoPage>}
+        {page==='shipping'&&<InfoPage title="Delivery & Shipping" activeKey="shipping" onNav={setPage}
+          subtitle="Delivery time, charges, tracking aur refund — sab kuch clearly explain kiya gaya hai."
+          body={shopSettings.shipping_rules} fallback={<ShippingBody/>}>
+          <div className="mt-6 md:mt-8"><Footer shopSettings={shopSettings} onNav={setPage}/></div>
+        </InfoPage>}
 
         {/* ── SHOP ── */}
         {page==='shop'&&(

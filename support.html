@@ -51,6 +51,34 @@
   .sp-card-title{font-size:.82rem;font-weight:700;color:var(--dark,#0F172A);}
   .sp-card-sub{font-size:.68rem;color:var(--gray,#64748B);}
   .sp-foot{text-align:center;padding:18px 16px 32px;font-size:.7rem;color:var(--gray,#64748B);}
+
+  /* ── Help content: topics + FAQ + quick links ── */
+  .sp-section{margin-top:22px;background:var(--card-bg,#fff);border:1px solid var(--border,#E2E8F0);border-radius:18px;padding:16px;}
+  .sp-section h2{font-size:.92rem;font-weight:800;margin:0 0 4px;color:var(--dark,#0F172A);display:flex;align-items:center;gap:8px;}
+  .sp-section .sp-sub{font-size:.72rem;color:var(--gray,#64748B);margin:0 0 12px;line-height:1.5;}
+  .sp-topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+  .sp-topic{display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:14px;background:var(--page-bg,#F5F5F5);border:1px solid var(--border,#E2E8F0);text-decoration:none;transition:transform .15s,box-shadow .15s;}
+  .sp-topic:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.07);}
+  .sp-topic .t-ic{font-size:1.15rem;}
+  .sp-topic .t-t{font-size:.78rem;font-weight:700;color:var(--dark,#0F172A);}
+  .sp-topic .t-d{font-size:.66rem;color:var(--gray,#64748B);line-height:1.45;}
+  .sp-faq details{border:1px solid var(--border,#E2E8F0);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:var(--page-bg,#F5F5F5);}
+  .sp-faq details[open]{background:var(--primary-light,#E8F5E9);border-color:var(--primary,#16A34A);}
+  .sp-faq summary{font-size:.78rem;font-weight:700;color:var(--dark,#0F172A);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .sp-faq summary::-webkit-details-marker{display:none;}
+  .sp-faq summary::after{content:'+';font-size:1rem;font-weight:800;color:var(--primary,#16A34A);flex-shrink:0;transition:transform .2s;}
+  .sp-faq details[open] summary::after{content:'−';}
+  .sp-faq .a{font-size:.72rem;color:var(--text,#334155);line-height:1.6;margin-top:7px;}
+  .sp-hours{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px;}
+  .sp-hours span{font-size:.68rem;font-weight:600;color:var(--primary-dark,#15803D);background:var(--primary-light,#E8F5E9);border-radius:99px;padding:5px 11px;}
+  .sp-legal{display:flex;flex-wrap:wrap;gap:8px;}
+  .sp-legal a{font-size:.7rem;font-weight:700;color:var(--primary-dark,#15803D);background:var(--primary-light,#E8F5E9);border:1px solid var(--border,#E2E8F0);border-radius:99px;padding:7px 13px;text-decoration:none;transition:transform .15s;}
+  .sp-legal a:hover{transform:translateY(-1px);}
+  html[data-theme="dark"] .sp-section{background:#151B26;}
+  html[data-theme="dark"] .sp-faq details{background:#10151F;}
+  html[data-theme="dark"] .sp-topic{background:#10151F;}
+  html[data-theme="dark"] .sp-faq details[open]{background:rgba(22,163,74,.12);}
+  html[data-theme="dark"] .sp-legal a,html[data-theme="dark"] .sp-hours span{background:rgba(22,163,74,.14);border-color:var(--border);}
   html[data-theme="dark"] .sp-header{background:#151B26;}
   html[data-theme="dark"] .sp-chat-box{background:#151B26;border-color:var(--border);}
   html[data-theme="dark"] .sp-card{background:#151B26;}
@@ -89,7 +117,7 @@
      hota, input keyboard ke upar hi rehta hai. */
   @media (max-width: 480px){
     body{overflow:hidden;}
-    .sp-header,.sp-hero,.sp-contact,.sp-foot{display:none;}
+    .sp-header,.sp-hero,.sp-contact,.sp-foot,.sp-section{display:none;}
     .sp-main{padding:0;max-width:100%;}
     #ananya-inline{
       height:100vh;
@@ -141,6 +169,123 @@
         <div><div class="sp-card-title">Email</div><div class="sp-card-sub">support@rkgrocerymart.com</div></div>
       </a>
     </div>
+
+    <!-- ── Popular Help Topics ── -->
+    <section class="sp-section" style="margin-top:22px">
+      <h2>🧭 Popular Help Topics</h2>
+      <p class="sp-sub">Sabse zyada pooche jaane wale topics — ek tap mein poora jawab.</p>
+      <div class="sp-topics">
+        <a class="sp-topic" href="index.html#shipping">
+          <span class="t-ic">🚚</span>
+          <span class="t-t">Delivery &amp; Charges</span>
+          <span class="t-d">Time slots, free-delivery threshold, tracking aur delayed orders.</span>
+        </a>
+        <a class="sp-topic" href="index.html#terms">
+          <span class="t-ic">↩️</span>
+          <span class="t-t">Returns &amp; Refunds</span>
+          <span class="t-d">Freshness guarantee, wrong item, replacement aur refund timeline.</span>
+        </a>
+        <a class="sp-topic" href="index.html#terms">
+          <span class="t-ic">💳</span>
+          <span class="t-t">Payment &amp; Orders</span>
+          <span class="t-d">UPI/COD, order cancel kaise karein, coupons aur invoices.</span>
+        </a>
+        <a class="sp-topic" href="index.html#privacy">
+          <span class="t-ic">🔒</span>
+          <span class="t-t">Account &amp; Privacy</span>
+          <span class="t-d">Data kaise use hota hai, account delete aur password reset.</span>
+        </a>
+        <a class="sp-topic" href="index.html#about">
+          <span class="t-ic">🏪</span>
+          <span class="t-t">About RK Grocery Mart</span>
+          <span class="t-d">Hamari kahani, values aur kya-kya milta hai humare store par.</span>
+        </a>
+        <a class="sp-topic" href="index.html#shop">
+          <span class="t-ic">🛒</span>
+          <span class="t-t">Products &amp; Stock</span>
+          <span class="t-d">Categories, freshness, substitutions aur naye products.</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ── FAQ ── -->
+    <section class="sp-section sp-faq">
+      <h2>❓ Frequently Asked Questions</h2>
+      <p class="sp-sub">Jawaab nahi mila? Neeche chat box mein Ananya se seedha poochh lein — wo 24x7 available hai.</p>
+
+      <details open>
+        <summary>Mera order kitne time mein pahunchega?</summary>
+        <div class="a">Standard delivery average 60-90 minute mein ho jaati hai. Slots roz 7:00 AM se 10:00 PM tak available hain — checkout par apna slot chunein. Rush hours (shaam 6-9 PM) aur festive season mein thoda delay ho sakta hai, uske liye aapko SMS/WhatsApp se update milta rehta hai.</div>
+      </details>
+
+      <details>
+        <summary>Delivery kitne ki hai — koi hidden charge to nahi?</summary>
+        <div class="a">₹499 ya usse zyada ke orders par delivery free hai. ₹499 se kam ke orders par ₹29 handling lagta hai. Checkout par final amount pehle hi dikh jaata hai — koi hidden charge kabhi nahi. Poora details: <a href="index.html#shipping" style="color:var(--primary);font-weight:700">Delivery &amp; Shipping</a> page par.</div>
+      </details>
+
+      <details>
+        <summary>Kaise track karun ki mera order kahan hai?</summary>
+        <div class="a">Order confirm hote hi confirmation SMS/WhatsApp aata hai. Picking → Packed → Out for delivery → Delivered — har step par notification bheji jaati hai. Agar phir bhi status chahiye to upar chat box mein Ananya se "mera order kahan hai" poochh lein, ya seedha call kar lein.</div>
+      </details>
+
+      <details>
+        <summary>Sabzi/fruit fresh nahi nikla to kya karun?</summary>
+        <div class="a">Hamari freshness guarantee ke tehat: delivery ke 24 ghante ke andar photo ke saath batayein — hum turant replacement bhejenge ya 100% refund kar denge. Bina kisi sawaal ke. Yeh policy har fresh item, dairy aur bakery par laagu hoti hai.</div>
+      </details>
+
+      <details>
+        <summary>Order cancel karne par paisa wapas milega?</summary>
+        <div class="a">Ji bilkul. Delivery se pehle tak aap bina kisi charges ke cancel kar sakte hain — full refund. Prepaid orders ka refund 3-5 working days mein original payment method par reflect hota hai (UPI par aam taur par same/next day). COD orders ke liye refund UPI/bank transfer se hota hai.</div>
+      </details>
+
+      <details>
+        <summary>Payment ke kaun se options hain?</summary>
+        <div class="a">UPI (GPay, PhonePe, Paytm), debit/credit cards, net banking, wallets aur Cash on Delivery — sab supported hain. Saare online payments encrypted (SSL) aur PCI-DSS compliant gateways se hote hain; hum aapke card details kabhi store nahi karte.</div>
+      </details>
+
+      <details>
+        <summary>Koi item stock mein nahi hai to?</summary>
+        <div class="a">Aise case mein hum aapko pehle inform karte hain — aap substitute accept kar sakte hain, item skip kar sakte hain ya uska refund le sakte hain. Hum kabhi bina bataye koi aur mehanga item nahi bhejte.</div>
+      </details>
+
+      <details>
+        <summary>Mera area abhi deliver hota hai?</summary>
+        <div class="a">Checkout par apna PIN code/area daalein — turant pata chal jaayega. Agar aapka area list mein nahi hai to WhatsApp (+91 63931 96765) par bata dein — hum aapke area ko jaldi add karne ki koshish karte hain.</div>
+      </details>
+
+      <details>
+        <summary>Support kab available hai?</summary>
+        <div class="a">
+          Ananya AI chat: 24x7 (turant jawab).<br/>
+          Phone &amp; WhatsApp support: roz 7:00 AM – 10:00 PM.<br/>
+          Email (support@rkgrocerymart.com): 24 ghante mein andar-andar jawab.
+          <div class="sp-hours" style="margin-top:8px">
+            <span>🕒 Daily 7 AM – 10 PM</span>
+            <span>💬 Chat 24x7</span>
+            <span>📧 Reply in 24 hrs</span>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>Order mein kuch add/change kar sakta hun?</summary>
+        <div class="a">Picking shuru hone se pehle aap order modify ya cancel kar sakte hain. Picking ke baad change possible nahi hota (taaki aapka slot miss na ho) — aap cancel karke naya order place kar sakte hain, pehle wale ka refund automatically process ho jaata hai.</div>
+      </details>
+    </section>
+
+    <!-- ── Legal / policy quick links ── -->
+    <section class="sp-section">
+      <h2>📄 Policies &amp; Information</h2>
+      <p class="sp-sub">Poori jaankari ek jagah — sab kuch clearly likha hua.</p>
+      <div class="sp-legal">
+        <a href="index.html#about">About Us</a>
+        <a href="index.html#privacy">Privacy Policy</a>
+        <a href="index.html#terms">Terms &amp; Conditions</a>
+        <a href="index.html#shipping">Delivery &amp; Shipping</a>
+        <a href="account.html">My Account</a>
+        <a href="index.html#shop">Shop Products</a>
+      </div>
+    </section>
   </main>
 
   <footer class="sp-foot">© 2026 RK Grocery Mart · हर घर की पसंद · Sabhi rights reserved</footer>
