@@ -29,6 +29,7 @@
  * Env: RAZORPAY_WEBHOOK_SECRET (Razorpay Dashboard → Settings → Webhooks)
  */
 const crypto = require('crypto');
+const { sendUserNotification } = require('./_notify');
 
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
@@ -65,7 +66,7 @@ async function callRpc(fn, payload) {
 // DB me razorpay_order_id se order dhoondho (draft hi eligible hota hai)
 async function findOrderByRzpOrder(razorpayOrderId) {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/orders?select=id,order_number,razorpay_order_id,payment_status,status,final_amount` +
+    `${SUPABASE_URL}/rest/v1/orders?select=id,order_number,razorpay_order_id,payment_status,status,final_amount,user_id` +
       `&razorpay_order_id=eq.${encodeURIComponent(razorpayOrderId)}&limit=1`,
     {
       headers: {
@@ -178,6 +179,19 @@ module.exports = async (req, res) => {
           p_source: 'webhook',
         });
         console.log('[razorpay-webhook] payment.captured →', out?.status, order.order_number);
+        // Customer notification (in-app + push) — sirf asli pehli baar
+        // (duplicate webhook par finalize 'already_paid' return karta hai).
+        if (out?.status === 'paid') {
+          try {
+            await sendUserNotification({
+              userId: order.user_id || null,
+              title: 'Payment successful ✅',
+              message: `Order ${order.order_number || ''} confirm ho gaya hai — hum jaldi deliver karenge.`,
+              type: 'order',
+              url: '/account.html?tab=orders',
+            });
+          } catch (e) { console.warn('[razorpay-webhook] notify skipped:', e?.message || e); }
+        }
         return res.status(200).json({ ok: true, status: out?.status });
       }
 
@@ -212,6 +226,17 @@ module.exports = async (req, res) => {
         p_source: 'webhook:order.paid',
       });
       console.log('[razorpay-webhook] order.paid →', out?.status, order.order_number);
+      if (out?.status === 'paid') {
+        try {
+          await sendUserNotification({
+            userId: order.user_id || null,
+            title: 'Payment successful ✅',
+            message: `Order ${order.order_number || ''} confirm ho gaya hai — hum jaldi deliver karenge.`,
+            type: 'order',
+            url: '/account.html?tab=orders',
+          });
+        } catch (e) { console.warn('[razorpay-webhook] notify skipped:', e?.message || e); }
+      }
       return res.status(200).json({ ok: true, status: out?.status });
     }
 

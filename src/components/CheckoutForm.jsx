@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { UpiPayCard } from './UpiPayCard';
-import { useShopSettings, useCouponValidator } from '../hooks/dataHooks';
+import { useCouponValidator } from '../hooks/dataHooks';
 import { supabase } from '../lib/supabaseClient';
 
 /* ══════════════════════════════════════════════════════════
@@ -31,13 +30,6 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
   const [phoneTouched,setPhoneTouched]=useState(false);
   const [placing,setPlacing]=useState(false);
   const [orderError,setOrderError]=useState('');
-  const [orderInfo,setOrderInfo]=useState(null);
-  const [showVerifyForm,setShowVerifyForm]=useState(false);
-  const [utr,setUtr]=useState('');
-  const [screenshotFile,setScreenshotFile]=useState(null);
-  const [screenshotPreview,setScreenshotPreview]=useState(null);
-  const [submittingVerify,setSubmittingVerify]=useState(false);
-  const [pendingOrder,setPendingOrder]=useState(null);
   // ── Razorpay online payment (server-side order + signature verify) ──
   const [rzpBusy,setRzpBusy]=useState(false);
   // VITE_RAZORPAY_KEY_ID = public key id (browser-safe). Secret sirf server par.
@@ -59,32 +51,6 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
   const [locState,setLocState]=useState('idle'); // idle | loading | success | denied | error
   const [deliveryInfo,setDeliveryInfo]=useState(null);
   const total=cartTotal;
-  const COUNTDOWN_SEC=600;
-  const REMINDER_AFTER_SEC=120;
-  const [remainingSec,setRemainingSec]=useState(COUNTDOWN_SEC);
-  useEffect(()=>{
-    if(!showVerifyForm)return;
-    setRemainingSec(COUNTDOWN_SEC);
-    const t=setInterval(()=>setRemainingSec(s=>{
-      if(s<=1){
-        clearInterval(t);
-        setShowVerifyForm(false);
-        setPendingOrder(null);
-        // Polish fix: timer expiry now keeps the user on the checkout form (so they can
-        // retry payment / pick COD instead) rather than bouncing them all the way home
-        // and risking the impression their cart got cleared.
-        showToast('⏰ Time khatam ho gaya — dobara try karein');
-        return 0;
-      }
-      return s-1;
-    }),1000);
-    return()=>clearInterval(t);
-  },[showVerifyForm]);
-  const fmtTime=s=>{const m=Math.floor(s/60);const ss=String(s%60).padStart(2,'0');return`${m}:${ss}`;};
-  const showWaitHint=remainingSec<=COUNTDOWN_SEC-REMINDER_AFTER_SEC;
-  // BUG FIX (Critical #1): UPI ID ab admin ki Settings se live aati hai, hardcoded nahi.
-  const {settings:shopSettings}=useShopSettings();
-  const UPI_ID=shopSettings.upi_id;
   // BUG FIX (Critical #3): Coupon code input — pehle checkout mein ye field tha hi nahi,
   // isliye admin ke banaye coupons kabhi customer use nahi kar paata tha.
   const {validate:validateCoupon,checking:couponChecking}=useCouponValidator();
@@ -188,13 +154,6 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     }catch(err){showToast('Error! Dobara try karo.');}
     finally{setSavingAddr(false);}
   };
-  const handleScreenshotChange=e=>{
-    const file=e.target.files?.[0];
-    if(!file)return;
-    if(file.size>5*1024*1024){showToast('Screenshot 5MB se chhota hona chahiye');return;}
-    setScreenshotFile(file);
-    const r=new FileReader();r.onload=()=>setScreenshotPreview(r.result);r.readAsDataURL(file);
-  };
   // Razorpay checkout script ko ek baar load karo (cache karke)
   const loadRazorpayScript=()=>new Promise((resolve,reject)=>{
     if(window.Razorpay){resolve();return;}
@@ -208,7 +167,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     setRzpBusy(true);
     setOrderError('');
     try{
-      if(!RZP_KEY_ID){setOrderError('⚠️ Online payment abhi setup nahi hua — UPI QR ya COD chunein.');setRzpBusy(false);return;}
+      if(!RZP_KEY_ID){setOrderError('⚠️ Online payment abhi setup nahi hua — COD chunein.');setRzpBusy(false);return;}
       // Guest/session expired hone par order record ke bina payment na ho (paisa waste)
       if(!user){setOrderError('⚠️ Online payment ke liye login zaroori hai. Pehle login karein.');setRzpBusy(false);return;}
       await loadRazorpayScript();
@@ -224,7 +183,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       if(!result){
         result=await window.RKOrders.createDraft(user.uid,{cart,total,address:addressPayload,paymentMethod:'razorpay',promoCode:appliedCoupon?.code||null,discount,rewardsPoints:rewardApplied,...locationPayload});
         if(!result){setRzpBusy(false);setOrderError('⚠️ Order save nahi hua. Kripya dobara try karein.');return;}
-        if(result.migrationRequired){setRzpBusy(false);setOrderError('⚠️ Payment system update pending — thodi der baad try karein ya UPI/COD chunein.');return;}
+        if(result.migrationRequired){setRzpBusy(false);setOrderError('⚠️ Payment system update pending — thodi der baad try karein ya COD chunein.');return;}
         if(result.blocked){setRzpBusy(false);setOrderError('⚠️ Aapka account blocked hai — admin se sampark karein.');return;}
         // Razorpay ka amount HAMESHA server ke final_amount se (client display
         // se nahi) — 1-rupee rounding mismatch par payment reject na ho.
@@ -246,7 +205,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         body:JSON.stringify({amount:payPaise,receipt:orderNumber,orderId,notes:{orderNumber,orderId:orderId||''}}),
       });
       const o=await r.json().catch(()=>({}));
-      if(!r.ok||!o.orderId){setRzpBusy(false);setOrderError(o.error?'⚠️ '+o.error:'⚠️ Online payment shuru nahi hua — thodi der baad try karein ya UPI/COD chunein.');return;}
+      if(!r.ok||!o.orderId){setRzpBusy(false);setOrderError(o.error?'⚠️ '+o.error:'⚠️ Online payment shuru nahi hua — thodi der baad try karein ya COD chunein.');return;}
       const rzpOrderId=o.orderId;
       // handler ke baad modal dismiss ho — fake "cancel" na mark ho jaye
       rzpPaidRef.current=false;
@@ -307,7 +266,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       rzp.on('payment.failed',(resp)=>{
         if(rzpPaidRef.current)return;
         setRzpBusy(false);
-        setOrderError('⚠️ Payment fail hui — kripya dobara try karein ya UPI/COD chunein.');
+        setOrderError('⚠️ Payment fail hui — kripya dobara try karein ya COD chunein.');
         // DB me draft ko 'failed' mark karo (paid order par kabhi downgrade nahi hota)
         fetch('/api/razorpay-failed',{method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({orderId,razorpay_order_id:rzpOrderId,
@@ -318,7 +277,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     }catch(err){
       console.error('[CheckoutForm] razorpay:',err?.message||err);
       setRzpBusy(false);
-      setOrderError('⚠️ Online payment mein error — UPI QR ya COD chunein.');
+      setOrderError('⚠️ Online payment mein error — dobara try karein ya COD chunein.');
     }
   };
   const handlePlaceOrder=async()=>{
@@ -375,31 +334,8 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       }
       return;
     }
-    // Bug fix #3: don't fabricate/display a fake order number before any order actually
-    // exists. The QR/verification screen now shows "Pending" until createOrder() succeeds
-    // inside handleSubmitVerification, avoiding the confusing temp-number swap.
-    setPendingOrder({address:addressPayload,paymentMethod:pay,locationPayload});
-    setOrderInfo({orderId:null,orderNumber:null});
-    setShowVerifyForm(true);
-  };
-  const handleSubmitVerification=async()=>{
-    const utrClean=utr.trim();
-    if(!/^\d{12}$/.test(utrClean)){showToast('Sahi 12-digit UTR / Transaction ID daalein');return;}
-    if(!screenshotFile){showToast('Payment screenshot upload karein');return;}
-    if(!window.RKPayment){showToast('Verification system load nahi hua');return;}
-    if(!pendingOrder){showToast('Order data missing');return;}
-    setSubmittingVerify(true);
-    let result=null;
-    if(window.RKOrders&&user)result=await window.RKOrders.createOrder(user.uid,{cart,total,address:pendingOrder.address,paymentMethod:pendingOrder.paymentMethod,promoCode:appliedCoupon?.code||null,discount,rewardsPoints:rewardApplied,...(pendingOrder.locationPayload||{})});
-    if(!result){setSubmittingVerify(false);showToast('Order create nahi hua');return;}
-    const realOrderId=result.orderId;
-    const realOrderNumber=result.orderNumber||('RK'+Math.floor(1000+Math.random()*9000));
-    const screenshotUrl=await window.RKPayment.uploadScreenshot(screenshotFile,realOrderNumber);
-    if(!screenshotUrl){setSubmittingVerify(false);showToast('Screenshot upload fail hua');return;}
-    const saved=await window.RKPayment.submitVerification(user?.uid,{orderId:realOrderId,orderNumber:realOrderNumber,customerName:f.name.trim(),mobile:f.phone.trim(),utr:utrClean,screenshotUrl,amount:finalAmount});
-    setSubmittingVerify(false);
-    if(saved){if(window.RKCart)window.RKCart.clearCart();onSuccess(realOrderNumber,'upi');}
-    else showToast('Verification submit nahi hua');
+    // UPI-QR/UTR verification flow hata diya gaya — ab sirf Razorpay + COD.
+    setOrderError('⚠️ Payment method sahi nahi hai — dobara chunein.');
   };
 
   // Shared Tailwind field styles (kept purely presentational — no ids/classes
@@ -409,62 +345,6 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
   const inputCls="w-full mt-1 mb-3 px-3.5 py-2.5 rounded-xl text-sm font-poppins outline-none";
   const inputStyle={background:'var(--light)',border:'1.5px solid var(--border)',color:'var(--dark)'};
   const labelCls="text-xs font-semibold font-poppins block";
-
-  if(showVerifyForm){
-    return(
-      <div className="fixed inset-0 z-[90] flex flex-col" style={{background:'var(--page-bg)'}}>
-        <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{borderBottom:'1px solid var(--border)',background:'var(--card-bg)'}}>
-          <button aria-label="Band karein" onClick={()=>{setShowVerifyForm(false);setPendingOrder(null);}}
-            className="w-8 h-8 rounded-full flex items-center justify-center" style={{color:'var(--gray)'}}>✕</button>
-          <div className="font-extrabold font-poppins text-sm" style={{color:'var(--dark)'}}>Payment Karein</div>
-          <div className={`font-poppins font-bold text-xs px-2.5 py-1 rounded-lg ${remainingSec<=60?'animate-pulse':''}`}
-            style={{background:remainingSec<=60?'var(--tint-red-bg)':'var(--primary-light)',color:remainingSec<=60?'var(--tint-red-text)':'var(--primary-dark)'}}>⏱ {fmtTime(remainingSec)}</div>
-        </div>
-        {/* FIX (2026-08): scroll container ke saare children par `shrink-0` — pehle
-            flexbox inhe chhote viewports par compress kar deta tha (UpiPayCard ka
-            overflow-hidden uski min-height 0 kar deta hai, isliye wo sabse pehle
-            shrink hota tha) → QR card clip hota tha aur content 'squeeze' hone se
-            scrollHeight==clientHeight reh jata tha → screen 'frozen' lagti thi, scroll
-            karna impossible. Ab content kabhi compress nahi hota — chhote screens par
-            container proper scroll karta hai. + overscroll-contain (mobile par scroll
-            chaining se page 'fixed' feel na ho) + -webkit-overflow-scrolling:touch. */}
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pt-5 flex flex-col items-center" style={{WebkitOverflowScrolling:'touch', paddingBottom:'calc(8rem + env(safe-area-inset-bottom, 0px))'}}>
-          <div className="shrink-0 text-xs font-poppins font-semibold text-center" style={{color:'var(--gray)'}}>
-            {orderInfo?.orderNumber?`Order #${orderInfo.orderNumber}`:'Order pending — verification ke baad confirm hoga'}
-          </div>
-          <div className="shrink-0 text-3xl font-extrabold font-poppins mt-1 mb-4" style={{color:'var(--dark)'}}>₹{finalAmount}</div>
-          <div className="shrink-0 w-full flex justify-center"><UpiPayCard total={finalAmount} upiId={UPI_ID}/></div>
-          {showWaitHint&&(
-            <div className="shrink-0 flex items-center gap-2 rounded-xl px-3 py-2.5 mt-4 text-xs font-poppins font-semibold w-full max-w-sm" style={{background:'var(--tint-yellow-bg)',border:'1px solid var(--tint-yellow-border)',color:'var(--tint-yellow-text)'}}>
-              <span>⏰</span><span>QR dobara scan karein ya UPI ID <b>{UPI_ID}</b> par manually pay karein</span>
-            </div>
-          )}
-          <div className={`shrink-0 ${cardCls} w-full max-w-sm mt-3.5`} style={cardStyle}>
-            <div className="font-extrabold font-poppins text-sm mb-2" style={{color:'var(--dark)'}}>🧾 Payment Verification</div>
-            <label className={labelCls} htmlFor="utr-input" style={{color:'var(--gray)'}}>UTR / Transaction ID</label>
-            <input id="utr-input" className={inputCls} style={inputStyle} placeholder="UTR / Transaction ID *" value={utr} onChange={e=>setUtr(e.target.value.replace(/\s/g,''))}/>
-            <div className="text-[11px] font-poppins -mt-2 mb-3" style={{color:'var(--gray)'}}>UTR aapke UPI app ke payment history mein milega (12 digit number)</div>
-            <label className="block rounded-xl p-4 text-center cursor-pointer" style={{border:`1.5px dashed var(--border)`,background:screenshotFile?'var(--primary-light)':'var(--light)'}}>
-              <input type="file" accept="image/*" onChange={handleScreenshotChange} aria-label="Payment screenshot upload karein" className="hidden"/>
-              {!screenshotPreview
-                ?<>
-                  <div className="text-3xl">📷</div>
-                  <div className="font-bold font-poppins text-sm mt-1.5" style={{color:'var(--dark)'}}>Payment Screenshot Upload Karein</div>
-                  <div className="text-[11px] font-poppins mt-0.5" style={{color:'var(--gray)'}}>JPG/PNG • Max 5MB</div>
-                </>
-                :<img className="max-h-40 rounded-lg mx-auto" src={screenshotPreview} alt="Screenshot preview"/>
-              }
-            </label>
-          </div>
-          <button className="shrink-0 place-order-btn w-full max-w-sm mt-3.5 text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm"
-            style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))'}}
-            disabled={submittingVerify} onClick={handleSubmitVerification}>
-            {submittingVerify?'⏳ Submitting...':'✅ Verification Submit Karein'}
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return(
     <>
@@ -635,18 +515,12 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
 
       <div className={`co-card ${cardCls}`} style={cardStyle}>
         <div className="co-card-title font-extrabold font-poppins text-sm mb-2.5" style={{color:'var(--dark)'}}>💳 Payment Method</div>
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5">
           <div onClick={()=>setPay('razorpay')} className="rounded-xl p-3 text-center cursor-pointer"
             style={{border:`1.5px solid ${pay==='razorpay'?'var(--primary)':'var(--border)'}`,background:pay==='razorpay'?'var(--primary-light)':'transparent'}}>
             <div className="text-2xl">💳</div>
             <div className="text-xs font-bold font-poppins mt-1" style={{color:'var(--dark)'}}>Online Payment</div>
             <div className="text-[10px] font-poppins" style={{color:'var(--gray)'}}>Card / UPI / NetBanking</div>
-          </div>
-          <div onClick={()=>setPay('upi')} className="rounded-xl p-3 text-center cursor-pointer"
-            style={{border:`1.5px solid ${pay==='upi'?'var(--primary)':'var(--border)'}`,background:pay==='upi'?'var(--primary-light)':'transparent'}}>
-            <div className="text-2xl">📱</div>
-            <div className="text-xs font-bold font-poppins mt-1" style={{color:'var(--dark)'}}>UPI / QR Code</div>
-            <div className="text-[10px] font-poppins" style={{color:'var(--gray)'}}>Scan karke pay karo</div>
           </div>
           <div onClick={()=>setPay('cod')} className="rounded-xl p-3 text-center cursor-pointer"
             style={{border:`1.5px solid ${pay==='cod'?'var(--primary)':'var(--border)'}`,background:pay==='cod'?'var(--primary-light)':'transparent'}}>

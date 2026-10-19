@@ -93,7 +93,6 @@ const SHOP_SETTINGS_DEFAULTS = {
   shop_name: 'RK Grocery Mart',
   contact: '',
   whatsapp: '',
-  upi_id: 'Q025544077@ybl', // fallback agar admin ne settings save na ki ho
   delivery_radius: 8,
   delivery_charge: 30,
   open_time: '08:00',
@@ -128,7 +127,6 @@ export function useShopSettings(){
         shop_name:data.shop_name||SHOP_SETTINGS_DEFAULTS.shop_name,
         contact:data.contact||'',
         whatsapp:data.whatsapp||'',
-        upi_id:data.upi_id||SHOP_SETTINGS_DEFAULTS.upi_id,
         delivery_radius:data.delivery_radius??SHOP_SETTINGS_DEFAULTS.delivery_radius,
         delivery_charge:data.delivery_charge??SHOP_SETTINGS_DEFAULTS.delivery_charge,
         open_time:data.open_time||SHOP_SETTINGS_DEFAULTS.open_time,

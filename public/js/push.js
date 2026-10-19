@@ -17,7 +17,14 @@
   'use strict';
 
   // Vite ke VITE_VAPID_PUBLIC_KEY se inject hota hai (public key browser-safe)
-  const VAPID_KEY = window.__RK_PUSH_VAPID__ || '';
+  //
+  // BUG FIX (load order): pehle ye line IIFE ke run-time par capture ho jaati
+  // thi. account.html me /js/push.js classic script (parse-time, pehle) load
+  // hota hai, jabki window.__RK_PUSH_VAPID__ deferred React module (AccountPage)
+  // baad me set karta hai — isliye VAPID_KEY hamesha '' rehta tha, subscribe()
+  // hamesha 'VAPID key missing' throw karta tha aur Settings ka notification
+  // toggle hamesha error deta tha. Ab key LAZY padhi jaati hai — use ke waqt.
+  function getVapidKey() { return window.__RK_PUSH_VAPID__ || ''; }
 
   function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -34,6 +41,7 @@
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
       throw new Error('Push not supported in this browser');
     }
+    const VAPID_KEY = getVapidKey();
     if (!VAPID_KEY) throw new Error('VAPID key missing — push setup nahi hua');
     const reg = await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
@@ -75,7 +83,7 @@
   }
 
   window.RKPush = {
-    isSupported: () => ('serviceWorker' in navigator && 'PushManager' in window && !!VAPID_KEY),
+    isSupported: () => ('serviceWorker' in navigator && 'PushManager' in window && !!getVapidKey()),
     subscribe,
     save,
     unsave,

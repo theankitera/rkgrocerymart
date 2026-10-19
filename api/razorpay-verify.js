@@ -20,6 +20,7 @@
  * Response: { verified: true, paymentId } | { verified: false, error }
  */
 const crypto = require('crypto');
+const { sendUserNotification } = require('./_notify');
 
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
@@ -109,14 +110,16 @@ module.exports = async (req, res) => {
   }
 
   // ── 2. Verify against the DB draft + REAL order amount (service role) ──
+  let orderMeta = null;
   try {
     const orderRes = await supabase(
-      `orders?select=final_amount,payment_status,status,razorpay_order_id&id=eq.${encodeURIComponent(orderId)}`
+      `orders?select=final_amount,payment_status,status,razorpay_order_id,user_id,order_number&id=eq.${encodeURIComponent(orderId)}`
     );
     const dbOrder = Array.isArray(orderRes.data) ? orderRes.data[0] : null;
     if (!dbOrder) {
       return res.status(404).json({ verified: false, error: 'Order not found' });
     }
+    orderMeta = dbOrder;
 
     // Idempotency guard #1: payment pehle se verified hai → success bhejo,
     // duplicate record BANAO MAT (webhook aur checkout dono race kar sakte hain).
@@ -194,6 +197,23 @@ module.exports = async (req, res) => {
   } catch (e) {
     // Verification record optional hai — order already finalize ho chuka hai.
     console.warn('[razorpay-verify] payment_verifications insert skipped:', e?.message || e);
+  }
+
+  // ── 5. Customer notification (in-app + web push) — best-effort, order
+  //      flow kabhi iski wajah se fail nahi hoga. alreadyPaid duplicate par
+  //      notify NAHI hota (finalize idempotent hai — sirf asli pehli baar).
+  if (finalResult?.status !== 'already_paid') {
+    try {
+      await sendUserNotification({
+        userId: body.userId || orderMeta?.user_id || null,
+        title: 'Payment successful ✅',
+        message: `Order ${orderNumber || orderMeta?.order_number || ''} confirm ho gaya hai — hum jaldi deliver karenge.`,
+        type: 'order',
+        url: '/account.html?tab=orders',
+      });
+    } catch (e) {
+      console.warn('[razorpay-verify] notify skipped:', e?.message || e);
+    }
   }
 
   return res.status(200).json({

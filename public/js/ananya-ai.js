@@ -183,7 +183,13 @@
     const el = document.getElementById('ananya-widget');
     if (el) el.setAttribute('data-ananya-theme', isDark ? 'dark' : 'light');
   }
-  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', applyTheme);
+  // Purane Safari (<=13) par addEventListener nahi hota — top-level unguarded
+  // call poora script kill kar deti thi (widget hi mount nahi hota tha).
+  try {
+    const mq = window.matchMedia('(prefers-color-scheme:dark)');
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', applyTheme);
+    else if (typeof mq.addListener === 'function') mq.addListener(applyTheme);
+  } catch (e) { /* theme change live-update optional hai */ }
 
   /* ══════════════════════════════════════════
      MOBILE KEYBOARD / VIEWPORT FIX
@@ -222,7 +228,12 @@
     try {
       const host = CONFIG.supabaseUrl.replace(/^https?:\/\//, '').split('.')[0];
       const key = `sb-${host}-auth-token`;
-      const raw = localStorage.getItem(key);
+      // BUG FIX (login-gate loop): React login (LoginPage/AuthModal) by-default
+      // session ko sessionStorage me rakhta hai ("Yaad rakhein" unchecked =
+      // rk_remember==='0' → supabaseClient.js pickStorage()). Pehle yahan sirf
+      // localStorage padha jaata tha — isliye logged-in user ko bhi gate dikhta
+      // tha aur chat kabhi khulti nahi thi. Ab dono storages check hoti hain.
+      const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
       if (!raw) return null;
       const data = JSON.parse(raw);
       // supabase-js v2 session object: { access_token, refresh_token, expires_at, user }
@@ -263,7 +274,24 @@
         // user ko bhi hamesha guest/gate dikhta tha.
         const SB = window.supabase || window.supabaseJs;
         if (SB && typeof SB.createClient === 'function' && CONFIG.supabaseUrl !== 'YOUR_SUPABASE_URL') {
-          state.supabase = SB.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+          // BUG FIX (login-gate loop): support.html par React app nahi hota, to
+          // widget apna client banata tha — lekin bina storage option ke us client
+          // ka default storage SIRF localStorage tha. Login "Yaad rakhein" off
+          // (default) karne par session sessionStorage me jata hai → client ko
+          // session milta hi nahi → getSession() null → gate wapas. Ab ek dual
+          // storage adapter lagaya hai jo localStorage me na mile to
+          // sessionStorage se session padh leta hai.
+          const dualStorage = {
+            getItem(k) {
+              const v = localStorage.getItem(k);
+              return v !== null ? v : sessionStorage.getItem(k);
+            },
+            setItem(k, v) { localStorage.setItem(k, v); },
+            removeItem(k) { localStorage.removeItem(k); sessionStorage.removeItem(k); },
+          };
+          state.supabase = SB.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey, {
+            auth: { storage: dualStorage, persistSession: true, autoRefreshToken: true },
+          });
         }
       }
 
