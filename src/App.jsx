@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
-import { Search, ShoppingCart, User, Download, Home, ShoppingBag, SlidersHorizontal, X, Zap, Leaf, BadgePercent, ShieldCheck, Package, Headphones, Send, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ShoppingCart, User, Download, Home, ShoppingBag, SlidersHorizontal, X, Zap, Leaf, BadgePercent, ShieldCheck, Package, Headphones, Send, MessageCircle, ChevronLeft, ChevronRight, Store, Users, Star, Truck, Clock, MapPin, Wallet, RotateCcw, FileText, Lock, Phone, Mail, HelpCircle, CheckCircle2, ScrollText } from 'lucide-react';
 import { supabase } from './lib/supabaseClient';
 import { TICKER, calcDiscount, catEmoji } from './lib/helpers';
 import { openAppDownload } from './lib/appDownload';
