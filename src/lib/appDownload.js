@@ -4,13 +4,13 @@
  * Website ke teeno jagah (bottom-nav Get App, desktop header Get App,
  * homepage download_app section) ek hi jagah se APK download karte hain.
  *
- * APK location: public/downloads/rinku-kirana.apk (Vercel par /downloads/...)
+ * APK location: public/downloads/rkgrocerymart.apk (Vercel par /downloads/...)
  * serve hota hai — build ke time Vite public/ ko dist me copy karta hai.
  *
  * Fallback: APK file abhi upload nahi hui (404) to PWA install prompt /
  * "Add to Home Screen" hint dikhata hai — link kabhi dead nahi hoga.
  */
-export const APP_APK_PATH = '/downloads/rinku-kirana.apk';
+export const APP_APK_PATH = '/downloads/rkgrocerymart.apk';
 export const APP_APK_URL = typeof window !== 'undefined'
   ? new URL(APP_APK_PATH, window.location.origin).href
   : APP_APK_PATH;
