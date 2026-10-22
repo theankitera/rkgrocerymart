@@ -4,6 +4,12 @@
   "functions": {
     "api/chat.js": {
       "maxDuration": 15
+    },
+    "api/razorpay-webhook.js": {
+      "maxDuration": 30
+    },
+    "api/razorpay-verify.js": {
+      "maxDuration": 30
     }
   },
   "headers": [

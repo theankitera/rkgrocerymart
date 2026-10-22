@@ -179,6 +179,10 @@ module.exports = async (req, res) => {
           p_source: 'webhook',
         });
         console.log('[razorpay-webhook] payment.captured →', out?.status, order.order_number);
+        // Response PEHLE bhejo — Razorpay ka timeout bachane ke liye. Notification
+        // baad me (best-effort): customer ko 2-3s baad push milega to koi farak
+        // nahi, par 200 late jaana = Razorpay delivery FAILED mark karega.
+        res.status(200).json({ ok: true, status: out?.status });
         // Customer notification (in-app + push) — sirf asli pehli baar
         // (duplicate webhook par finalize 'already_paid' return karta hai).
         if (out?.status === 'paid') {
@@ -192,7 +196,7 @@ module.exports = async (req, res) => {
             });
           } catch (e) { console.warn('[razorpay-webhook] notify skipped:', e?.message || e); }
         }
-        return res.status(200).json({ ok: true, status: out?.status });
+        return;
       }
 
       // payment.failed → draft ko 'failed' mark (guard: paid kabhi downgrade nahi)
@@ -226,6 +230,8 @@ module.exports = async (req, res) => {
         p_source: 'webhook:order.paid',
       });
       console.log('[razorpay-webhook] order.paid →', out?.status, order.order_number);
+      // Response PEHLE, notification baad me (payment.captured wali hi tarah).
+      res.status(200).json({ ok: true, status: out?.status });
       if (out?.status === 'paid') {
         try {
           await sendUserNotification({
@@ -237,7 +243,7 @@ module.exports = async (req, res) => {
           });
         } catch (e) { console.warn('[razorpay-webhook] notify skipped:', e?.message || e); }
       }
-      return res.status(200).json({ ok: true, status: out?.status });
+      return;
     }
 
     // Unknown/unsupported event — 200 bhejo taaki Razorpay retry na kare.
