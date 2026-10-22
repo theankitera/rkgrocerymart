@@ -231,12 +231,17 @@
 
   /* ========== PUBLIC API ========== */
   window.RKPWA = {
+    // returns true if a prompt/sheet was actually shown
     promptInstall: function () {
       if (deferredPrompt) {
         deferredPrompt.prompt();
-      } else if (isIOS()) {
-        showIOSSheet();
+        return true;
       }
+      if (isIOS()) {
+        showIOSSheet();
+        return true;
+      }
+      return false;
     },
     isStandalone: isStandalone,
   };

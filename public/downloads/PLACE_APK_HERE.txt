@@ -1,8 +1,18 @@
-Is folder me APK rakhna hai:
-  rinku-kirana.apk
+Is folder me APK files rakhi hain (rinku-kirana.apk, rkgrocerymart.apk):
 
-- APK EAS se banegi (myshop-app folder): eas build --profile preview --platform android
-- Build complete hone par APK download karo aur yahan (public/downloads/) rakho.
-- Site "Get App" button isi /downloads/rinku-kirana.apk URL se download karegi
-  (src/lib/appDownload.js me APP_APK_PATH).
-- Agar file missing hogi to button automatically PWA install par fallback kar dega.
+STATUS (abhi): APK download BAND hai.
+- Site ke "Get App" / "Install App" button ab APK download NAHI karte —
+  wo sirf PWA install ("Add to Home Screen") karte hain
+  (src/lib/appDownload.js dekho).
+- Reason: naya app abhi sahi se bana nahi hai aur Play Store par
+  publish nahi hua. Jab tak app Play Store par nahi aata, APK ka
+  koi download link nahi hoga.
+
+Wapas kaise chalu karein (Play Store launch ke baad):
+- APK EAS se banti hai (myshop-app folder):
+    eas build --profile preview --platform android
+- Build complete hone par APK download karke yahan rakho.
+- src/lib/appDownload.js me openAppDownload me APK HEAD-check +
+  window.location.href wala code wapas daal do (git history me
+  commit 5ff4f3a ke baad wala purana version mil jayega), ya seedha
+  Play Store URL daal do.

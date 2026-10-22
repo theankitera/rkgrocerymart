@@ -797,9 +797,9 @@ function DownloadApp({onInstall}){
         </ul>
         <div className="mt-4 flex flex-wrap gap-2.5 justify-center md:justify-start">
           <button onClick={onInstall} className="flex items-center gap-2 bg-white text-[#15803D] font-extrabold font-poppins text-xs md:text-sm px-4 md:px-5 py-2.5 rounded-xl shadow-lg hover:scale-[1.03] active:scale-95 transition-transform">
-            <Download size={16}/> Download App
+            <Download size={16}/> Install App
           </button>
-          <span className="text-white/70 text-[10px] md:text-xs font-poppins self-center">Android APK • Free • 1-tap install</span>
+          <span className="text-white/70 text-[10px] md:text-xs font-poppins self-center">Free • Home screen par 1-tap install</span>
         </div>
       </div>
       <div className="text-7xl md:text-8xl select-none" aria-hidden="true">🛒</div>
