@@ -1511,6 +1511,13 @@ export default function App(){
     if(m)m.setAttribute('content',theme==='dark'?'#0F1521':(shopSettings.theme_color||'#15803D'));
   },[theme,shopSettings.theme_color]);
 
+  // Admin Settings → Branding favicon — initial load par /js/favicon.js khud
+  // apply kar chuka hota hai; ye effect REALTIME update ke liye hai: admin ne
+  // favicon save kiya → customer ke khule tab me turant icon badal jata hai.
+  useEffect(()=>{
+    if(typeof window.RKSetFavicon==='function')window.RKSetFavicon(shopSettings.favicon_url||'');
+  },[shopSettings.favicon_url]);
+
   useEffect(()=>{
     if(window.RKCart)window.RKCart.init();
     supabase.auth.getSession().then(({data:{session}})=>{
