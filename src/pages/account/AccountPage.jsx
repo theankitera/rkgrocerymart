@@ -38,9 +38,9 @@ const fmtDate  = d => new Date(d).toLocaleDateString('en-IN', { day:'numeric', m
 const fmtTime  = d => new Date(d).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
 const memberSince = d => { const dt=new Date(d); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]+' '+dt.getFullYear(); };
 const loyaltyLevel = n => {
-  if (n>=50) return { label:'🥇 Gold Member',  color:'#F59E0B' };
+  if (n>=50) return { label:'🥇 Gold Member',  color:'#FFB300' };
   if (n>=20) return { label:'🥈 Silver Member', color:'#94A3B8' };
-  if (n>=5)  return { label:'🥉 Bronze Member', color:'#B45309' };
+  if (n>=5)  return { label:'🥉 Bronze Member', color:'#C2185B' };
   return { label:'🌱 New Member', color:'#10B981' };
 };
 const statusLabel = s => ({ pending:'Pending', confirmed:'Confirmed', out_for_delivery:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled' }[s]||s);
@@ -1039,8 +1039,8 @@ export default function AccountPage() {
               <div className="text-[11px] font-semibold font-poppins uppercase tracking-wide" style={{color:'rgba(255,255,255,0.65)'}}>👋 Namaste,</div>
               <div className="text-xl md:text-2xl font-black font-poppins text-white truncate" style={{letterSpacing:'-.4px'}}>{p?.name||'User'}</div>
               <div className="text-xs font-poppins truncate mt-0.5" style={{color:'rgba(255,255,255,0.7)'}}>{p?.email||''}</div>
-              <div className="inline-flex items-center gap-1 rounded-full px-3 py-1 mt-2" style={{background:'rgba(255,184,0,0.22)', border:'1.5px solid rgba(255,184,0,0.45)'}}>
-                <span className="text-[11px] font-extrabold font-poppins" style={{color:'#FFD700'}}>{loyalty.label}</span>
+              <div className="inline-flex items-center gap-1 rounded-full px-3 py-1 mt-2" style={{background:'rgba(194,24,91,0.15)', border:'1.5px solid rgba(194,24,91,0.4)'}}>
+                <span className="text-[11px] font-extrabold font-poppins" style={{color:'#F06292'}}>{loyalty.label}</span>
               </div>
             </div>
           </div>
