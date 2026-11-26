@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import AuthLayout, { BrandBar, MsgBox, FeatureChips } from './AuthLayout.jsx';
+import AuthLayout, { BrandBar, MsgBox, FeatureChips, escapeHtml } from './AuthLayout.jsx';
 import { GoogleIcon, FacebookIcon, useSocialProviders, SOCIAL_DISABLED_MSG, signInWithProvider } from '../../lib/socialAuth.jsx';
 
 function getStrength(pw) {
@@ -72,7 +72,7 @@ export default function SignupPage() {
     if (err) { setError(friendly(err)); return; }
     if (data.user && !data.session) { setEmailSent(true); return; }
     if (data.session) {
-      setSuccess(`Welcome <b>${fullName}</b>! Account ban gaya 🎉 Redirect ho rahe hain…`);
+      setSuccess(`Welcome <b>${escapeHtml(fullName)}</b>! Account ban gaya 🎉 Redirect ho rahe hain…`);
       setTimeout(() => { window.location.href = 'index.html'; }, 1200);
     }
   }
@@ -160,40 +160,40 @@ export default function SignupPage() {
         <form onSubmit={e => { e.preventDefault(); handleSignup(); }}>
         <div className="field-row" style={{marginBottom:14}}>
           <div className="field-group" style={{marginBottom:0}}>
-            <div className="field-label">👤 Pehla Naam</div>
+            <label className="field-label" htmlFor="su-first">👤 Pehla Naam</label>
             <div className="field-wrap">
               <span className="field-icon">🧑</span>
-              <input className="field-input" type="text" autoComplete="given-name" name="firstName" placeholder="Rahul"
+              <input className="field-input" type="text" autoComplete="given-name" id="su-first" name="firstName" placeholder="Rahul"
                 value={firstName} onChange={e => setFirstName(e.target.value)}/>
             </div>
           </div>
           <div className="field-group" style={{marginBottom:0}}>
-            <div className="field-label">👤 Aakhri Naam</div>
+            <label className="field-label" htmlFor="su-last">👤 Aakhri Naam</label>
             <div className="field-wrap">
               <span className="field-icon">🧑</span>
-              <input className="field-input" type="text" autoComplete="family-name" name="lastName" placeholder="Gupta"
+              <input className="field-input" type="text" autoComplete="family-name" id="su-last" name="lastName" placeholder="Gupta"
                 value={lastName} onChange={e => setLastName(e.target.value)}/>
             </div>
           </div>
         </div>
 
         <div className="field-group">
-          <div className="field-label">📧 Email Address</div>
+          <label className="field-label" htmlFor="su-email">📧 Email Address</label>
           <div className="field-wrap">
             <span className="field-icon">✉️</span>
-            <input className="field-input" type="email" inputMode="email" autoComplete="email" name="email"
+            <input className="field-input" type="email" inputMode="email" autoComplete="email" id="su-email" name="email"
               placeholder="aapka@email.com" value={email} onChange={e => setEmail(e.target.value)}/>
           </div>
         </div>
 
         <div className="field-group">
-          <div className="field-label">🔒 Password</div>
+          <label className="field-label" htmlFor="su-pass1">🔒 Password</label>
           <div className="field-wrap">
             <span className="field-icon">🔐</span>
-            <input className="field-input" type={showPw1 ? 'text' : 'password'} autoComplete="new-password" name="password"
+            <input className="field-input" type={showPw1 ? 'text' : 'password'} autoComplete="new-password" id="su-pass1" name="password"
               placeholder="Naya strong password" value={password} onChange={e => setPassword(e.target.value)}
               style={{paddingRight:44}}/>
-            <button className="pass-toggle" type="button" onClick={() => setShowPw1(v => !v)}>
+            <button className="pass-toggle" type="button" aria-label={showPw1 ? 'Password chhupayein' : 'Password dikhayein'} onClick={() => setShowPw1(v => !v)}>
               {showPw1 ? '🙈' : '👁️'}
             </button>
           </div>
@@ -213,23 +213,23 @@ export default function SignupPage() {
         </div>
 
         <div className="field-group">
-          <div className="field-label">🔒 Password Confirm</div>
+          <label className="field-label" htmlFor="su-pass2">🔒 Password Confirm</label>
           <div className="field-wrap">
             <span className="field-icon">✅</span>
-            <input className="field-input" type={showPw2 ? 'text' : 'password'} autoComplete="new-password" name="confirmPassword"
+            <input className="field-input" type={showPw2 ? 'text' : 'password'} autoComplete="new-password" id="su-pass2" name="confirmPassword"
               placeholder="Wahi password dobara" value={confirm} onChange={e => setConfirm(e.target.value)}
               style={{paddingRight:44}}/>
-            <button className="pass-toggle" type="button" onClick={() => setShowPw2(v => !v)}>
+            <button className="pass-toggle" type="button" aria-label={showPw2 ? 'Password chhupayein' : 'Password dikhayein'} onClick={() => setShowPw2(v => !v)}>
               {showPw2 ? '🙈' : '👁️'}
             </button>
           </div>
         </div>
 
         <div className="field-group">
-          <div className="field-label">📱 Mobile Number <span style={{fontSize:'.62rem',color:'#B0BDCC',fontWeight:400}}>(optional)</span></div>
+          <label className="field-label" htmlFor="su-phone">📱 Mobile Number <span style={{fontSize:'.62rem',color:'#64748B',fontWeight:400}}>(optional)</span></label>
           <div className="field-wrap">
             <span className="field-icon">📞</span>
-            <input className="field-input" type="tel" inputMode="tel" autoComplete="tel" name="phone"
+            <input className="field-input" type="tel" inputMode="tel" autoComplete="tel" id="su-phone" name="phone"
               placeholder="9876543210" value={phone} onChange={e => setPhone(e.target.value)}/>
           </div>
         </div>

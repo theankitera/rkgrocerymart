@@ -32,6 +32,10 @@ export function BrandBar({ badge1, badge2 }) {
   );
 }
 
+// User-controlled text (jaise naam) ko HTML mein daalne se pehle escape
+// karo — warna apne hi naam mein <script> likhkar self-XSS ho sakta hai.
+export const escapeHtml = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
 export function MsgBox({ type, html }) {
   if (!html) return null;
   return (

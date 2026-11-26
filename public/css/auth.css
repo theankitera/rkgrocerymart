@@ -23,7 +23,7 @@
   --dark: #0F1923;
   --text: #1A2332;
   --gray: #64748B;
-  --light-gray: #94A3B8;
+  --light-gray: #64748B;
   --border: #E2E8F0;
   --white: #ffffff;
   --glass-bg: rgba(255,255,255,0.92);
@@ -51,7 +51,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(135deg, #0A1628 0%, #0D2137 30%, #0A2E1A 60%, #071A0F 100%);
+  background: linear-gradient(135deg, #0A1628 0%, #0D2137 30%, #3D0A0A 60%, #1A0505 100%);
   overflow: hidden;
 }
 
@@ -68,7 +68,7 @@ body {
   content: '';
   position: absolute;
   width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(194,24,91,0.18) 0%, transparent 70%);
   bottom: -100px; right: -100px;
   animation: orbFloat2 15s ease-in-out infinite;
 }
@@ -166,7 +166,7 @@ body {
 
 .brand-tagline {
   font-size: 0.68rem;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.75);
   font-weight: 500;
   letter-spacing: 0.5px;
 }
@@ -365,7 +365,9 @@ body {
   cursor: pointer;
   font-size: 1rem;
   color: var(--light-gray);
-  padding: 4px;
+  padding: 6px;
+  min-width: 32px;
+  min-height: 32px;
   border-radius: 6px;
   transition: color 0.2s;
   line-height: 1;
@@ -563,8 +565,8 @@ body {
 }
 
 .msg-box.success {
-  background: #F0FDF4;
-  border: 1.5px solid #BBF7D0;
+  background: #FDECEA;
+  border: 1.5px solid #F5C6CB;
   color: #B71C1C;
 }
 
@@ -727,16 +729,16 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, #FFF3E0, #FFF8F0);
-  border: 1.5px solid #FFE0A3;
+  background: linear-gradient(135deg, #FDECEA, #FFF5F5);
+  border: 1.5px solid #F5C6CB;
   border-radius: 12px;
   padding: 10px 14px;
   margin-bottom: 16px;
 }
 
 .db-icon { font-size: 1.5rem; flex-shrink: 0; }
-.db-title { font-size: 0.8rem; font-weight: 800; color: #92600B; }
-.db-sub   { font-size: 0.66rem; color: #B45309; margin-top: 1px; }
+.db-title { font-size: 0.8rem; font-weight: 800; color: #B71C1C; }
+.db-sub   { font-size: 0.66rem; color: #C2185B; margin-top: 1px; }
 
 /* ── RESPONSIVE ───────────────────────────────── */
 @media (max-width: 400px) {

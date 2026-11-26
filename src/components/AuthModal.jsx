@@ -50,7 +50,7 @@ function friendlyLogin(err) {
   if (m.includes('network') || m.includes('fetch'))       return 'Network error. Internet check karein.';
   return m || 'Kuch error hua. Dobara try karein.';
 }
-function friendlySignup(err, switchToLogin) {
+function friendlySignup(err) {
   const m = err?.message || '';
   if (m.includes('User already registered') || m.includes('already registered'))
     return { text: 'Yeh email pehle se registered hai!', link: true };
@@ -166,6 +166,23 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
   useEffect(() => {
     scrollRef.current?.scrollTo?.({ top: 0, left: 0 });
   }, [mode, emailSent]);
+
+  // Esc se band karo; khulte hi pehle input par focus; Tab modal ke
+  // andar hi ghume (focus trap) — keyboard users ke liye.
+  useEffect(() => {
+    const el = scrollRef.current;
+    el?.querySelector('input,button')?.focus();
+    const h = e => {
+      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key !== 'Tab' || !el) return;
+      const f = [...el.querySelectorAll('button,input,a[href],[tabindex]:not([tabindex="-1"])')].filter(n => !n.disabled && n.offsetParent !== null);
+      if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [mode]);
 
   return (
     <div className="fixed inset-0 z-[1100] flex items-end sm:items-center justify-center"

@@ -57,7 +57,7 @@ export default function ResetPasswordPage() {
         }
       }
       setState('invalid');
-    }, 2200);
+    }, 6000);
 
     return () => { subscription?.unsubscribe(); clearTimeout(timer); };
   }, []);
@@ -66,7 +66,7 @@ export default function ResetPasswordPage() {
     const m = err?.message || '';
     if (m.includes('Auth session missing') || m.includes('session missing'))
       return 'Reset link expire ho gaya ya pehle use ho chuka hai. Naya link mangwayein.';
-    if (m.includes('Password should be')) return 'Password kam se kam 8 characters ka hona chahiye.';
+    if (m.includes('Password should be')) return 'Password kam se kam 6 characters ka hona chahiye.';
     return m || 'Kuch error hua. Dobara try karein.';
   }
 
@@ -131,13 +131,13 @@ export default function ResetPasswordPage() {
 
             <form onSubmit={e => { e.preventDefault(); handleNewPassword(); }}>
             <div className="field-group">
-              <div className="field-label">🔒 Naya Password</div>
+              <label className="field-label" htmlFor="rp-pass1">🔒 Naya Password</label>
               <div className="field-wrap">
                 <span className="field-icon">🔐</span>
-                <input className="field-input" type={showPw1 ? 'text' : 'password'} autoComplete="new-password" name="newPassword"
+                <input className="field-input" type={showPw1 ? 'text' : 'password'} autoComplete="new-password" id="rp-pass1" name="newPassword"
                   placeholder="Naya strong password" value={newPass} onChange={e => setNewPass(e.target.value)}
                   style={{paddingRight:44}}/>
-                <button className="pass-toggle" type="button" onClick={() => setShowPw1(v => !v)}>
+                <button className="pass-toggle" type="button" aria-label={showPw1 ? 'Password chhupayein' : 'Password dikhayein'} onClick={() => setShowPw1(v => !v)}>
                   {showPw1 ? '🙈' : '👁️'}
                 </button>
               </div>
@@ -155,13 +155,13 @@ export default function ResetPasswordPage() {
             </div>
 
             <div className="field-group">
-              <div className="field-label">✅ Password Confirm</div>
+              <label className="field-label" htmlFor="rp-pass2">✅ Password Confirm</label>
               <div className="field-wrap">
                 <span className="field-icon">✅</span>
-                <input className="field-input" type={showPw2 ? 'text' : 'password'} autoComplete="new-password" name="confirmPassword"
+                <input className="field-input" type={showPw2 ? 'text' : 'password'} autoComplete="new-password" id="rp-pass2" name="confirmPassword"
                   placeholder="Wahi password dobara" value={confirm} onChange={e => setConfirm(e.target.value)}
                   style={{paddingRight:44}}/>
-                <button className="pass-toggle" type="button" onClick={() => setShowPw2(v => !v)}>
+                <button className="pass-toggle" type="button" aria-label={showPw2 ? 'Password chhupayein' : 'Password dikhayein'} onClick={() => setShowPw2(v => !v)}>
                   {showPw2 ? '🙈' : '👁️'}
                 </button>
               </div>

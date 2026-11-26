@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase, setRememberPreference } from '../../lib/supabaseClient';
-import AuthLayout, { BrandBar, MsgBox, FeatureChips } from './AuthLayout.jsx';
+import AuthLayout, { BrandBar, MsgBox, FeatureChips, escapeHtml } from './AuthLayout.jsx';
 import { GoogleIcon, FacebookIcon, useSocialProviders, SOCIAL_DISABLED_MSG, signInWithProvider } from '../../lib/socialAuth.jsx';
 
 export default function LoginPage() {
@@ -62,7 +62,7 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-    setSuccess(`Welcome back, <b>${data.user?.user_metadata?.name || email.split('@')[0]}</b>! 🎉 Redirect ho rahe hain…`);
+    setSuccess(`Welcome back, <b>${escapeHtml(data.user?.user_metadata?.name || email.split('@')[0])}</b>! 🎉 Redirect ho rahe hain…`);
     setLoading(false);
     setTimeout(() => { window.location.href = next; }, 1200);
   }
@@ -118,21 +118,21 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin}>
         <div className="field-group">
-          <div className="field-label">📧 Email Address</div>
+          <label className="field-label" htmlFor="login-email">📧 Email Address</label>
           <div className="field-wrap">
             <span className="field-icon">✉️</span>
-            <input className="field-input" type="email" inputMode="email" autoComplete="email" name="email"
+            <input className="field-input" type="email" inputMode="email" autoComplete="email" id="login-email" name="email"
               placeholder="aapka@email.com" value={email} onChange={e => setEmail(e.target.value)}/>
           </div>
         </div>
 
         <div className="field-group">
-          <div className="field-label">🔒 Password</div>
+          <label className="field-label" htmlFor="login-password">🔒 Password</label>
           <div className="field-wrap">
             <span className="field-icon">🔐</span>
-            <input className="field-input" type={showPw ? 'text' : 'password'} autoComplete="current-password" name="password"
+            <input className="field-input" type={showPw ? 'text' : 'password'} autoComplete="current-password" id="login-password" name="password"
               placeholder="Apna password daalein" value={password} onChange={e => setPassword(e.target.value)} style={{paddingRight:44}}/>
-            <button className="pass-toggle" type="button" onClick={() => setShowPw(v => !v)}>
+            <button className="pass-toggle" type="button" aria-label={showPw ? 'Password chhupayein' : 'Password dikhayein'} onClick={() => setShowPw(v => !v)}>
               {showPw ? '🙈' : '👁️'}
             </button>
           </div>
