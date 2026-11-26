@@ -367,7 +367,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
           ):(
             <div className="flex justify-between items-center rounded-xl px-3 py-2 text-xs font-poppins" style={{background:'var(--light)'}}>
               <span>🎟️ <b>{appliedCoupon.code}</b> applied — ₹{appliedCoupon.discount} OFF</span>
-              <button type="button" onClick={handleRemoveCoupon} style={{background:'none',border:'none',color:'var(--gray)',cursor:'pointer'}}>✕</button>
+              <button type="button" aria-label="Coupon hatayein" onClick={handleRemoveCoupon} style={{background:'none',border:'none',color:'var(--gray)',cursor:'pointer',padding:'6px 10px',minHeight:32,minWidth:32}}>✕</button>
             </div>
           )}
           {couponError&&<div className="text-[11px] font-poppins font-semibold mt-1" style={{color:'var(--red)'}}>⚠️ {couponError}</div>}

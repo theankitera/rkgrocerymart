@@ -35,17 +35,16 @@ if ('ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0) {
 
 /* ─── helpers (unchanged) ─────────────────── */
 const fmt      = n => '₹' + Number(n).toLocaleString('en-IN');
-const fmtDate  = d => new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
 const fmtTime  = d => new Date(d).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
 const memberSince = d => { const dt=new Date(d); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]+' '+dt.getFullYear(); };
 const loyaltyLevel = n => {
-  if (n>=50) return { label:'🥇 Gold Member',  color:'#FFB300' };
-  if (n>=20) return { label:'🥈 Silver Member', color:'#94A3B8' };
-  if (n>=5)  return { label:'🥉 Bronze Member', color:'#C2185B' };
-  return { label:'🌱 New Member', color:'#10B981' };
+  if (n>=50) return { label:'🥇 Gold Member' };
+  if (n>=20) return { label:'🥈 Silver Member' };
+  if (n>=5)  return { label:'🥉 Bronze Member' };
+  return { label:'🌱 New Member' };
 };
 const statusLabel = s => ({ pending:'Pending', confirmed:'Confirmed', out_for_delivery:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled' }[s]||s);
-const notifColor  = t => ({ offer:'var(--tint-pink-bg)', order:'var(--tint-blue-bg)', delivery:'var(--tint-purple-bg)', stock:'var(--tint-green-bg)', system:'var(--tint-neutral-bg)' }[t]||'var(--tint-neutral-bg)');
+const notifColor  = t => ({ offer:'var(--tint-pink-bg)', order:'var(--tint-blue-bg)', delivery:'var(--tint-purple-bg)', stock:'var(--tint-neutral-bg)', system:'var(--tint-neutral-bg)' }[t]||'var(--tint-neutral-bg)');
 const notifIcon   = t => ({ offer:'🎁', order:'📦', delivery:'🚴', stock:'📢', system:'ℹ️' }[t]||'🔔');
 const addrIcon    = l => { const s=(l||'').toLowerCase(); if(s.includes('home')) return '🏠'; if(s.includes('office')||s.includes('work')) return '🏢'; return '📍'; };
 
@@ -98,7 +97,7 @@ function Card({ title, icon, action, children, noBody }) {
 function CardActionBtn({ onClick, children }) {
   return (
     <button onClick={onClick}
-      className="text-[11px] font-bold font-poppins px-3 py-1.5 rounded-full transition-colors"
+      className="text-[11px] font-bold font-poppins px-3 py-1.5 min-h-8 rounded-full transition-colors"
       style={{background:'var(--primary-light)', color:'var(--primary)'}}>
       {children}
     </button>
@@ -132,11 +131,12 @@ function Badge({ status }) {
   return <span className="inline-block px-2.5 py-1 rounded-full text-[10px] font-extrabold font-poppins tracking-wide mt-1" style={{background:bg,color:text}}>{statusLabel(status)}</span>;
 }
 
-function Toggle({ on, onClick }) {
+function Toggle({ on, onClick, label }) {
   return (
-    <div className="w-[46px] h-[26px] rounded-full relative cursor-pointer flex-shrink-0 transition-colors duration-300" style={{background:on?'var(--primary)':'#CBD5E1'}} onClick={onClick}>
-      <div className="w-5 h-5 bg-white rounded-full absolute top-[3px] transition-all duration-300" style={{left:on?'23px':'3px', boxShadow:'0 1px 4px rgba(0,0,0,0.2)'}}/>
-    </div>
+    <button type="button" role="switch" aria-checked={!!on} aria-label={label||'Toggle'}
+      className="w-[46px] h-[32px] rounded-full relative cursor-pointer flex-shrink-0 transition-colors duration-300 border-0 p-0" style={{background:on?'var(--primary)':'#CBD5E1'}} onClick={onClick}>
+      <span className="w-5 h-5 bg-white rounded-full absolute top-[6px] transition-all duration-300" style={{left:on?'23px':'3px', boxShadow:'0 1px 4px rgba(0,0,0,0.2)'}}/>
+    </button>
   );
 }
 
@@ -144,8 +144,6 @@ function Toggle({ on, onClick }) {
 function OverviewTab({ state, switchTab }) {
   const p = state.profile;
   const totalOrders = state.orders.length;
-  const savings     = state.orders.reduce((s,o)=>s+(o.discount||0),0);
-  const unread      = state.notifications.filter(n=>!n.is_read).length;
   const recentOrders = state.orders.slice(0,3);
 
   return (
@@ -191,7 +189,7 @@ function OrderRow({ o, onClick, onReorder }) {
         <Badge status={o.status}/>
         {o.status==='delivered'&&onReorder&&(
           <button onClick={e=>{e.stopPropagation();onReorder(o.id);}}
-            className="mt-2 text-white text-[10px] font-bold font-poppins rounded-md px-2.5 py-1.5" style={{background:'var(--primary)'}}>🔁 Buy Again</button>
+            className="mt-2 text-white text-[10px] font-bold font-poppins rounded-md px-2.5 py-1.5 min-h-8" style={{background:'var(--primary)'}}>🔁 Buy Again</button>
         )}
       </div>
     </div>
@@ -201,6 +199,15 @@ function OrderRow({ o, onClick, onReorder }) {
 /* ─── Orders Tab ──────────────────────────── */
 function OrdersTab({ state, showToast, setState }) {
   const [modal, setModal] = useState(null);
+  const [orderLimit,setOrderLimit]=useState(25);
+  const [loadingMore,setLoadingMore]=useState(false);
+
+  async function loadMoreOrders(){
+    setLoadingMore(true);
+    const {data}=await supabase.from('orders').select('*').neq('status','pending_payment').eq('user_id',state.user?.id).order('created_at',{ascending:false}).limit(orderLimit+25);
+    setLoadingMore(false);
+    if(data){ if(setState)setState(prev=>({...prev,orders:data})); setOrderLimit(orderLimit+25); }
+  }
 
   async function viewOrder(o) {
     const { data: items } = await supabase.from('order_items').select('*').eq('order_id', o.id);
@@ -235,6 +242,15 @@ function OrdersTab({ state, showToast, setState }) {
           ? state.orders.map(o=><OrderRow key={o.id} o={o} onClick={()=>viewOrder(o)} onReorder={reorder}/>)
           : <EmptyState icon="📦" title="Koi order nahi mila" sub="Pehla order place karo!" cta="Shop Now →" onCta={()=>window.location.href='index.html'}/>}
       </Card>
+      {state.orders.length>=orderLimit&&(
+        <div className="text-center mt-3">
+          <button onClick={loadMoreOrders} disabled={loadingMore}
+            className="text-[13px] font-bold font-poppins px-5 py-2.5 rounded-xl min-h-10"
+            style={{background:'var(--primary-light)',color:'var(--primary-dark)'}}>
+            {loadingMore?'⏳ Load ho raha hai...':'⬇️ Aur orders dikhayein'}
+          </button>
+        </div>
+      )}
 
       {modal && (
         <div className="fixed inset-0 z-[90] flex items-end md:items-center justify-center" onClick={()=>setModal(null)}>
@@ -253,7 +269,10 @@ function OrdersTab({ state, showToast, setState }) {
                 <Badge status={modal.o.status}/>
               </div>
 
-              <div className="text-[11px] font-bold font-poppins uppercase tracking-wide mb-2.5" style={{color:'var(--muted)'}}>Order Status</div>
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="text-[11px] font-bold font-poppins uppercase tracking-wide" style={{color:'var(--muted)'}}>Order Status</div>
+                {modal.o.updated_at&&<div className="text-[10px] font-poppins" style={{color:'var(--muted)'}}>Last update: {fmtTime(modal.o.updated_at)}</div>}
+              </div>
               {modal.o.status==='cancelled'
                 ? <div className="rounded-xl p-3.5 mb-5 text-center text-[13px] font-bold font-poppins" style={{background:'var(--tint-red-bg)',color:'var(--tint-red-text)',border:'1.5px solid var(--tint-red-border)'}}>❌ Ye order cancel kar diya gaya hai. Refund 3-5 working days mein milega.</div>
                 : <div className="mb-5">
@@ -373,9 +392,9 @@ function AddressesTab({ state, setState, showToast }) {
                 </div>
                 <div className="text-[11px] font-poppins leading-snug" style={{color:'var(--gray)'}}>{a.line1}{a.line2?', '+a.line2:''}<br/>{a.city}{a.pincode?' - '+a.pincode:''}</div>
                 <div className="flex gap-1.5 mt-2 flex-wrap">
-                  <button onClick={()=>setForm({...a})} className="text-[11px] font-bold font-poppins px-2.5 py-1 rounded-md" style={{background:'var(--tint-blue-bg)',color:'var(--tint-blue-text)'}}>✏️ Edit</button>
-                  <button onClick={()=>deleteAddr(a.id)} className="text-[11px] font-bold font-poppins px-2.5 py-1 rounded-md" style={{background:'var(--tint-red-bg)',color:'var(--red)'}}>🗑️ Delete</button>
-                  {!a.is_default&&<button onClick={()=>setDefault(a.id)} className="text-[11px] font-bold font-poppins px-2.5 py-1 rounded-md" style={{background:'var(--primary-light)',color:'var(--primary)'}}>✓ Set Default</button>}
+                  <button onClick={()=>setForm({...a})} className="text-[11px] font-bold font-poppins px-2.5 py-1 min-h-8 rounded-md" style={{background:'var(--tint-blue-bg)',color:'var(--tint-blue-text)'}}>✏️ Edit</button>
+                  <button onClick={()=>deleteAddr(a.id)} className="text-[11px] font-bold font-poppins px-2.5 py-1 min-h-8 rounded-md" style={{background:'var(--tint-red-bg)',color:'var(--red)'}}>🗑️ Delete</button>
+                  {!a.is_default&&<button onClick={()=>setDefault(a.id)} className="text-[11px] font-bold font-poppins px-2.5 py-1 min-h-8 rounded-md" style={{background:'var(--primary-light)',color:'var(--primary)'}}>✓ Set Default</button>}
                 </div>
               </div>
             </div>
@@ -404,11 +423,11 @@ function AddressesTab({ state, setState, showToast }) {
             </div>
             <div>
               <label className={labelCls} style={{color:'var(--gray)'}}>Pincode *</label>
-              <input className={inputCls} style={inputStyle} placeholder="6-digit pincode" type="tel" value={f.pincode||''} onChange={e=>upd({pincode:e.target.value})}/>
+              <input className={inputCls} style={inputStyle} placeholder="6-digit pincode" type="tel" value={f.pincode||''} maxLength={6} onChange={e=>upd({pincode:e.target.value.replace(/\D/g,'').slice(0,6)})}/>
             </div>
           </div>
           <div className="flex items-center gap-2.5 mb-4">
-            <Toggle on={!!f.is_default} onClick={()=>upd({is_default:!f.is_default})}/>
+            <Toggle on={!!f.is_default} label="Set as default delivery address" onClick={()=>upd({is_default:!f.is_default})}/>
             <span className="text-[13px] font-semibold font-poppins" style={{color:'var(--text)'}}>Set as default delivery address</span>
           </div>
           <button className="w-full text-white font-extrabold font-poppins rounded-xl py-3 text-sm" style={btnPrimaryStyle} onClick={saveAddr}>💾 Save Address</button>
@@ -432,12 +451,15 @@ function ProfileTab({ state, setState, showToast }) {
 
   function previewAvatar(e) {
     const f = e.target.files[0]; if (!f) return;
+    if (!f.type.startsWith('image/')) { showToast('Sirf photo file (JPG/PNG) chunein!'); e.target.value=''; return; }
+    if (f.size > 2*1024*1024) { showToast('Photo 2MB se chhoti honi chahiye!'); e.target.value=''; return; }
     setFile(f);
     const r = new FileReader(); r.onload=ev=>setPreview(ev.target.result); r.readAsDataURL(f);
   }
 
   async function saveProfile() {
     if (!name.trim()) { showToast('Naam zaroori hai!'); return; }
+    if (phone.trim() && !/^[6-9]\d{9}$/.test(phone.trim())) { showToast('Sahi 10-digit mobile number daalein!'); return; }
     setSaving(true);
     let avatar_url = p.avatar_url||null;
     if (file) {
@@ -484,9 +506,9 @@ function ProfileTab({ state, setState, showToast }) {
       </div>
       <div className="mb-3">
         <label className={labelCls} style={{color:'var(--gray)'}}>Phone Number</label>
-        <input className={inputCls} style={inputStyle} value={phone} onChange={e=>setPhone(e.target.value)} placeholder="10-digit mobile" type="tel" maxLength={10}/>
+        <input className={inputCls} style={inputStyle} value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,'').slice(0,10))} placeholder="10-digit mobile" type="tel" maxLength={10}/>
       </div>
-      <div className="rounded-xl px-3.5 py-3 text-[12px] font-poppins leading-relaxed mb-3.5" style={{background:'var(--tint-green-bg)', border:'1.5px solid var(--tint-green-border)', color:'var(--tint-green-text)'}}>
+      <div className="rounded-xl px-3.5 py-3 text-[12px] font-poppins leading-relaxed mb-3.5" style={{background:'var(--tint-neutral-bg)', border:'1.5px solid var(--tint-neutral-border)', color:'var(--tint-neutral-text)'}}>
         📅 Member since: <b>{memberSince(p.created_at||state.user?.created_at)}</b>
         &nbsp;•&nbsp; 🆔 ID: <span className="text-[10px] opacity-60">{state.user?.id?.slice(0,8)}…</span>
       </div>
@@ -569,7 +591,7 @@ function WishlistTab({ state, setState, showToast, priceAlerts, toggleAlert }) {
                 <div className="text-sm font-extrabold font-poppins mt-0.5" style={{color:'var(--primary)'}}>₹{w.price}</div>
               </div>
               <div className="flex flex-col gap-1.5">
-                <button onClick={()=>addToCart(w)} className="text-white text-[11px] font-bold font-poppins rounded-md px-3 py-1.5" style={{background:'var(--primary)'}}>🛒 Add</button>
+                <button onClick={()=>addToCart(w)} className="text-white text-[11px] font-bold font-poppins rounded-md px-3 py-1.5 min-h-8" style={{background:'var(--primary)'}}>🛒 Add</button>
                 <button onClick={()=>toggleAlert(w.product_id)}
                   title={alerted?'Price alert hatao':'Price drop / back-in-stock alert set karo'}
                   className="text-[11px] font-bold font-poppins rounded-md px-2.5 py-1"
@@ -710,7 +732,7 @@ function RewardsTab({ state, showToast }) {
         <div className="text-[13px] font-extrabold font-poppins" style={{color:'var(--tint-red-text)'}}>🎁 Dost ko refer karo, dono ko ₹30 cashback!</div>
         <div className="rounded-xl px-3.5 py-2.5 flex items-center justify-between my-3" style={{background:'var(--card-bg)',border:'1.5px dashed var(--tint-red-border)'}}>
           <span className="text-lg font-black font-poppins" style={{color:'var(--dark)', letterSpacing:'3px'}}>{refCode}</span>
-          <button onClick={copy} className="text-white text-[11px] font-bold font-poppins rounded-md px-3 py-1.5 flex items-center gap-1" style={{background:'var(--primary)'}}><Copy size={12}/> Copy</button>
+          <button onClick={copy} className="text-white text-[11px] font-bold font-poppins rounded-md px-3 py-1.5 min-h-8 flex items-center gap-1" style={{background:'var(--primary)'}}><Copy size={12}/> Copy</button>
         </div>
         <div className="text-[11px] font-poppins mb-1" style={{color:'var(--tint-red-text)'}}>
           {referredCount>0 ? `🎉 ${referredCount} dost refer kiye — pehla order confirm hote hi ₹30 milega` : 'Abhi tak koi dost refer nahi hua — link share karo!'}
@@ -721,7 +743,7 @@ function RewardsTab({ state, showToast }) {
 
       <Card title="Points Kaise Milenge?" icon="ℹ️">
         {[
-          {i:'🛒',t:'Order Karo',  s:'Har delivered order = 10 points',        bg:'var(--tint-green-bg)'},
+          {i:'🛒',t:'Order Karo',  s:'Har delivered order = 10 points',        bg:'var(--tint-neutral-bg)'},
           {i:'👥',t:'Refer Karo',  s:'Dost ka pehla order confirm = ₹30 aapko + ₹30 dost ko',  bg:'var(--tint-blue-bg)'},
           {i:'⭐',t:'Redeem Karo', s:'100 points = ₹10 discount — checkout par apply karo', bg:'var(--tint-yellow-bg)'},
         ].map(r=>(
@@ -871,11 +893,11 @@ function SettingsTab({ switchTab, user, showToast }) {
   const rows = [
     {icon:'🔒',bg:'var(--tint-blue-bg)',label:'Change Password',   sub:'Password update karo',          fn:()=>setPwModal(true)},
     {icon:'🔔',bg:'var(--tint-pink-bg)',label:'Notifications',     sub:'Offers aur updates manage karo', fn:()=>switchTab('notifications')},
-    {icon:'👤',bg:'var(--tint-green-bg)',label:'Edit Profile',      sub:'Name, phone update karo',        fn:()=>switchTab('profile')},
+    {icon:'👤',bg:'var(--tint-neutral-bg)',label:'Edit Profile',      sub:'Name, phone update karo',        fn:()=>switchTab('profile')},
     {icon:'📍',bg:'var(--tint-purple-bg)',label:'Manage Addresses',  sub:'Delivery addresses',             fn:()=>switchTab('addresses')},
     {icon:'⭐',bg:'var(--tint-yellow-bg)',label:'Rewards & Referral',sub:'Points aur cashback',            fn:()=>switchTab('rewards')},
-    {icon:'📦',bg:'var(--tint-green-bg)',label:'Order History',     sub:'Purane orders dekhein',          fn:()=>switchTab('orders')},
-    {icon:'💬',bg:'var(--tint-green-bg)',label:'Help & Support',    sub: shopSettings.open_time?`Ananya AI — roz ${String(shopSettings.open_time).slice(0,5)}–${String(shopSettings.close_time||'').slice(0,5)}`:'Ananya AI — Help & Support',      fn:()=>window.location.href='support.html'},
+    {icon:'📦',bg:'var(--tint-neutral-bg)',label:'Order History',     sub:'Purane orders dekhein',          fn:()=>switchTab('orders')},
+    {icon:'💬',bg:'var(--tint-neutral-bg)',label:'Help & Support',    sub: shopSettings.open_time?`Ananya AI — roz ${String(shopSettings.open_time).slice(0,5)}–${String(shopSettings.close_time||'').slice(0,5)}`:'Ananya AI — Help & Support',      fn:()=>window.location.href='support.html'},
     {icon:'📱',bg:'var(--tint-neutral-bg)',label:'App Version',       sub:'v1.0.0 • RK Grocery Mart',        fn:null},
   ];
 
@@ -894,7 +916,7 @@ function SettingsTab({ switchTab, user, showToast }) {
       </Card>
 
       <Card title="Payment Methods" icon="💳" noBody>
-        {[{icon:'💵',bg:'var(--tint-green-bg)',name:'Cash on Delivery',sub:'Ghar pe cash dena'},{icon:'💳',bg:'var(--tint-blue-bg)',name:'Online Payment',sub:'Card / UPI / NetBanking'}].map(p=>(
+        {[{icon:'💵',bg:'var(--tint-neutral-bg)',name:'Cash on Delivery',sub:'Ghar pe cash dena'},{icon:'💳',bg:'var(--tint-blue-bg)',name:'Online Payment',sub:'Card / UPI / NetBanking'}].map(p=>(
           <div key={p.name} className="flex items-center gap-3 px-4 md:px-5 py-3.5 last:border-b-0" style={{borderBottom:'1px solid var(--border)'}}>
             <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:p.bg}}>{p.icon}</div>
             <div className="flex-1"><div className="text-[13px] font-bold font-poppins" style={{color:'var(--dark)'}}>{p.name}</div><div className="text-[11px] font-poppins mt-0.5" style={{color:'var(--muted)'}}>{p.sub}</div></div>
@@ -905,7 +927,7 @@ function SettingsTab({ switchTab, user, showToast }) {
 
       <Card title="Appearance" icon="🌗">
         <div className="flex items-center gap-2.5">
-          <Toggle on={dark} onClick={toggleTheme}/>
+          <Toggle on={dark} label="Dark mode" onClick={toggleTheme}/>
           <span className="text-[13px] font-semibold font-poppins flex items-center gap-1.5" style={{color:'var(--text)'}}>{dark?<Moon size={14}/>:<Sun size={14}/>} Dark Mode</span>
         </div>
       </Card>
@@ -916,7 +938,7 @@ function SettingsTab({ switchTab, user, showToast }) {
             <div className="text-[13px] font-semibold font-poppins" style={{color:'var(--text)'}}>Web Push Notifications</div>
             <div className="text-[11px] font-poppins mt-0.5" style={{color:'var(--muted)'}}>Offers, price-drop aur order updates — browser mein</div>
           </div>
-          <Toggle on={notifOn} onClick={()=>!notifBusy&&toggleNotif()}/>
+          <Toggle on={notifOn} label="Notifications" onClick={()=>!notifBusy&&toggleNotif()}/>
         </div>
       </Card>
 
@@ -1055,8 +1077,8 @@ export default function AccountPage() {
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-2xl md:text-3xl font-bold font-poppins overflow-hidden" style={{background:'rgba(255,255,255,0.2)', border:'3px solid rgba(255,255,255,0.5)', boxShadow:'0 4px 16px rgba(0,0,0,0.2)'}}>
                 {p?.avatar_url ? <img src={p.avatar_url} alt="" className="w-full h-full object-cover"/> : (p?.name?p.name[0].toUpperCase():'👤')}
               </div>
-              <button onClick={()=>switchTab('profile')} aria-label="Change photo" className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center" style={{background:'var(--yellow)', border:'2px solid rgba(255,255,255,0.9)', boxShadow:'0 2px 6px rgba(0,0,0,0.15)'}}>
-                <Camera size={12} className="text-white"/>
+              <button onClick={()=>switchTab('profile')} aria-label="Change photo" className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center" style={{background:'var(--yellow)', border:'2px solid rgba(255,255,255,0.9)', boxShadow:'0 2px 6px rgba(0,0,0,0.15)'}}>
+                <Camera size={14} className="text-white"/>
               </button>
             </div>
             <div className="min-w-0 flex-1">
