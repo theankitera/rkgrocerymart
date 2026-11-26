@@ -1868,13 +1868,14 @@ export default function App(){
 
             {/* Search — desktop only, center (mobile gets a full-width row below) */}
             <div className="hidden md:block flex-1 max-w-xl mx-auto">
-              <div className="w-full flex items-center gap-3 rounded-2xl p-2.5"
+              <div className="search-box w-full flex items-center gap-3 rounded-2xl p-2.5"
                 style={{background:'var(--light)',border:'1.5px solid var(--border)',opacity:searchDisabled?0.5:1}}>
                 <Search size={18} style={{color:'var(--gray)'}} className="flex-shrink-0"/>
                 <input placeholder="Search groceries, snacks, dairy..." value={search} readOnly={searchDisabled}
+                  spellCheck={false} autoComplete="off" autoCorrect="off" autoCapitalize="off"
                   onClick={()=>{if(searchDisabled)showToast('Pehle yeh kaam poora karein 🙏');}}
                   onChange={e=>{setSearch(e.target.value);setPage('shop');setShopPage(1);}}
-                  className="flex-1 bg-transparent text-sm font-poppins outline-none" style={{color:'var(--dark)'}}/>
+                  className="search-input flex-1 bg-transparent text-sm font-poppins outline-none" style={{color:'var(--dark)'}}/>
                 {search&&!searchDisabled&&<button aria-label="Search saaf karein" onClick={()=>setSearch('')} style={{color:'#A0AEC0',background:'none'}}>✕</button>}
               </div>
             </div>
@@ -1914,13 +1915,14 @@ export default function App(){
 
           {/* Mobile search — full width row below logo/actions */}
           <div className="md:hidden w-full mt-3">
-            <div className="w-full flex items-center gap-3 rounded-2xl p-3"
+            <div className="search-box w-full flex items-center gap-3 rounded-2xl p-3"
               style={{background:'var(--light)',border:'1.5px solid var(--border)',opacity:searchDisabled?0.5:1}}>
               <Search size={16} style={{color:'var(--gray)'}} className="flex-shrink-0"/>
               <input placeholder="Search groceries, snacks, dairy..." value={search} readOnly={searchDisabled}
+                spellCheck={false} autoComplete="off" autoCorrect="off" autoCapitalize="off"
                 onClick={()=>{if(searchDisabled)showToast('Pehle yeh kaam poora karein 🙏');}}
                 onChange={e=>{setSearch(e.target.value);setPage('shop');setShopPage(1);}}
-                className="flex-1 bg-transparent text-sm font-poppins outline-none" style={{color:'var(--dark)',fontSize:16}}/>
+                className="search-input flex-1 bg-transparent text-sm font-poppins outline-none" style={{color:'var(--dark)',fontSize:16}}/>
               {search&&!searchDisabled&&<button aria-label="Search saaf karein" onClick={()=>setSearch('')} style={{color:'#A0AEC0',background:'none'}}>✕</button>}
             </div>
           </div>

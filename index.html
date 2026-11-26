@@ -108,6 +108,10 @@ button{cursor:pointer;border:none;outline:none;font-family:'Poppins',sans-serif;
 input,select,textarea{outline:none;border:none;font-family:'Poppins',sans-serif;font-size:16px;}
 :focus-visible{outline:none;box-shadow:var(--focus-ring);}
 :focus-visible{outline:2px solid var(--primary);outline-offset:2px;}
+/* Search box: focus par laal ring NAHI — click karte hi laal line aati thi.
+   Focus ka ishara outer box ki border (neutral grey) se milta hai, laal se nahi. */
+.search-input:focus-visible{outline:none!important;box-shadow:none!important;}
+.search-box:focus-within{border-color:#94A3B8!important;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:#f1f1f1;}
 ::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px;}
