@@ -248,7 +248,7 @@ export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wis
                     <button key={i} disabled={uOos} onClick={()=>{setSelUnit(i);}}
                       className="rounded-xl px-3.5 py-2 text-left transition-all disabled:opacity-45"
                       style={active
-                        ?{background:'var(--primary-dark)',color:'#fff',boxShadow:'0 4px 12px rgba(22,163,74,0.3)'}
+                        ?{background:'var(--primary-dark)',color:'#fff',boxShadow:'0 4px 12px rgba(211,47,47,0.3)'}
                         :{background:'var(--light)',color:'var(--dark)',border:'1.5px solid var(--border)'}}>
                       <div className="text-xs font-extrabold font-poppins">{u.label}</div>
                       <div className="text-[11px] font-bold font-poppins" style={{color:active?'rgba(255,255,255,0.9)':'var(--primary)'}}>

@@ -261,7 +261,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
             showToast('Payment window band hua — order save nahi hua, dobara try kar sakte hain');
           },
         },
-        theme:{color:'#15803D'},
+        theme:{color:'#D32F2F'},
         prefill:{name:f.name.trim(),contact:f.phone.trim(),email:user?.email||''},
       });
       rzp.on('payment.failed',(resp)=>{
@@ -547,7 +547,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         </div>
       )}
       <button className="place-order-btn w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm"
-        style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(22,163,74,0.35)',color:'var(--on-primary)'}}
+        style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(211,47,47,0.35)',color:'var(--on-primary)'}}
         disabled={placing||rzpBusy} onClick={handlePlaceOrder}>
         {placing||rzpBusy?'⏳ Process Ho Raha Hai...':(pay==='razorpay'?`💳 Pay Now — ₹${finalAmount.toFixed(0)}`:`📲 Order Confirm Karein — ₹${finalAmount.toFixed(0)}`)} →
       </button>

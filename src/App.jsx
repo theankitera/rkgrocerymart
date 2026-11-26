@@ -62,7 +62,7 @@ function CategoryRail({cats,catsLoading,catEmoji,onClick,activeCatId=null,headin
         <div className="flex items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{background:'linear-gradient(135deg,var(--primary),var(--primary-dark))',boxShadow:'0 4px 12px rgba(22,163,74,0.35)'}}>
+              style={{background:'linear-gradient(135deg,var(--primary),var(--primary-dark))',boxShadow:'0 4px 12px rgba(211,47,47,0.35)'}}>
               <span className="text-lg md:text-xl">🛍️</span>
             </div>
             <h2 className="text-base md:text-xl font-extrabold font-poppins truncate leading-tight" style={{color:'var(--dark)'}}>{heading}</h2>
@@ -93,7 +93,7 @@ function CategoryRail({cats,catsLoading,catEmoji,onClick,activeCatId=null,headin
                   className={`flex-shrink-0 ${tileClass} snap-start flex flex-col items-center gap-1.5 group outline-none`}>
                   {/* Blinkit-style image-first rounded card */}
                   <div className="relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-200 group-active:scale-95 group-hover:-translate-y-1 group-hover:shadow-lg"
-                    style={{background:'var(--light)',border:'1px solid var(--border)',boxShadow:active?'0 0 0 2.5px var(--primary), 0 4px 14px rgba(22,163,74,0.25)':'0 2px 10px rgba(0,0,0,0.06)',transition:'box-shadow 0.2s ease, transform 0.2s ease'}}>
+                    style={{background:'var(--light)',border:'1px solid var(--border)',boxShadow:active?'0 0 0 2.5px var(--primary), 0 4px 14px rgba(211,47,47,0.25)':'0 2px 10px rgba(0,0,0,0.06)',transition:'box-shadow 0.2s ease, transform 0.2s ease'}}>
                     {(c.display_image||c.image_url)
                       ?<img src={c.display_image||c.image_url} alt={c.name} loading="lazy"
                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"/>
@@ -141,7 +141,7 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
           :banners.map(b=>(
             <div key={b.id} role="button" tabIndex={0} aria-label={b.title||'Banner'}
               className="relative w-full h-full flex-shrink-0 snap-start snap-always cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-              style={{background:b.bg_gradient||'linear-gradient(135deg,#064E3B,#047857)'}}
+              style={{background:b.bg_gradient||'linear-gradient(135deg,#7F1D1D,#B91C1C)'}}
               onClick={()=>handleBannerClick(b)}
               onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handleBannerClick(b);}}}>
               {b.image_url&&<img src={b.image_url} alt={b.title} className="absolute inset-0 w-full h-full object-cover opacity-70"/>}
@@ -679,7 +679,7 @@ function FlashSale({prods,loading,cart,addToCart,updQty,onDetail,wishlistIds,onW
   const chips=[{v:h,l:'Hours'},{v:m,l:'Min'},{v:s,l:'Sec'}];
   return(
     <div className="rounded-3xl p-4 md:p-6"
-      style={{background:'linear-gradient(120deg,#14532D,#15803D 55%,#166534)',boxShadow:'0 10px 30px rgba(21,128,61,0.35)'}}>
+      style={{background:'linear-gradient(120deg,#7F1D1D,#D32F2F 55%,#B71C1C)',boxShadow:'0 10px 30px rgba(183,28,28,0.35)'}}>
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <span className="text-xl md:text-2xl animate-pulse">⚡</span>
@@ -794,7 +794,7 @@ function CustomerReviews({reviews=[]}){
 function DownloadApp({onInstall}){
   return(
     <div className="rounded-3xl p-5 md:p-8 flex flex-col md:flex-row items-center gap-5 md:gap-8"
-      style={{background:'linear-gradient(135deg,#16A34A,#15803D)'}}>
+      style={{background:'linear-gradient(135deg,#D32F2F,#B71C1C)'}}>
       <div className="flex-1 text-center md:text-left">
         <h2 className="text-white font-extrabold font-poppins text-lg md:text-2xl">App Install Karein 📱</h2>
         <p className="text-white/80 text-xs md:text-sm font-poppins mt-1.5 leading-relaxed">Fast loading, offline access aur home screen se ek-tap shopping — bilkul free!</p>
@@ -804,7 +804,7 @@ function DownloadApp({onInstall}){
           ))}
         </ul>
         <div className="mt-4 flex flex-wrap gap-2.5 justify-center md:justify-start">
-          <button onClick={onInstall} className="flex items-center gap-2 bg-white text-[#15803D] font-extrabold font-poppins text-xs md:text-sm px-4 md:px-5 py-2.5 rounded-xl shadow-lg hover:scale-[1.03] active:scale-95 transition-transform">
+          <button onClick={onInstall} className="flex items-center gap-2 bg-white text-[#B71C1C] font-extrabold font-poppins text-xs md:text-sm px-4 md:px-5 py-2.5 rounded-xl shadow-lg hover:scale-[1.03] active:scale-95 transition-transform">
             <Download size={16}/> Install App
           </button>
           <span className="text-white/70 text-[10px] md:text-xs font-poppins self-center">Free • Home screen par 1-tap install</span>
@@ -1533,7 +1533,7 @@ export default function App(){
       document.documentElement.style.setProperty('--primary',shopSettings.theme_color);
     }
     const m=document.querySelector('meta[name="theme-color"]');
-    if(m)m.setAttribute('content',theme==='dark'?'#0F1521':(shopSettings.theme_color||'#15803D'));
+    if(m)m.setAttribute('content',theme==='dark'?'#0F1521':(shopSettings.theme_color||'#D32F2F'));
   },[theme,shopSettings.theme_color]);
 
   // Admin Settings → Branding favicon — initial load par /js/favicon.js khud
@@ -1878,7 +1878,7 @@ export default function App(){
 
               <button onClick={()=>setCartOpen(true)} aria-label={count?`Cart, ${count} items, ₹${total}`:'Cart is empty'}
                 className="relative flex items-center gap-1.5 px-3 h-9 rounded-xl text-white font-poppins font-bold text-sm"
-                style={{background:`linear-gradient(135deg, var(--primary), var(--primary-dark))`, boxShadow:'0 4px 12px rgba(22,163,74,0.3)',color:'var(--on-primary)'}}>
+                style={{background:`linear-gradient(135deg, var(--primary), var(--primary-dark))`, boxShadow:'0 4px 12px rgba(211,47,47,0.3)',color:'var(--on-primary)'}}>
                 <ShoppingCart size={17}/>
                 <span className="hidden md:inline">Cart</span>
                 {count>0&&<span className="hidden lg:inline text-[10px] font-semibold opacity-90 border-l border-white/25 pl-1.5">₹{total}</span>}
@@ -2195,7 +2195,7 @@ export default function App(){
                 {total >= (shopSettings.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--primary-dark)'}}>✅ Minimum order ₹{shopSettings.min_order ?? 499} poora ho gaya.</div>}
                 <button onClick={goToCheckout}
                   className="w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm"
-                  style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(22,163,74,0.35)',color:'var(--on-primary)'}}>
+                  style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(211,47,47,0.35)',color:'var(--on-primary)'}}>
                   {user?`Checkout — ₹${total.toFixed(0)} →`:'Login & Checkout →'}
                 </button>
               </div>

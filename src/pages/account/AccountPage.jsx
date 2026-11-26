@@ -66,7 +66,7 @@ const cardStyle = { background:'var(--card-bg)', boxShadow:'0 2px 10px rgba(0,0,
 const inputCls  = "w-full rounded-xl px-3.5 py-2.5 text-[15px] font-poppins outline-none";
 const inputStyle= { background:'var(--light)', border:'1.5px solid var(--border)', color:'var(--dark)' };
 const labelCls  = "text-[10px] font-bold font-poppins uppercase tracking-wide block mb-1.5";
-const btnPrimaryStyle   = { background:'linear-gradient(135deg, var(--primary), var(--primary-dark))', boxShadow:'0 4px 16px rgba(22,163,74,0.3)' };
+const btnPrimaryStyle   = { background:'linear-gradient(135deg, var(--primary), var(--primary-dark))', boxShadow:'0 4px 16px rgba(211,47,47,0.3)' };
 const btnSecondaryStyle = { background:'var(--light)', color:'var(--gray)', border:'1.5px solid var(--border)' };
 const btnDangerStyle    = { background:'var(--tint-red-bg)', color:'var(--red)', border:'1.5px solid var(--tint-red-border)' };
 // Product ka primary image (dataHooks.js jaisa hi logic): is_default first, warna sort_order se pehli
@@ -249,7 +249,7 @@ function OrdersTab({ state, showToast }) {
                   let cls = i<modal.curIdx?'done':i===modal.curIdx?'active':'waiting';
                   if (modal.o.status==='cancelled') cls='waiting';
                   const dotStyle = cls==='done'?{background:'var(--primary-light)',color:'var(--primary)'}
-                    :cls==='active'?{background:'var(--primary)',color:'#fff',boxShadow:'0 0 0 4px rgba(22,163,74,0.2)'}
+                    :cls==='active'?{background:'var(--primary)',color:'#fff',boxShadow:'0 0 0 4px rgba(211,47,47,0.2)'}
                     :{background:'var(--light)',color:'var(--muted)'};
                   return (
                     <div key={i} className="flex gap-3 mb-2.5">
@@ -835,7 +835,7 @@ function SettingsTab({ switchTab, user, showToast }) {
     document.documentElement.setAttribute('data-theme',t);
     try { localStorage.setItem('rk_theme',t); } catch(e){}
     const m=document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content',t==='dark'?'#0F1521':'#15803D');
+    if (m) m.setAttribute('content',t==='dark'?'#0F1521':'#D32F2F');
     setDark(!dark);
   }
 
@@ -1023,7 +1023,7 @@ export default function AccountPage() {
 
       <div className="max-w-site mx-auto px-4 md:px-8 py-4 md:py-6 pb-28 md:pb-10">
         {/* Hero */}
-        <div className="rounded-2xl p-5 md:p-6 relative overflow-hidden" style={{background:'linear-gradient(135deg,#064E3B 0%,#065F46 35%,#1BA672 80%,#34D399 100%)', boxShadow:'0 8px 32px rgba(6,78,59,0.35)'}}>
+        <div className="rounded-2xl p-5 md:p-6 relative overflow-hidden" style={{background:'linear-gradient(135deg,#7F1D1D 0%,#B71C1C 35%,#D32F2F 80%,#EF5350 100%)', boxShadow:'0 8px 32px rgba(127,29,29,0.35)'}}>
           <div className="absolute rounded-full pointer-events-none" style={{right:-50,top:-50,width:200,height:200,background:'rgba(255,255,255,0.06)'}}/>
           <div className="absolute rounded-full pointer-events-none" style={{right:40,bottom:-70,width:240,height:240,background:'rgba(255,255,255,0.04)'}}/>
           <div className="flex items-center gap-3.5 md:gap-4 relative z-[1]">

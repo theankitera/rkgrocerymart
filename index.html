@@ -45,7 +45,7 @@
      The icon is still cached for PWA offline use via service-worker.js. -->
   <link rel="stylesheet" href="/css/delivery-radius.css"/>
 <link rel="manifest" href="/manifest.json"/>
-<meta name="theme-color" content="#16A34A" id="rk-theme-color"/>
+<meta name="theme-color" content="#D32F2F" id="rk-theme-color"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -81,18 +81,18 @@
    background ek safed dabbe jaisa dikhta tha, dark mode me aur bhi zyada. */
 button{background:transparent;}
 :root{
-  --primary:#16A34A;--primary-dark:#15803D;--primary-light:#E8F5E9;
+  --primary:#D32F2F;--primary-dark:#B71C1C;--primary-light:#FDECEA;
   --on-primary:#fff;--z-nav:100;--z-drawer-bg:1000;--z-drawer:1010;--z-modal:1100;--z-toast:1200;
-  --orange:#FF9933;--yellow:#FFB800;--red:#E63946;--blue:#3B82F6;--purple:#8B5CF6;
-  --dark:#1A1A2E;--text:#2D3748;--gray:#718096;--light:#F7FAFC;
+  --orange:#FF9933;--yellow:#FFB300;--red:#E53935;--blue:#3B82F6;--purple:#8B5CF6;
+  --dark:#102027;--text:#2D3748;--gray:#718096;--light:#F7FAFC;
   --border:#E2E8F0;
-  --page-bg:#F5F5F5;--card-bg:#fff;--footer-bg:#1A1A2E;
+  --page-bg:#F4F6F8;--card-bg:#fff;--footer-bg:#102027;
   --header-h:96px;
   --shadow-xs:0 1px 2px rgba(0,0,0,.06);--shadow-sm:0 2px 8px rgba(0,0,0,.08);
-  --shadow-md:0 4px 12px rgba(22,163,74,.3);--shadow-lg:0 6px 18px rgba(0,0,0,.10);
+  --shadow-md:0 4px 12px rgba(211,47,47,.3);--shadow-lg:0 6px 18px rgba(0,0,0,.10);
   --shadow-xl:0 12px 32px rgba(0,0,0,.16);
   --ease-standard:cubic-bezier(.4,0,.2,1);--dur-fast:150ms;--dur-base:200ms;--dur-slow:300ms;
-  --focus-ring:0 0 0 3px rgba(22,163,74,.35);
+  --focus-ring:0 0 0 3px rgba(211,47,47,.35);
   /* Soft tint panels (info/warn/error/success) — dark mode par inhe flip karte hain */
   --tint-yellow-bg:#FFF8E1;--tint-yellow-border:#FFE0A3;--tint-yellow-text:#92600B;
   --tint-blue-bg:#EFF6FF;--tint-blue-border:#BFDBFE;--tint-blue-text:#1D4ED8;
@@ -116,7 +116,7 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:#3A4A5E;}
 .logo{font-size:1.5rem;font-weight:900;color:var(--primary);flex-shrink:0;cursor:pointer;}
 .logo span{color:var(--orange);}
 .header{background:#fff;padding:12px 16px 10px;position:sticky;top:0;z-index:var(--z-nav);box-shadow:0 1px 8px rgba(0,0,0,0.08);}
-.ticker{background:linear-gradient(90deg,#1BA672,#0EA5E9,#8B5CF6,#EF4444,#F97316,#1BA672);background-size:400%;animation:gradAnim 8s linear infinite;overflow:hidden;padding:7px 0;}
+.ticker{background:linear-gradient(90deg,#D32F2F,#FFB300,#1A365D,#E53935,#FFB300,#D32F2F);background-size:400%;animation:gradAnim 8s linear infinite;overflow:hidden;padding:7px 0;}
 @keyframes gradAnim{0%{background-position:0%}100%{background-position:400%}}
 .ticker-track{display:flex;animation:tickerScroll 25s linear infinite;white-space:nowrap;}
 .ticker-item{color:#fff;font-size:0.72rem;font-weight:600;padding:0 24px;letter-spacing:0.3px;}
@@ -148,7 +148,7 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:#3A4A5E;}
 .inp{width:100%;background:#F7FAFC;border:1.5px solid var(--border);border-radius:10px;padding:12px 13px;font-size:16px;color:var(--dark);margin-bottom:10px;transition:border 0.2s;min-height:44px;}
 .inp:focus{border-color:var(--primary);}
 .osi{display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;}
-.place-order-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:var(--on-primary);border-radius:14px;font-weight:800;font-size:1rem;box-shadow:0 6px 16px rgba(22,163,74,0.35);margin-top:16px;min-height:48px;cursor:pointer;}
+.place-order-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:var(--on-primary);border-radius:14px;font-weight:800;font-size:1rem;box-shadow:0 6px 16px rgba(211,47,47,0.35);margin-top:16px;min-height:48px;cursor:pointer;}
 .place-order-btn:disabled{opacity:0.6;cursor:not-allowed;}
 .success-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;padding:24px;text-align:center;}
 .success-anim{font-size:5rem;animation:successPop 0.6s cubic-bezier(0.34,1.56,0.64,1);}
@@ -161,16 +161,16 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:#3A4A5E;}
 @keyframes toastUp{from{opacity:0;transform:translateX(-50%) translateY(20px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
 html,body,.header,.desktop-header,.co-card,.cart-drawer,.bottom-nav,.inp{transition:background-color 0.25s ease,border-color 0.25s ease,color 0.25s ease;}
 html[data-theme="dark"]{
-  --primary:#4ADE80;--primary-dark:#16A34A;--primary-light:#163828;
-  --on-primary:#052e16;
+  --primary:#FF6B6B;--primary-dark:#E53935;--primary-light:#3D1A1A;
+  --on-primary:#450A0A;
   --orange:#FFB366;--yellow:#FFCB47;--red:#FF6B6B;--blue:#60A5FA;--purple:#A78BFA;
   --dark:#F1F5F9;--text:#CBD5E1;--gray:#94A3B8;--light:#1A2332;
   --border:#2D3B4E;
   --page-bg:#0F1521;--card-bg:#151B26;--footer-bg:#0A0E16;
   --shadow-xs:0 1px 2px rgba(0,0,0,.3);--shadow-sm:0 2px 8px rgba(0,0,0,.35);
-  --shadow-md:0 4px 12px rgba(46,204,130,.25);--shadow-lg:0 6px 18px rgba(0,0,0,.4);
+  --shadow-md:0 4px 12px rgba(255,107,107,.25);--shadow-lg:0 6px 18px rgba(0,0,0,.4);
   --shadow-xl:0 12px 32px rgba(0,0,0,.5);
-  --focus-ring:0 0 0 3px rgba(46,204,130,.4);
+  --focus-ring:0 0 0 3px rgba(255,107,107,.4);
   --tint-yellow-bg:#3A2E10;--tint-yellow-border:#6B4A1F;--tint-yellow-text:#FFCB47;
   --tint-blue-bg:#142A3D;--tint-blue-border:#2F5878;--tint-blue-text:#7CB4FF;
   --tint-red-bg:#3A1414;--tint-red-border:#5A1F1F;--tint-red-text:#FF8A8A;
