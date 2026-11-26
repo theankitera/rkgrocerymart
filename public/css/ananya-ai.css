@@ -792,7 +792,7 @@
   font-size: 13.5px;
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(22,163,74,0.35);
+  box-shadow: 0 4px 14px rgba(211,47,47,0.35);
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
@@ -1036,7 +1036,7 @@
   width: 42px;
   height: 42px;
   border-radius: var(--an-r-sm);
-  background: linear-gradient(135deg, rgba(22,163,74,0.12), rgba(255,184,0,0.12));
+  background: linear-gradient(135deg, rgba(211,47,47,0.12), rgba(194,24,91,0.12));
   display: flex;
   align-items: center;
   justify-content: center;
