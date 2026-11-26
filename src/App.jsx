@@ -1080,7 +1080,7 @@ function TermsBody(){
 
       <IHead icon={Truck}>5. Delivery</IHead>
       <IBullets items={[
-        'Delivery time slots are available daily from 7:00 AM to 10:00 PM — slots shown depend on your area.',
+        'Orders are delivered the same day, usually within 20–55 minutes — the exact time depends on your area and rush hours.',
         'Estimated time is an ETA, not a guarantee — delays can occur due to traffic, weather or rush.',
         'If nobody is home, the delivery partner will call you; after 2 attempts the order is returned and a refund is processed.',
         'Delivery charges and the free-delivery threshold are listed on the <a href="index.html#shipping" style="color:var(--primary);font-weight:700;text-decoration:underline">Delivery &amp; Shipping</a> page.',
@@ -1142,7 +1142,7 @@ function ShippingBody(){
           ['⏱️ Standard Delivery','20–55 minute (avg.), 7 AM – 10 PM','0–5 km FREE, 5–8 km ₹30'],
           ['🛒 Minimum order','₹499 se kam ka order nahi liya jaata','₹499'],
           ['📍 Delivery area','Dukaan se 8 km ke andar (shop settings se)','Distance ke hisaab se'],
-          ['📅 Scheduled Delivery','Pick a time slot of your choice','Same-day delivery'],
+          ['⏰ Delivery time','Usually 20–55 minutes after placing the order','Same-day delivery'],
         ]}
       />
       <p className="text-[11px] font-poppins" style={{color:'var(--gray)'}}>Note: Charges may depend on your area, order value and ongoing offers. The final amount is shown clearly at checkout — no hidden charges.</p>
@@ -1159,7 +1159,7 @@ function ShippingBody(){
       <IHead icon={MapPin}>Delivery Areas &amp; Slots</IHead>
       <IBullets items={[
         'We deliver across our entire service area — just enter your PIN code/area at checkout to check.',
-        'Daily slots: <strong style="color:var(--dark)">7:00 AM to 10:00 PM</strong> (morning, afternoon, evening and night slots available).',
+        'Delivery is usually within 20–55 minutes of placing the order.',
         'During rush hours (6-9 PM evenings and weekends) a slight delay is possible — we inform you in advance.',
         'Moving to a new area? Message us on WhatsApp — if your area is not on the list yet, we will try to add it soon.',
       ]}/>

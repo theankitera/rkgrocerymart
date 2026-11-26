@@ -240,10 +240,12 @@ export function useHomeSections(){
       // agar koi flag nahi to purana behaviour — 20%+ discount wale.
       const flaggedFlash=inStock.filter(p=>p.is_flash_sale);
       const flashSource=flaggedFlash.length?flaggedFlash:inStock.filter(p=>p.discount>=20);
+      const flaggedBest=inStock.filter(p=>p.is_bestseller||p.is_trending);
+      const restBest=inStock.filter(p=>!p.is_bestseller&&!p.is_trending);
       setSections({
         flash:flashSource.sort((a,b)=>b.discount-a.discount).slice(0,8),
         deals:inStock.filter(p=>p.discount>0).sort((a,b)=>b.discount-a.discount).slice(0,8),
-        bestSellers:inStock.filter(p=>p.is_bestseller||p.is_trending).length?[...inStock.filter(p=>p.is_bestseller||p.is_trending),...inStock].slice(0,8):inStock.slice(0,8),
+        bestSellers:flaggedBest.length?[...flaggedBest,...restBest].slice(0,8):inStock.slice(0,8),
         newArrivals:(enriched.some(p=>p.is_new_arrival)?enriched.filter(p=>p.is_new_arrival):enriched).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,8),
       });
     }catch(e){/* keep previous sections; just stop the loader */}

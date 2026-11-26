@@ -84,7 +84,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     showToast(`✅ Coupon applied — ₹${result.discount} OFF`);
   };
   const handleRemoveCoupon=()=>{setAppliedCoupon(null);setCouponCode('');setCouponError('');};
-  const deliveryCharge=(deliveryInfo&&deliveryInfo.available)?deliveryInfo.charge:0;
+  const deliveryCharge=(deliveryInfo&&deliveryInfo.available)?deliveryInfo.charge:(shopSettings.delivery_charge ?? 30);
   const finalAmount=Math.max(0,total-discount+deliveryCharge);
   useEffect(()=>{
     let active=true;
@@ -130,17 +130,8 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     }
   };
 
-  // Auto-trigger the GPS prompt as soon as an address is on screen (either a
-  // saved address card, or the new-address form) — mirrors the same
-  // auto-trigger pattern used on the Account → Addresses page. Fires once;
-  // if the user denies, we don't ask again automatically.
-  useEffect(()=>{
-    if(loadingAddrs)return;
-    if(!selectedAddrId&&!showNewForm)return;
-    if(locState!=='idle')return;
-    handleUseLocation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[loadingAddrs,selectedAddrId,showNewForm]);
+  // (GPS auto-trigger hata diya gaya hai — permission sirf "Use Current
+  // Location" button dabane par manga jata hai.)
 
   const isPhoneValid=/^[6-9]\d{9}$/.test(f.phone.trim());
   const selectedAddr=addresses.find(a=>a.id===selectedAddrId)||null;
