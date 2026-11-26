@@ -153,7 +153,7 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
                   width < 448px isliye kabhi dikhta nahi tha). Width cap ab andar ke
                   text wrapper par hai, gradient poore banner par uniform rahega. */}
               <div className="absolute inset-0 p-4 md:p-10 flex flex-col justify-end md:justify-center"
-                style={{background:'linear-gradient(0deg, rgba(0,0,0,0.35), transparent 60%)'}}>
+                style={{background:'linear-gradient(0deg, rgba(0,0,0,0.55), transparent 60%)'}}>
                 <div className="w-full max-w-md">
                   <span className="inline-block bg-white/20 text-white text-[10px] md:text-xs font-bold font-poppins px-2 py-1 rounded-lg mb-1 w-fit">LIMITED OFFER</span>
                   <p className="text-white font-bold text-base md:text-3xl font-poppins leading-tight">{b.title}</p>

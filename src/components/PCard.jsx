@@ -69,7 +69,7 @@ export function PCard({p,cart,addToCart,updQty,onDetail,wishlistIds,onWishlist})
         <div className="text-xs font-semibold font-poppins line-clamp-2 leading-snug" style={{color:'var(--dark)'}}>{p.name}</div>
         <div className="text-[10px] font-poppins mt-0.5" style={{color:'var(--gray)'}}>
           {displayUnit}
-          {units&&<span className="ml-1 font-bold px-1.5 py-0.5 rounded-md" style={{background:'var(--primary-light)',color:'var(--primary-dark)'}}>{units.length} sizes</span>}
+          {units&&<span className="ml-1.5 font-bold px-1.5 py-0.5 rounded-md" style={{background:'var(--primary-light)',color:'var(--primary-dark)'}}>• {units.length} sizes</span>}
         </div>
         <div className="flex items-end justify-between mt-auto pt-2 gap-1">
           <div className="min-w-0">
