@@ -871,7 +871,7 @@ function SettingsTab({ switchTab, user, showToast }) {
       </Card>
 
       <Card title="Payment Methods" icon="💳" noBody>
-        {[{icon:'💵',bg:'var(--tint-green-bg)',name:'Cash on Delivery',sub:'Ghar pe cash dena'},{icon:'📱',bg:'var(--tint-blue-bg)',name:'UPI / QR Code',sub:'QR scan karke pay karein'}].map(p=>(
+        {[{icon:'💵',bg:'var(--tint-green-bg)',name:'Cash on Delivery',sub:'Ghar pe cash dena'},{icon:'💳',bg:'var(--tint-blue-bg)',name:'Online Payment',sub:'Card / UPI / NetBanking'}].map(p=>(
           <div key={p.name} className="flex items-center gap-3 px-4 md:px-5 py-3.5 last:border-b-0" style={{borderBottom:'1px solid var(--border)'}}>
             <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:p.bg}}>{p.icon}</div>
             <div className="flex-1"><div className="text-[13px] font-bold font-poppins" style={{color:'var(--dark)'}}>{p.name}</div><div className="text-[11px] font-poppins mt-0.5" style={{color:'var(--muted)'}}>{p.sub}</div></div>
