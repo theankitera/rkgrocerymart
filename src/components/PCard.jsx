@@ -83,10 +83,10 @@ export function PCard({p,cart,addToCart,updQty,onDetail,wishlistIds,onWishlist})
               style={{background:'var(--primary-dark)',minHeight:32}}>ADD</button>
             :<div className="flex-shrink-0 flex items-center gap-1 rounded-lg px-1 py-0.5" style={{background:'var(--primary-light)'}} onClick={e=>e.stopPropagation()}>
               <button aria-label="Quantity kam karein" onClick={()=>updQty(p.id,-1,null,lineKey)}
-                className="w-6 h-6 flex items-center justify-center font-bold text-sm" style={{color:'var(--primary-dark)'}}>−</button>
+                className="w-6 h-6 flex items-center justify-center font-bold text-sm bg-transparent" style={{color:'var(--primary-dark)'}}>−</button>
               <span className="text-xs font-bold font-poppins w-3 text-center" style={{color:'var(--primary-dark)'}}>{inC.qty}</span>
               <button aria-label="Quantity badhayein" disabled={atMax} onClick={()=>!atMax&&updQty(p.id,1,displayStock,lineKey)}
-                className="w-6 h-6 flex items-center justify-center font-bold text-sm disabled:opacity-40" style={{color:'var(--primary-dark)'}}>+</button>
+                className="w-6 h-6 flex items-center justify-center font-bold text-sm bg-transparent disabled:opacity-40" style={{color:'var(--primary-dark)'}}>+</button>
             </div>
           )}
         </div>

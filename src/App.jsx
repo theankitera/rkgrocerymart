@@ -172,7 +172,7 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
         <div className="absolute bottom-3 right-4 flex gap-1.5">
           {banners.map((_,i)=>(
             <button key={i} aria-label={`Banner ${i+1} dikhayein`} onClick={()=>setBannerIdx(i)}
-              className="p-2 flex items-center justify-center">
+              className="p-2 flex items-center justify-center bg-transparent">
               <span className={`block h-1.5 rounded-full transition-all ${i===bannerIdx?'w-5 bg-white':'w-1.5 bg-white/50'}`}/>
             </button>
           ))}
@@ -2191,8 +2191,8 @@ export default function App(){
                 <div className="mt-2 text-[11px] leading-relaxed" style={{color:'var(--muted)'}}>
                   🚚 Delivery: 0–5 km FREE, 5–8 km ₹30 — final charge checkout par aapke location se pata chalega.
                 </div>
-                {total < (s.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--orange)'}}>⚠️ Minimum order ₹{s.min_order ?? 499} hai — ₹{((s.min_order ?? 499)-total).toFixed(0)} aur add karein.</div>}
-                {total >= (s.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--primary-dark)'}}>✅ Minimum order ₹{s.min_order ?? 499} poora ho gaya.</div>}
+                {total < (shopSettings.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--orange)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-total).toFixed(0)} aur add karein.</div>}
+                {total >= (shopSettings.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--primary-dark)'}}>✅ Minimum order ₹{shopSettings.min_order ?? 499} poora ho gaya.</div>}
                 <button onClick={goToCheckout}
                   className="w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm"
                   style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(22,163,74,0.35)',color:'var(--on-primary)'}}>
