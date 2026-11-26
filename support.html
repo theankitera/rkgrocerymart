@@ -21,7 +21,9 @@
 <link rel="shortcut icon" href="/icons/favicon.ico"/><link rel="icon" type="image/svg+xml" href="/icons/rk-logo.svg"/>
 <link rel="stylesheet" href="/pwa.css"/>
 <link rel="stylesheet" href="/css/ananya-ai.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <script>
 /* Pre-paint theme: apply saved theme before first render to avoid flash */
 (function(){
@@ -224,7 +226,7 @@ window.__RK_CONFIG__={
     <!-- ── FAQ ── -->
     <section class="sp-section sp-faq">
       <h2>❓ Frequently Asked Questions</h2>
-      <p class="sp-sub">Didn&#39;t find your answer? Ask Ananya directly in the chat box above — she is available subah 8 se raat 9 (8 AM – 9 PM).</p>
+      <p class="sp-sub" id="sp-hours-faq">Didn&#39;t find your answer? Ask Ananya directly in the chat box above — Ananya AI se kabhi bhi pooch sakte hain; human support subah 5:30 se dopahar 12 (5:30 AM – 12:00 PM).</p>
 
       <details open>
         <summary>How long will my order take to arrive?</summary>
@@ -269,12 +271,12 @@ window.__RK_CONFIG__={
       <details>
         <summary>When is support available?</summary>
         <div class="a">
-          Ananya AI chat: subah 8 se raat 9 (instant answers).<br/>
-          Phone &amp; WhatsApp support: daily 7:00 AM – 10:00 PM.<br/>
+          <span id="sp-hours-chat">Ananya AI chat: kabhi bhi (instant answers).</span><br/>
+          <span id="sp-hours-phone">Phone &amp; WhatsApp support: daily 5:30 AM – 12:00 PM.</span><br/>
           Email (support@rkgrocerymart.com): reply within 24 hours.
           <div class="sp-hours" style="margin-top:8px">
-            <span>🕒 Daily 7 AM – 10 PM</span>
-            <span>💬 Chat — subah 8 se raat 9</span>
+            <span id="sp-hours-daily">🕒 Daily 5:30 AM – 12:00 PM</span>
+            <span id="sp-hours-chat2">💬 Chat — kabhi bhi</span>
             <span>📧 Reply in 24 hrs</span>
           </div>
         </div>
@@ -308,6 +310,7 @@ window.__RK_CONFIG__={
        fallback when the React app's shared client (window.sb) is not present
        on this standalone page. -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="/pwa.js?v=1" defer></script>
   <script src="/js/ananya-ai.js" defer></script>
 </body>
 </html>

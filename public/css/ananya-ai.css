@@ -3,7 +3,6 @@
    WhatsApp-style Chat | Glassmorphism | Mobile-First
    ══════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* ── CSS Variables ── */
 :root {
@@ -916,12 +915,12 @@
   color: #fff;
   flex-shrink: 0;
   transition: background 0.2s ease, transform 0.2s var(--an-ease);
-  box-shadow: 0 2px 8px rgba(37,211,102,0.4);
+  box-shadow: 0 2px 8px rgba(211,47,47,0.4);
   -webkit-tap-highlight-color: transparent;
 }
 
 .ananya-send-btn:hover {
-  background: #22C55E;
+  background: #B71C1C;
   transform: scale(1.08);
 }
 

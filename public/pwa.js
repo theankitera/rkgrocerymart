@@ -58,7 +58,8 @@
       "div",
       "rk-pwa-update-banner",
       '<span>🔄 Naya version available hai</span>' +
-        '<button class="rk-pwa-btn" id="rkPwaUpdateBtn">Refresh Karein</button>'
+        '<button class="rk-pwa-btn" id="rkPwaUpdateBtn">Refresh Karein</button>' +
+        '<button class="rk-pwa-btn-ghost" id="rkPwaDismissBtn" aria-label="Baad mein">✕</button>'
     );
     banner.id = "rkPwaUpdateBanner";
     document.body.insertBefore(banner, document.body.firstChild);
@@ -67,6 +68,9 @@
     });
     document.getElementById("rkPwaUpdateBtn").addEventListener("click", function () {
       if (waitingWorker) waitingWorker.postMessage("SKIP_WAITING");
+    });
+    document.getElementById("rkPwaDismissBtn").addEventListener("click", function () {
+      banner.remove();
     });
   }
 

@@ -10,8 +10,10 @@
   /* Aligned to the shared design tokens (Module 1) — these vars already
      flip automatically with the html[data-theme="dark"] toggle on every
      page, so pwa.css never needs its own dark-mode media query for them. */
-  --rk-pwa-primary: var(--primary, #16A34A);
-  --rk-pwa-primary-dark: var(--primary-dark, #15803D);
+  --rk-pwa-primary: var(--primary, #D32F2F);
+  --rk-pwa-primary-dark: var(--primary-dark, #B71C1C);
+  --z-pwa-banner: 1300;
+  --z-pwa-sheet: 1310;
   --rk-pwa-bg: #0F172A;
 }
 
@@ -32,7 +34,7 @@ button, a, .rk-pwa-touch {
   top: calc(var(--header-h, 96px) + 6px);
   left: 12px;
   right: 12px;
-  z-index: 1000010;
+  z-index: var(--z-pwa-banner);
   background: #111827;
   color: #fff;
   border-radius: 14px;
@@ -118,7 +120,7 @@ html[data-theme="dark"] .rk-pwa-btn-ghost { color: #6B7280; }
 /* ── Update banner ───────────────────────────── */
 .rk-pwa-update-banner {
   position: relative;
-  z-index: 1000002;
+  z-index: var(--z-pwa-banner);
   background: var(--rk-pwa-primary);
   color: #fff;
   padding: 11px 16px;
@@ -134,7 +136,7 @@ html[data-theme="dark"] .rk-pwa-btn-ghost { color: #6B7280; }
 
 /* ── iOS "Add to Home Screen" instructions sheet ─ */
 .rk-pwa-ios-sheet {
-  position: fixed; inset: 0; z-index: 1000003;
+  position: fixed; inset: 0; z-index: var(--z-pwa-sheet);
   background: rgba(0,0,0,0.55);
   display:flex; align-items:flex-end; justify-content:center;
   opacity:0; pointer-events:none; transition: opacity 0.25s ease;

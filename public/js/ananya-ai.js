@@ -346,6 +346,13 @@
         s.timings = 'Roz: subah ' + data.open_time.slice(0, 5) + ' – dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ')';
         const hl = document.getElementById('sp-hours-line');
         if (hl) hl.textContent = 'Ask anything — products, prices, orders, delivery or offers. Ananya AI se kabhi bhi pooch sakte hain — human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ').';
+        const hShort = fmtT(data.open_time) + ' – ' + fmtT(data.close_time);
+        const setT = (id, txt) => { const n = document.getElementById(id); if (n) n.textContent = txt; };
+        setT('sp-hours-faq', 'Didn\'t find your answer? Ask Ananya directly in the chat box above — Ananya AI se kabhi bhi pooch sakte hain; human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + hShort + ').');
+        setT('sp-hours-chat', 'Ananya AI chat: kabhi bhi (instant answers).');
+        setT('sp-hours-daily', '🕒 Daily ' + hShort);
+        setT('sp-hours-chat2', '💬 Chat — kabhi bhi');
+        setT('sp-hours-phone', 'Phone & WhatsApp support: daily ' + hShort + '.');
         const fq = CONFIG.faqs.find((f) => /timing/i.test(f.q));
         if (fq) fq.a = '🕐 Hamare store ke timings:\n' + s.timings + '\n\nOnline order kabhi bhi place kar sakte hain — delivery ' + s.timings.replace(/^Roz: /, '') + ' ke beech hoti hai! 😊';
         const tc = CONFIG.infoCards.find((c) => c.title === 'Store Timings');

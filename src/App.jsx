@@ -95,7 +95,7 @@ function CategoryRail({cats,catsLoading,catEmoji,onClick,activeCatId=null,headin
                   <div className="relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-200 group-active:scale-95 group-hover:-translate-y-1 group-hover:shadow-lg"
                     style={{background:'var(--light)',border:'1px solid var(--border)',boxShadow:active?'0 0 0 2.5px var(--primary), 0 4px 14px rgba(211,47,47,0.25)':'0 2px 10px rgba(0,0,0,0.06)',transition:'box-shadow 0.2s ease, transform 0.2s ease'}}>
                     {(c.display_image||c.image_url)
-                      ?<img src={c.display_image||c.image_url} alt={c.name} loading="lazy"
+                      ?<img src={c.display_image||c.image_url} alt={c.name} width={400} height={400} loading="lazy"
                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"/>
                       :<div className="w-full h-full flex items-center justify-center text-3xl md:text-4xl group-hover:scale-110 transition-transform duration-300"
                              style={{background:'var(--primary-light)'}}>{catEmoji(c)}</div>
@@ -145,7 +145,7 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
               style={{background:b.bg_gradient||'linear-gradient(135deg,#7F1D1D,#B91C1C)'}}
               onClick={()=>handleBannerClick(b)}
               onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handleBannerClick(b);}}}>
-              {b.image_url&&<img src={b.image_url} alt={b.title} className="absolute inset-0 w-full h-full object-cover opacity-70"/>}
+              {b.image_url&&<img src={b.image_url} alt={b.title} width={1200} height={360} className="absolute inset-0 w-full h-full object-cover opacity-70"/>}
               {/* Fix #5 (preserved): decorative emoji only when there's no real banner image */}
               {!b.image_url&&<div className="absolute right-2 bottom-2 text-6xl opacity-20">🛒</div>}
               {/* NOTE: gradient overlay div par max-w-md NAHI lagana — woh inset-0 ke
@@ -427,7 +427,7 @@ function DesktopSidebar({allCats,activeCatId,catEmoji,onPick,counts}){
             className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-[13px] font-semibold font-poppins active:scale-[0.97] hover:bg-black/[0.03] transition-colors"
             style={{color:active?'var(--primary)':'var(--dark)',background:active?'var(--primary-light)':'transparent'}}>
             {(c.display_image||c.image_url)
-              ?<img src={c.display_image||c.image_url} alt={c.name} className="w-7 h-7 rounded-lg object-cover flex-shrink-0"/>
+              ?<img src={c.display_image||c.image_url} alt={c.name} width={28} height={28} className="w-7 h-7 rounded-lg object-cover flex-shrink-0"/>
               :<div className="w-7 h-7 rounded-lg flex items-center justify-center text-base flex-shrink-0" style={{background:'var(--primary-light)'}}>{catEmoji(c)}</div>
             }
             <span className="truncate flex-1">{c.name}</span>
@@ -460,7 +460,7 @@ function Footer({shopSettings,onNav}){
     <div className="text-center font-poppins px-5 py-6 md:px-6 md:py-8 rounded-none md:rounded-2xl mb-0 md:mb-4"
       style={{background:`linear-gradient(135deg, var(--primary), var(--primary-dark))`,color:'rgba(255,255,255,0.85)',fontSize:'0.78rem',lineHeight:2}}>
       <div className="flex items-center justify-center gap-2.5" style={{marginBottom:8}}>
-        <img src={s.logo_url||'/icons/rk-logo.svg'} alt={s.shop_name||'RK Grocery Mart'} style={{width:38,height:38,borderRadius:12}}/>
+        <img src={s.logo_url||'/icons/rk-logo.svg'} alt={s.shop_name||'RK Grocery Mart'} width={38} height={38} style={{width:38,height:38,borderRadius:12}}/>
         <div className="text-left">
           <div className="text-white font-extrabold font-poppins" style={{fontSize:'1.15rem',lineHeight:1.1}}>{s.shop_name||'RK Grocery Mart'}</div>
           <div className="text-white/75 font-poppins" style={{fontSize:'0.7rem'}}>{s.footer_text||'हर घर की पसंद'}</div>
@@ -1858,7 +1858,7 @@ export default function App(){
             {/* Logo + location */}
             <div className="min-w-0">
               <button onClick={()=>setPage('home')} className="flex items-center gap-2 text-left" style={{background:'none'}}>
-                <img src={shopSettings.logo_url||'/icons/rk-logo.svg'} alt={shopSettings.shop_name||'RK Grocery Mart'} className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex-shrink-0"/>
+                <img src={shopSettings.logo_url||'/icons/rk-logo.svg'} alt={shopSettings.shop_name||'RK Grocery Mart'} width={36} height={36} className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex-shrink-0"/>
                 <span className="flex flex-col min-w-0">
                   <span className="text-[13px] sm:text-base md:text-lg font-extrabold font-poppins leading-none truncate" style={{color:'var(--dark)'}}><MultiColorName name={shopSettings.shop_name||'RK Grocery Mart'}/></span>
                   <span className="text-[8px] sm:text-[9px] md:text-[10px] font-poppins font-medium mt-0.5 truncate" style={{color:'var(--dark)'}}>{shopSettings.footer_text||'हर घर की पसंद'}</span>
@@ -2164,7 +2164,7 @@ export default function App(){
                   return(
                     <div key={i.k||i.id} className="flex items-center gap-3 py-2.5" style={{borderBottom:'1px solid var(--border)'}}>
                       {i.image
-                        ?<img src={i.image} alt={i.name} loading="lazy" decoding="async" className="w-11 h-11 rounded-xl object-cover flex-shrink-0" style={{background:'var(--light)'}}/>
+                        ?<img src={i.image} alt={i.name} width={44} height={44} loading="lazy" decoding="async" className="w-11 h-11 rounded-xl object-cover flex-shrink-0" style={{background:'var(--light)'}}/>
                         :<div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:'var(--light)'}}>🛒</div>}
                       <div className="min-w-0 flex-1">
                         <div className="text-[13px] font-bold font-poppins truncate" style={{color:'var(--dark)'}}>{i.name} <span className="font-normal" style={{color:'var(--gray)',fontSize:'0.7rem'}}>({i.unit})</span></div>

@@ -62,7 +62,7 @@ module.exports = async (req, res) => {
       <div style="background:#ffffff;border-radius:12px;padding:18px;border:1px solid #e2e8f0;">
         <p style="margin:0 0 12px;font-size:15px;color:#1e293b;line-height:1.6;">${message || ''}</p>
         <p style="margin:0;font-size:13px;color:#64748b;">
-          Order karne ke liye: <a href="https://rkgrocerymart.vercel.app" style="color:#16a34a;font-weight:bold;">rkgrocerymart.vercel.app</a>
+          Order karne ke liye: <a href="https://rkgrocerymart.vercel.app" style="color:#D32F2F;font-weight:bold;">rkgrocerymart.vercel.app</a>
         </p>
       </div>
       <p style="text-align:center;font-size:12px;color:#94a3b8;margin-top:18px;">

@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/bump-sw-version.js",
+    "postbuild": "git checkout -- public/service-worker.js public/version.json 2>/dev/null || true",
     "build": "vite build",
     "preview": "vite preview"
   },
