@@ -288,10 +288,15 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     // GPS is optional and never blocks checkout. If it resolved and the
     // location looks out of the normal delivery range, we don't stop the
     // order — we just flag it so the admin can verify and accept/reject.
-    let locationPayload={};
+    // Delivery charge hamesha bhejo — GPS deny ho to upar wala fallback
+    // (shopSettings.delivery_charge, ₹30) warna draft/RPC mein charge 0 aa
+    // jata hai: screen par ₹30 dikhta, par charge/record mein ₹0 — dukaan
+    // ko nuksaan + dikhaya gaya total aur liya gaya amount alag ho jate.
+    let locationPayload={delivery_charge:deliveryCharge,delivery_status:'unknown'};
     if(deliveryInfo){
       const validation=window.RKDelivery.validate(deliveryInfo.lat,deliveryInfo.lng);
       locationPayload={
+        ...locationPayload,
         latitude:deliveryInfo.lat,longitude:deliveryInfo.lng,distance_km:deliveryInfo.distanceKm,
         // delivery_charge bhi store karo — server-side cartTotal verify (razorpay-order)
         // isi order row se delivery fee add karta hai, warna fee wale orders reject ho jaate
