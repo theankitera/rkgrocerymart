@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { useShopSettings } from '../../hooks/dataHooks';
 import { uploadToCloudinary } from '../../lib/cloudinary';
 
 // Web push VAPID public key (browser-safe) — push.js ise read karta hai.
@@ -198,7 +199,7 @@ function OrderRow({ o, onClick, onReorder }) {
 }
 
 /* ─── Orders Tab ──────────────────────────── */
-function OrdersTab({ state, showToast }) {
+function OrdersTab({ state, showToast, setState }) {
   const [modal, setModal] = useState(null);
 
   async function viewOrder(o) {
@@ -216,6 +217,15 @@ function OrdersTab({ state, showToast }) {
 
   async function reorder(orderId) {
     if (window.RKOrders) { await window.RKOrders.reorder(orderId); showToast('Items cart mein add ho gaye! 🛒'); setTimeout(()=>window.location.href='index.html',1600); }
+  }
+
+  async function cancelOrder(o){
+    if(!window.confirm('Kya aap ye order cancel karna chahte hain? Paise wapas mil jayenge (refund 3-5 working days).'))return;
+    const {error}=await supabase.from('orders').update({status:'cancelled'}).eq('id',o.id).eq('user_id',state.user?.id);
+    if(error){showToast('Order cancel nahi hua — dobara try karein.');return;}
+    if(setState)setState(prev=>({...prev,orders:prev.orders.map(x=>x.id===o.id?{...x,status:'cancelled'}:x)}));
+    setModal(m=>m?{...m,o:{...m.o,status:'cancelled'}}:m);
+    showToast('Order cancel ho gaya. Refund 3-5 working days mein milega.');
   }
 
   return (
@@ -244,7 +254,9 @@ function OrdersTab({ state, showToast }) {
               </div>
 
               <div className="text-[11px] font-bold font-poppins uppercase tracking-wide mb-2.5" style={{color:'var(--muted)'}}>Order Status</div>
-              <div className="mb-5">
+              {modal.o.status==='cancelled'
+                ? <div className="rounded-xl p-3.5 mb-5 text-center text-[13px] font-bold font-poppins" style={{background:'var(--tint-red-bg)',color:'var(--tint-red-text)',border:'1.5px solid var(--tint-red-border)'}}>❌ Ye order cancel kar diya gaya hai. Refund 3-5 working days mein milega.</div>
+                : <div className="mb-5">
                 {modal.tlSteps.map((step,i)=>{
                   let cls = i<modal.curIdx?'done':i===modal.curIdx?'active':'waiting';
                   if (modal.o.status==='cancelled') cls='waiting';
@@ -261,7 +273,7 @@ function OrdersTab({ state, showToast }) {
                     </div>
                   );
                 })}
-              </div>
+              </div>}
 
               <div className="h-px mb-4" style={{background:'var(--border)'}}/>
               <div className="text-[11px] font-bold font-poppins uppercase tracking-wide mb-2.5" style={{color:'var(--muted)'}}>Items Ordered</div>
@@ -286,7 +298,9 @@ function OrdersTab({ state, showToast }) {
               <div className="grid grid-cols-2 gap-2.5 mt-5">
                 {modal.o.status==='delivered'
                   ? <button className="w-full text-white font-extrabold font-poppins rounded-xl py-3 text-sm" style={btnPrimaryStyle} onClick={()=>{reorder(modal.o.id);setModal(null);}}>🔁 Reorder</button>
-                  : <div/>}
+                  : (modal.o.status==='pending'||modal.o.status==='confirmed')
+                    ? <button className="w-full font-extrabold font-poppins rounded-xl py-3 text-sm" style={btnDangerStyle} onClick={()=>cancelOrder(modal.o)}>❌ Order Cancel Karein</button>
+                    : <div/>}
                 <button className="w-full font-bold font-poppins rounded-xl py-3 text-sm" style={btnSecondaryStyle} onClick={()=>setModal(null)}>Close</button>
               </div>
             </div>
@@ -611,7 +625,6 @@ function NotificationsTab({ state, setState, showToast }) {
 
 /* ─── Rewards Tab ─────────────────────────── */
 function RewardsTab({ state, showToast }) {
-  const totalOrders    = state.orders.length;
   const deliveredCount = state.orders.filter(o=>o.status==='delivered').length;
   const savings        = state.orders.reduce((s,o)=>s+(o.discount||0),0);
   // ── Real referral + points data (fix 2026-08-13: pehle sab frontend-only fake tha) ──
@@ -624,25 +637,34 @@ function RewardsTab({ state, showToast }) {
     (async()=>{
       if(!state.user){return;}
       const uid=state.user.id;
-      const [rpcR,codeR,refR,bonusR]=await Promise.allSettled([
+      const [rpcR,profR,refR,bonusR]=await Promise.allSettled([
         supabase.rpc('get_redeemable_points',{p_user_id:uid}),
-        supabase.rpc('generate_referral_code'),
+        supabase.from('profiles').select('referral_code').eq('id',uid).single(),
         supabase.from('referrals').select('id,status').eq('referrer_id',uid),
         supabase.from('reward_bonuses').select('points').eq('user_id',uid),
       ]);
       if(!active)return;
       if(rpcR.status==='fulfilled') setRedeemable(Number(rpcR.value.data)||0);
-      if(codeR.status==='fulfilled'&&codeR.value.data) setRefCode(codeR.value.data);
-      if(refR.status==='fulfilled') setReferredCount((refR.value.data||[]).length);
+      // Referral code sirf tab generate karo jab profile mein pehle se koi
+      // code na ho — warna har visit par naya code purana shared link
+      // tod deta tha.
+      const savedCode=profR.status==='fulfilled'?profR.value.data?.referral_code:null;
+      if(savedCode){ setRefCode(savedCode); }
+      else {
+        const g=await supabase.rpc('generate_referral_code');
+        if(!active)return;
+        if(g.data) setRefCode(g.data);
+      }
+      if(refR.status==='fulfilled') setReferredCount((refR.value.data||[]).filter(r=>r.status==='completed').length);
       if(bonusR.status==='fulfilled') setBonusPts((bonusR.value.data||[]).reduce((s,b)=>s+(b.points||0),0));
     })();
     return()=>{active=false;};
   },[state.user]);
   // Total points = delivered×10 + referral bonuses (single source of truth)
   const pts            = deliveredCount*10 + bonusPts;
-  const nextTarget     = totalOrders<5?5:totalOrders<20?20:50;
-  const progress       = Math.min((totalOrders/nextTarget)*100,100);
-  const loyalty        = loyaltyLevel(totalOrders);
+  const nextTarget     = deliveredCount<5?5:deliveredCount<20?20:50;
+  const progress       = Math.min((deliveredCount/nextTarget)*100,100);
+  const loyalty        = loyaltyLevel(deliveredCount);
 
   function copy() { navigator.clipboard.writeText(refCode).then(()=>showToast('Code copy ho gaya! 📋')); }
   function share() {
@@ -653,14 +675,14 @@ function RewardsTab({ state, showToast }) {
 
   return (
     <>
-      <div className="rounded-2xl p-5 mb-3.5 relative overflow-hidden" style={{background:'linear-gradient(135deg,#1E1B4B,#312E81,#4F46E5)', boxShadow:'0 8px 32px rgba(79,70,229,0.3)'}}>
+      <div className="rounded-2xl p-5 mb-3.5 relative overflow-hidden" style={{background:'linear-gradient(135deg,#7F1D1D,#B71C1C 55%,#D32F2F)', boxShadow:'0 8px 32px rgba(183,28,28,0.35)'}}>
         <div className="text-[11px] font-bold font-poppins uppercase tracking-wide mb-1" style={{color:'rgba(255,255,255,0.6)'}}>Your Points</div>
         <div className="text-4xl font-black font-poppins text-white" style={{letterSpacing:'-1px'}}>{pts}</div>
         <div className="text-xs font-semibold font-poppins mt-0.5" style={{color:'rgba(255,255,255,0.65)'}}>Total Reward Points</div>
         <div className="rounded-full h-[7px] mt-4" style={{background:'rgba(255,255,255,0.15)'}}>
           <div className="h-[7px] rounded-full transition-all duration-1000" style={{width:progress+'%', background:'linear-gradient(90deg,#FFB300,#C2185B)'}}/>
         </div>
-        <div className="flex justify-between text-[11px] font-poppins mt-1.5" style={{color:'rgba(255,255,255,0.6)'}}><span>{loyalty.label}</span><span>{totalOrders}/{nextTarget} orders</span></div>
+        <div className="flex justify-between text-[11px] font-poppins mt-1.5" style={{color:'rgba(255,255,255,0.6)'}}><span>{loyalty.label}</span><span>{deliveredCount}/{nextTarget} orders</span></div>
         <div className="flex gap-2 mt-4 flex-wrap">
           {[[deliveredCount,'Delivered'],[fmt(savings),'Total Saved'],[pts,'Points']].map(([val,lbl])=>(
             <div key={lbl} className="flex-1 rounded-xl p-3 text-center" style={{minWidth:72, background:'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.15)'}}>
@@ -680,7 +702,7 @@ function RewardsTab({ state, showToast }) {
             </div>
             <div className="text-2xl font-black font-poppins" style={{color:'var(--tint-yellow-text)'}}>{redeemable}</div>
           </div>
-          <div className="text-[11px] font-poppins mt-2.5" style={{color:'var(--tint-yellow-text)'}}>💡 Checkout par apply karo — 100 points = ₹10 OFF (coupon ke saath bhi chalega)</div>
+          <div className="text-[11px] font-poppins mt-2.5" style={{color:'var(--tint-yellow-text)'}}>💡 Ye aapke total points mein se woh hisse hain jo abhi checkout par use ho sakte hain — 100 points = ₹10 OFF (coupon ke saath bhi chalega)</div>
         </div>
       )}
 
@@ -792,6 +814,7 @@ function ChangePasswordModal({ onClose, showToast }) {
 
 /* ─── Settings Tab ────────────────────────── */
 function SettingsTab({ switchTab, user, showToast }) {
+  const {settings:shopSettings}=useShopSettings();
   const [dark, setDark] = useState(document.documentElement.getAttribute('data-theme')==='dark');
   const [pwModal, setPwModal] = useState(false);
   // ── Web push notifications toggle (real, fix 2026-08-13) ──
@@ -902,8 +925,8 @@ function SettingsTab({ switchTab, user, showToast }) {
       </Card>
 
       <div className="text-center text-[11px] leading-relaxed pt-2.5 pb-5" style={{color:'var(--muted)'}}>
-        🛒 RK Grocery Mart • Jaunpur<br/>
-        📞 6393196765 • v1.0.0
+        🛒 RK Grocery Mart{shopSettings.base_city?` • ${shopSettings.base_city}`:''}<br/>
+        {shopSettings.contact?`📞 ${shopSettings.contact} • `:''}v1.0.0
       </div>
 
       {pwModal && <ChangePasswordModal onClose={()=>setPwModal(false)} showToast={showToast}/>}
@@ -1005,8 +1028,9 @@ export default function AccountPage() {
   const tabProps = { state, setState, showToast, switchTab, priceAlerts:state.priceAlerts, toggleAlert };
   const p = state.profile;
   const totalOrders = state.orders.length;
+  const deliveredCount = state.orders.filter(o=>o.status==='delivered').length;
   const savings = state.orders.reduce((s,o)=>s+(o.discount||0),0);
-  const loyalty = loyaltyLevel(totalOrders);
+  const loyalty = loyaltyLevel(deliveredCount);
 
   return (
     <div style={{background:'var(--page-bg)', minHeight:'100vh'}}>
