@@ -1848,7 +1848,7 @@ export default function App(){
                 <img src={shopSettings.logo_url||'/icons/rk-logo.svg'} alt={shopSettings.shop_name||'RK Grocery Mart'} className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex-shrink-0"/>
                 <span className="flex flex-col min-w-0">
                   <span className="text-[13px] sm:text-base md:text-lg font-extrabold font-poppins leading-none truncate" style={{color:'var(--dark)'}}><MultiColorName name={shopSettings.shop_name||'RK Grocery Mart'}/></span>
-                  <span className="text-[8px] sm:text-[9px] md:text-[10px] font-poppins font-medium mt-0.5 truncate" style={{color:'var(--primary)'}}>{shopSettings.footer_text||'हर घर की पसंद'}</span>
+                  <span className="text-[8px] sm:text-[9px] md:text-[10px] font-poppins font-medium mt-0.5 truncate" style={{color:'var(--dark)'}}>{shopSettings.footer_text||'हर घर की पसंद'}</span>
                 </span>
               </button>
             </div>
