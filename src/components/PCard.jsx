@@ -28,7 +28,9 @@ export function PCard({p,cart,addToCart,updQty,onDetail,wishlistIds,onWishlist})
     <div
       className="product-card rounded-2xl overflow-hidden cursor-pointer flex flex-col h-full"
       style={{background:'var(--card-bg)',border:'1px solid var(--border)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}
-      onClick={openDetail}>
+      role="button" tabIndex={0} aria-label={p.name||'Product'}
+      onClick={openDetail}
+      onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openDetail();}}}>
       {/* Fix: overflow-hidden — image apni natural aspect-ratio se container ko
           kheench kar non-square (144x151/144x199) na bana de. Iske bina 3:4
           portrait images se cards alag-size dikhte the + detail page par

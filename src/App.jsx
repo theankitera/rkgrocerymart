@@ -155,7 +155,7 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
               <div className="absolute inset-0 p-4 md:p-10 flex flex-col justify-end md:justify-center"
                 style={{background:'linear-gradient(0deg, rgba(0,0,0,0.55), transparent 60%)'}}>
                 <div className="w-full max-w-md">
-                  <span className="inline-block bg-white/20 text-white text-[10px] md:text-xs font-bold font-poppins px-2 py-1 rounded-lg mb-1 w-fit">LIMITED OFFER</span>
+                  {(/off|offer|discount|%|sale|deal|free|bachat|chhoot/i.test((b.title||'')+' '+(b.subtitle||'')))&&<span className="inline-block bg-white/20 text-white text-[10px] md:text-xs font-bold font-poppins px-2 py-1 rounded-lg mb-1 w-fit">LIMITED OFFER</span>}
                   <p className="text-white font-bold text-base md:text-3xl font-poppins leading-tight">{b.title}</p>
                   {b.subtitle&&<p className="text-white/80 text-xs md:text-base mt-0.5">{b.subtitle}</p>}
                   <button onClick={e=>{e.stopPropagation();handleBannerClick(b);}}
@@ -419,7 +419,8 @@ function DesktopSidebar({allCats,activeCatId,catEmoji,onPick,counts}){
       {allCats.map(c=>{
         const active=activeCatId===c.id;
         return(
-          <div key={c.id} onClick={()=>onPick(c.id)}
+          <div key={c.id} role="button" tabIndex={0} aria-label={c.name} onClick={()=>onPick(c.id)}
+            onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onPick(c.id);}}}
             className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl cursor-pointer text-[13px] font-semibold font-poppins active:scale-[0.97] hover:bg-black/[0.03] transition-colors"
             style={{color:active?'var(--primary)':'var(--dark)',background:active?'var(--primary-light)':'transparent'}}>
             {(c.display_image||c.image_url)
@@ -441,6 +442,8 @@ function DesktopSidebar({allCats,activeCatId,catEmoji,onPick,counts}){
 // par hai kyunki Footer App ke bahar define hai — App ke andar hota to Footer
 // ko dikhta hi nahi (wahi blank-page bug tha).
 const fmtT=t=>{ if(!t) return ''; const m=String(t).match(/^(\d{1,2}):(\d{2})/); if(!m) return t; let h=+m[1]; const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+m[2]+' '+ap; };
+// '08:00' -> 8, '21:00' -> 9 — Hindi 'subah 8 se raat 9' jaise text ke liye.
+const shortH=t=>{ const m=String(t||'').match(/^(\d{1,2})/); return m?+m[1]%12||12:null; };
 function Footer({shopSettings,onNav}){
   const s=shopSettings;
   const socials=[
@@ -456,7 +459,7 @@ function Footer({shopSettings,onNav}){
       <div className="flex items-center justify-center gap-2.5" style={{marginBottom:8}}>
         <img src={s.logo_url||'/icons/rk-logo.svg'} alt={s.shop_name||'RK Grocery Mart'} style={{width:38,height:38,borderRadius:12}}/>
         <div className="text-left">
-          <div className="text-white font-extrabold font-poppins" style={{fontSize:'1.15rem',lineHeight:1.1}}><MultiColorName name={s.shop_name||'RK Grocery Mart'} colors={['var(--yellow)','#FFFFFF']}/></div>
+          <div className="text-white font-extrabold font-poppins" style={{fontSize:'1.15rem',lineHeight:1.1}}>{s.shop_name||'RK Grocery Mart'}</div>
           <div className="text-white/75 font-poppins" style={{fontSize:'0.7rem'}}>{s.footer_text||'हर घर की पसंद'}</div>
         </div>
       </div>
@@ -534,7 +537,7 @@ function HomeContent({homepageSections,banners,bannersLoading,bannerIdx,setBanne
           // NAHI hai (nayi categories — admin sync na karne tak yahan dikhti hain).
           category_sections: cats.filter(c=>!ownCatIds.has(c.id)).map(catRail),
 
-          why_choose_us: <WhyChooseUs productCount={sectionProdsReady?Object.values(sectionProds).reduce((s,l)=>s+(l||[]).length,0):0} catCount={cats.length}/>,
+          why_choose_us: <WhyChooseUs productCount={sectionProdsReady?Object.values(sectionProds).reduce((s,l)=>s+(l||[]).length,0):0} catCount={cats.length} s={shopSettings}/>,
           reviews: <CustomerReviews reviews={dbReviews}/>,
           download_app: <DownloadApp onInstall={()=>openAppDownload(showToast)}/>,
           newsletter: <Newsletter showToast={showToast}/>,
@@ -684,14 +687,14 @@ function FlashSale({prods,loading,cart,addToCart,updQty,onDetail,wishlistIds,onW
         <div className="flex items-center gap-2">
           <span className="text-xl md:text-2xl animate-pulse">⚡</span>
           <h2 className="text-white font-extrabold font-poppins text-base md:text-xl">Flash Sale</h2>
-          <span className="hidden sm:inline-block text-white/70 text-xs font-poppins">Roz naye deals!</span>
+          <span className="hidden sm:inline-block text-white/90 text-xs font-poppins">Roz naye deals!</span>
         </div>
         <div className="flex items-center gap-1.5" role="timer" aria-label="Flash sale countdown">
-          <span className="text-white/80 text-[10px] md:text-xs font-bold font-poppins mr-1">Ends in</span>
+          <span className="text-white/90 text-[10px] md:text-xs font-bold font-poppins mr-1">Aaj raat 12 baje tak</span>
           {chips.map(t=>(
             <div key={t.l} className="flex flex-col items-center bg-white/15 backdrop-blur rounded-xl px-2 py-1 md:px-3 md:py-1.5 min-w-[50px]">
               <span className="text-white font-black font-poppins text-sm md:text-lg tabular-nums">{pad(t.v)}</span>
-              <span className="text-white/70 text-[8px] md:text-[9px] font-poppins uppercase tracking-wide">{t.l}</span>
+              <span className="text-white/90 text-[8px] md:text-[9px] font-poppins uppercase tracking-wide">{t.l}</span>
             </div>
           ))}
         </div>
@@ -711,14 +714,14 @@ function FlashSale({prods,loading,cart,addToCart,updQty,onDetail,wishlistIds,onW
 }
 
 // 💚 Why Choose Us — static premium feature grid (product/category count real data se)
-function WhyChooseUs({productCount=0,catCount=0}){
+function WhyChooseUs({productCount=0,catCount=0,s}){
   const feats=[
     {icon:Zap,title:'Lightning Delivery',desc:'20-55 minute mein order aapke ghar tak'},
     {icon:Leaf,title:'Fresh & Natural',desc:'Roz subah mandi se fresh fruits-sabziyan'},
     {icon:BadgePercent,title:'Best Prices',desc:'Market se saste — daily deals & coupons'},
-    {icon:ShieldCheck,title:'100% Safe Payments',desc:'UPI, cards, netbanking — secure checkout'},
+    {icon:ShieldCheck,title:'100% Safe Payments',desc:'Online payment (Razorpay) + COD — secure checkout'},
     {icon:Package,title:'Wide Selection',desc:productCount>0?`${productCount}+ products, ${catCount>0?catCount+' categories':''} — sab kuch ek jagah`:'Sab kuch ek jagah — grocery, dairy, snacks'},
-    {icon:Headphones,title:'Help & Support',desc:'Subah 8 se raat 9 — call, WhatsApp ya Ananya AI chat'},
+    {icon:Headphones,title:'Help & Support',desc:`Subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9} — call, WhatsApp ya Ananya AI chat`},
   ];
   return(
     <div>
@@ -774,7 +777,7 @@ function CustomerReviews({reviews=[]}){
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {list.map((r,idx)=>(
           <div key={r.name+idx} className="rounded-2xl p-4 md:p-5" style={{background:'var(--card-bg)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
-            <div className="text-[#FFB800] text-sm tracking-tight">{"★★★★★".slice(0,r.stars)}{"☆".repeat(5-r.stars)}</div>
+            <div className="text-[#B45309] text-sm tracking-tight">{"★★★★★".slice(0,r.stars)}{"☆".repeat(5-r.stars)}</div>
             <p className="mt-2.5 text-xs md:text-[13px] font-poppins leading-relaxed" style={{color:'var(--text)'}}>“{r.text}”</p>
             <div className="mt-3 flex items-center gap-2">
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{background:'linear-gradient(135deg,var(--primary),var(--orange))'}}>{r.name[0]}</div>
@@ -926,7 +929,7 @@ function ICall({title,children,icon:Icon=HelpCircle}){
 }
 
 // ── Default page content (admin shop_settings se override hota hai) ──
-function AboutBody(){
+function AboutBody({s,pc}){
   return(
     <div>
       <IP><strong style={{color:'var(--dark)'}}>RK Grocery Mart</strong> is a modern online grocery store where everything from your monthly fruits and vegetables to daily dairy, staples, snacks and household essentials is available in one place — delivered straight to your doorstep. We believe grocery shopping should never be boring: no long queues, no heavy bags, no worrying about expiry dates.</IP>
@@ -940,24 +943,24 @@ function AboutBody(){
       <IFeatures items={[
         {e:'🌿',t:'100% Fresh Promise',d:'Vegetables, fruits and dairy refreshed daily — a spoiled item replaced free within 24 hours.'},
         {e:'🏷️',t:'Fair & Transparent Pricing',d:'You pay exactly what you see — no hidden charges, no last-minute surprises.'},
-        {e:'⚡',t:'Lightning-Fast Delivery',d:'From 7 AM to 10 PM — your order reaches your door in 20–55 minutes.'},
+        {e:'⚡',t:'Lightning-Fast Delivery',d:`From ${fmtT(s?.open_time)||'8:00 AM'} to ${fmtT(s?.close_time)||'9:00 PM'} — your order reaches your door in 20–55 minutes.`},
       ]}/>
 
       <IHead icon={Users}>Why Families Love Us</IHead>
       <IBullets items={[
-        '<strong style="color:var(--dark)">A complete store for every home</strong> — 5,000+ products across 16 categories: fresh fruits & vegetables, dairy & eggs, staples (flour, rice, lentils), snacks, beverages, chocolates, personal care, home cleaning and baby care.',
+        '<strong style="color:var(--dark)">A complete store for every home</strong> — '+(pc>0?pc+'+':'150+')+' products across 16 categories: fresh fruits & vegetables, dairy & eggs, staples (flour, rice, lentils), snacks, beverages, chocolates, personal care, home cleaning and baby care.',
         '<strong style="color:var(--dark)">Quality check on every order</strong> — before picking, our team verifies expiry dates, packaging and freshness of each item.',
         '<strong style="color:var(--dark)">Supporting local vendors</strong> — we source from local farmers and distributors whenever possible, so you get fresher produce and they get a fair price.',
-        '<strong style="color:var(--dark)">Easy payments</strong> — UPI, cards, net banking, cash on delivery and wallets — whatever is convenient for you.',
-        '<strong style="color:var(--dark)">Ananya AI support</strong> — a chat assistant (subah 8 se raat 9) that instantly answers order status, product and offer questions.',
+        '<strong style="color:var(--dark)">Easy payments</strong> — Online payment via Razorpay (UPI, cards, net banking) or Cash on Delivery — whatever is convenient for you.',
+        `<strong style="color:var(--dark)">Ananya AI support</strong> — a chat assistant (subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9}) that instantly answers order status, product and offer questions.`,
       ]}/>
 
       <IHead icon={Zap}>By The Numbers</IHead>
       <IStats items={[
-        {v:'5,000+',l:'Products'},
+        {v:(pc>0?pc+'+':'150+'),l:'Products'},
         {v:'16',l:'Categories'},
         {v:'20-55 min',l:'Avg. Delivery'},
-        {v:'7 AM–10 PM',l:'Daily Open'},
+        {v:`${fmtT(s?.open_time)||'8:00 AM'}–${fmtT(s?.close_time)||'9:00 PM'}`,l:'Daily Open'},
       ]}/>
 
       <IHead icon={ShieldCheck}>Our Promise</IHead>
@@ -965,7 +968,7 @@ function AboutBody(){
         'A freshness guarantee on every order — not satisfied? Replacement or full refund within 24 hours.',
         'Never a surprise delivery charge — all charges are shown clearly before the order is confirmed.',
         'Your data is used only to process your orders — it is never sold (details: Privacy Policy).',
-        'Whatever the issue, we are available subah 8 se raat 9 — WhatsApp, call or email, whatever is convenient for you.',
+        `Whatever the issue, we are available subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9} — WhatsApp, call or email, whatever is convenient for you.`,
       ]}/>
 
       <ICall title="Talk To Us" icon={MessageCircle}>
@@ -1001,7 +1004,7 @@ function PrivacyBody(){
       ]}/>
 
       <IHead icon={Wallet}>3. Payment Security</IHead>
-      <IP>Every payment is encrypted (SSL/TLS) and processed through PCI-DSS compliant payment partners. We neither store nor can see your card or UPI credentials. Even when you pay via a UPI ID, we only store the transaction reference.</IP>
+      <IP>Every payment is encrypted (SSL/TLS) and processed through PCI-DSS compliant payment partners. We neither store nor can see your card details. Payments go through Razorpay; we only store the transaction reference.</IP>
 
       <IHead icon={ShieldCheck}>4. Cookies &amp; Local Storage</IHead>
       <IP>We use cookies and browser local storage to remember your login session, cart contents, theme preference (dark/light) and your location/area. You can block cookies from your browser settings, but doing so may break features such as cart, login and checkout.</IP>
@@ -1065,7 +1068,7 @@ function TermsBody(){
       <IBullets items={[
         'All prices are in Indian Rupees (₹) and include GST where applicable.',
         'The price is locked once the order is confirmed. Orders cancelled due to a pricing error receive a full refund.',
-        'Accepted: UPI, debit/credit cards, net banking, wallets and Cash on Delivery (COD).',
+        'Accepted: Online payment via Razorpay (UPI, debit/credit cards, net banking) and Cash on Delivery (COD).',
         'For COD orders please keep exact change ready — the delivery partner may not be able to provide change.',
         'Coupon/discount offers have their own terms and cannot always be combined with one another.',
       ]}/>
@@ -1130,7 +1133,7 @@ function TermsBody(){
   );
 }
 
-function ShippingBody(){
+function ShippingBody({s}){
   return(
     <div>
       <IP>At RK Grocery Mart we want your groceries to arrive <strong style={{color:'var(--dark)'}}>on time, safely and perfectly fresh</strong>. This page explains our complete delivery policy clearly — from charges to tracking, everything.</IP>
@@ -1139,7 +1142,7 @@ function ShippingBody(){
       <ITable
         head={['Service','Details','Charges']}
         rows={[
-          ['⏱️ Standard Delivery','20–55 minute (avg.), 7 AM – 10 PM','0–5 km FREE, 5–8 km ₹30'],
+          ['⏱️ Standard Delivery',`20–55 minute (avg.), ${fmtT(s?.open_time)||'8:00 AM'} – ${fmtT(s?.close_time)||'9:00 PM'}`,'0–5 km FREE, 5–8 km ₹30'],
           ['🛒 Minimum order','₹499 se kam ka order nahi liya jaata','₹499'],
           ['📍 Delivery area','Dukaan se 8 km ke andar (shop settings se)','Distance ke hisaab se'],
           ['⏰ Delivery time','Usually 20–55 minutes after placing the order','Same-day delivery'],
@@ -1199,12 +1202,12 @@ function ShippingBody(){
       <IBullets items={[
         'Cancel before delivery: <strong style="color:var(--dark)">full refund</strong>, zero charges.',
         'Partial delivery: you pay only for delivered items, the rest is refunded immediately.',
-        'Refund mode: original payment method (UPI/card/wallet) — for COD orders, bank transfer/UPI.',
-        'Refund timeline: <strong style="color:var(--dark)">3-5 working days</strong> (UPI usually the same day).',
+        'Refund mode: original payment method (Razorpay for online orders) — for COD orders, bank transfer.',
+        'Refund timeline: <strong style="color:var(--dark)">3-5 working days</strong>.',
       ]}/>
 
       <ICall title="Need Help With A Delivery?" icon={Truck}>
-        Order status, address change or slot reschedule — anything. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · or ask anything (subah 8 se raat 9) on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Ananya AI chat</a>.
+        Order status, address change — anything. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · or ask anything (subah 8 se raat 9) on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Ananya AI chat</a>.
       </ICall>
     </div>
   );
@@ -1926,7 +1929,7 @@ export default function App(){
       {/* A quiet service-proof strip gives shoppers the reassurance they need
           before browsing, without competing with the promotional ticker. */}
       <div style={{background:'var(--card-bg)',borderBottom:'1px solid var(--border)'}}>
-        <div className="max-w-site mx-auto px-3 md:px-8 py-2 flex items-center justify-center gap-x-3 md:gap-x-7 flex-nowrap text-[10px] md:text-[11px] font-semibold font-poppins" style={{color:'var(--gray)'}}>
+        <div className="max-w-site mx-auto px-2 md:px-8 py-2 flex items-center justify-center gap-x-2 md:gap-x-7 flex-nowrap text-[9px] md:text-[11px] font-semibold font-poppins" style={{color:'var(--gray)'}}>
           <span className="flex items-center gap-1.5 whitespace-nowrap"><span aria-hidden="true">⚡</span> Fast local delivery</span>
           <span className="flex items-center gap-1.5 whitespace-nowrap"><span aria-hidden="true">🥬</span> Freshness checked</span>
           <span className="flex items-center gap-1.5 whitespace-nowrap"><ShieldCheck size={13} style={{color:'var(--primary)'}}/> Secure payments</span>
@@ -1957,7 +1960,7 @@ export default function App(){
         />}
         {page==='about'&&<InfoPage title="About Us" activeKey="about" onNav={setPage}
           subtitle="Our story, mission and the promises we keep with every single order."
-          body={shopSettings.about_text} fallback={<AboutBody/>}>
+          body={shopSettings.about_text} fallback={<AboutBody s={shopSettings} pc={shopTotal}/>}>
           <div className="mt-6 md:mt-8"><Footer shopSettings={shopSettings} onNav={setPage}/></div>
         </InfoPage>}
         {page==='privacy'&&<InfoPage title="Privacy Policy" activeKey="privacy" onNav={setPage}
@@ -1972,7 +1975,7 @@ export default function App(){
         </InfoPage>}
         {page==='shipping'&&<InfoPage title="Delivery & Shipping" activeKey="shipping" onNav={setPage}
           subtitle="Delivery times, charges, tracking and refunds — everything explained clearly."
-          body={shopSettings.shipping_rules} fallback={<ShippingBody/>}>
+          body={shopSettings.shipping_rules} fallback={<ShippingBody s={shopSettings}/>}>
           <div className="mt-6 md:mt-8"><Footer shopSettings={shopSettings} onNav={setPage}/></div>
         </InfoPage>}
 
@@ -2193,9 +2196,9 @@ export default function App(){
                 </div>
                 {total < (shopSettings.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--orange)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-total).toFixed(0)} aur add karein.</div>}
                 {total >= (shopSettings.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--primary-dark)'}}>✅ Minimum order ₹{shopSettings.min_order ?? 499} poora ho gaya.</div>}
-                <button onClick={goToCheckout}
-                  className="w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm"
-                  style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(211,47,47,0.35)',color:'var(--on-primary)'}}>
+                <button onClick={goToCheckout} disabled={total < (shopSettings.min_order ?? 499)}
+                  className="w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm disabled:cursor-not-allowed"
+                  style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(211,47,47,0.35)',color:'var(--on-primary)',opacity:total < (shopSettings.min_order ?? 499)?0.55:1}}>
                   {user?`Checkout — ₹${total.toFixed(0)} →`:'Login & Checkout →'}
                 </button>
               </div>
@@ -2215,33 +2218,38 @@ export default function App(){
         ].map(n=>{
           const Icon=n.icon;const active=page===n.id;
           return(
-            <div key={n.id} className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5"
-              onClick={()=>setPage(n.id)}>
+            <div key={n.id} role="button" tabIndex={0} aria-label={n.l} className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5"
+              onClick={()=>setPage(n.id)}
+              onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setPage(n.id);}}}>
               <Icon size={21} strokeWidth={active?2.5:1.8} style={{color:active?'var(--primary)':'var(--gray)'}}/>
               <span className="text-[10px] font-medium font-poppins" style={{color:active?'var(--primary)':'var(--gray)'}}>{n.l}</span>
             </div>
           );
         })}
-        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5"
-          onClick={()=>window.location.href='support.html'}>
+        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" role="button" tabIndex={0} aria-label="Help"
+          onClick={()=>window.location.href='support.html'}
+          onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();window.location.href='support.html';}}}>
           <Headphones size={21} strokeWidth={1.8} style={{color:'var(--gray)'}}/>
           <span className="text-[10px] font-medium font-poppins" style={{color:'var(--gray)'}}>Help</span>
         </div>
         {!isPWA&&(
-          <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" onClick={()=>openAppDownload(showToast)}>
+          <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" role="button" tabIndex={0} aria-label="Get App" onClick={()=>openAppDownload(showToast)}
+            onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openAppDownload(showToast);}}}>
             <Download size={21} strokeWidth={1.8} style={{color:'var(--primary)'}}/>
             <span className="text-[10px] font-bold font-poppins" style={{color:'var(--primary)'}}>Get App</span>
           </div>
         )}
-        <div className="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" onClick={()=>setCartOpen(true)}>
+        <div className="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" role="button" tabIndex={0} aria-label="Cart" onClick={()=>setCartOpen(true)}
+          onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setCartOpen(true);}}}>
           {count>0&&<span className="absolute top-1 right-1/4 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#fff'}}>{count>9?'9+':count}</span>}
-          <ShoppingCart size={21} strokeWidth={page==='cart'?2.5:1.8} style={{color:page==='cart'?'var(--primary)':'var(--gray)'}}/>
-          <span className="text-[10px] font-medium font-poppins" style={{color:page==='cart'?'var(--primary)':'var(--gray)'}}>Cart</span>
+          <ShoppingCart size={21} strokeWidth={cartOpen?2.5:1.8} style={{color:cartOpen?'var(--primary)':'var(--gray)'}}/>
+          <span className="text-[10px] font-medium font-poppins" style={{color:cartOpen?'var(--primary)':'var(--gray)'}}>Cart</span>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5"
-          onClick={()=>{if(user)window.location.href='account.html';else openLogin();}}>
-          <User size={21} strokeWidth={page===(user?'account':'login')?2.5:1.8} style={{color:page===(user?'account':'login')?'var(--primary)':'var(--gray)'}}/>
-          <span className="text-[10px] font-medium font-poppins" style={{color:page===(user?'account':'login')?'var(--primary)':'var(--gray)'}}>{user?'Account':'Login'}</span>
+        <div className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" role="button" tabIndex={0} aria-label={user?'Account':'Login'}
+          onClick={()=>{if(user)window.location.href='account.html';else openLogin();}}
+          onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(user)window.location.href='account.html';else openLogin();}}}>
+          <User size={21} strokeWidth={1.8} style={{color:'var(--gray)'}}/>
+          <span className="text-[10px] font-medium font-poppins" style={{color:'var(--gray)'}}>{user?'Account':'Login'}</span>
         </div>
       </div>
 

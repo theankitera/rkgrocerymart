@@ -318,7 +318,7 @@ export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wis
                 {[1,2,3,4,5].map(s=>(
                   <button key={s} type="button" onClick={()=>setRvRating(s)} aria-label={`${s} star`}
                     className="p-1 transition-transform hover:scale-125 active:scale-90">
-                    <Star size={20} style={{color:s<=rvRating?'#FFB800':'var(--border)',fill:s<=rvRating?'#FFB800':'transparent'}}/>
+                    <Star size={20} style={{color:s<=rvRating?'#B45309':'var(--border)',fill:s<=rvRating?'#B45309':'transparent'}}/>
                   </button>
                 ))}
                 <span className="text-xs font-poppins ml-2" style={{color:'var(--gray)'}}>{rvRating}/5</span>
@@ -343,7 +343,7 @@ export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wis
                 <div key={i} className="pt-4 mt-4" style={{borderTop:'1px solid var(--border)'}}>
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-bold font-poppins" style={{color:'var(--dark)'}}>{r.customer_name||'Customer'}</span>
-                    <span className="text-[#FFB800] text-xs tracking-tight">{"★★★★★".slice(0,Math.max(1,Math.min(5,r.rating||5)))}{"☆".repeat(5-Math.max(1,Math.min(5,r.rating||5)))}</span>
+                    <span className="text-[#B45309] text-xs tracking-tight">{"★★★★★".slice(0,Math.max(1,Math.min(5,r.rating||5)))}{"☆".repeat(5-Math.max(1,Math.min(5,r.rating||5)))}</span>
                   </div>
                   <p className="text-sm font-poppins leading-relaxed mt-1.5" style={{color:'var(--text)'}}>{r.comment}</p>
                   {r.admin_reply&&(
