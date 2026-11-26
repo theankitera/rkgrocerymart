@@ -2087,7 +2087,7 @@ export default function App(){
         {/* ── CHECKOUT ── */}
         {page==='checkout'&&(
           <div className="checkout-page">
-            <button className="pdp-back" style={{marginBottom:6}} onClick={()=>setCartOpen(true)}>← Cart par wapas</button>
+            <button className="pdp-back" style={{marginBottom:6}} onClick={()=>setCartOpen(true)}>🛒 Cart Dekhein</button>
             <h2>🚚 Checkout</h2>
             <CheckoutForm cart={cart} total={total} showToast={showToast} user={user}
               onSuccess={(id,pay,adminReview)=>{setSuccess({id,pay,adminReview:!!adminReview});setPage('success');}}/>
@@ -2101,22 +2101,13 @@ export default function App(){
             <h2>Order Place Ho Gaya!</h2>
             <div className="order-pill">Order #{success.id}</div>
             <p>{success.pay==='cod'?'💵 Delivery par cash dena':success.pay==='razorpay'?'💳 Online payment successful — order confirm ho gaya!':'⏳ Payment verify ho rahi hai — 10-15 min mein confirm ho jayega'}</p>
-            <p>⏰ 20–55 minute mein delivery hogi</p>
+            {!success.adminReview&&<p>⏰ 20–55 minute mein delivery hogi</p>}
             {success.adminReview&&<p style={{color:'var(--orange)',fontWeight:700}}>⚠️ Aapka address hamari delivery range se bahar hai — order admin verification ke baad confirm hoga. Hum jald call karke batayenge.</p>}
-            <div className="mt-4 text-left max-w-xs mx-auto">
-              {[['Order mila',true],['Pack ho raha hai',false],['Nikal gaya',false],['Delivered',false]].map(([label,done],i)=>(
-                <div key={label} className="flex items-center gap-2.5 py-1">
-                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold flex-shrink-0" style={{background:done?'var(--primary-dark)':'var(--light)',color:done?'var(--on-primary)':'var(--muted)',border:'1.5px solid '+(done?'var(--primary-dark)':'var(--border)')}}>{done?'✓':i+1}</span>
-                  <span className="text-[12.5px] font-bold" style={{color:done?'var(--dark)':'var(--muted)'}}>{label}</span>
-                  {i===0&&<span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:'var(--light)',color:'var(--muted)'}}>abhi</span>}
-                </div>
-              ))}
-              <div className="text-[11px] mt-1" style={{color:'var(--muted)'}}>Live status ke liye Track Order dekhein — order aage badhte hi update hoga.</div>
-            </div>
+            <p className="text-[12px] mt-3" style={{color:'var(--muted)'}}>Live status ke liye neeche Track Order dabayein — order aage badhte hi update hoga.</p>
             <div className="flex gap-2.5 mt-4 justify-center">
               <button className="home-btn" style={{margin:0}} onClick={()=>{setSuccess(null);setPage('home');}}>🏠 Home Par Jao</button>
               <a className="home-btn" style={{margin:0,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:6}}
-                href="account.html" onClick={()=>{setSuccess(null);}}>📦 Track Order</a>
+                href="account.html?tab=orders" onClick={()=>{setSuccess(null);}}>📦 Track Order</a>
             </div>
           </div>
         )}
