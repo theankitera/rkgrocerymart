@@ -437,6 +437,10 @@ function DesktopSidebar({allCats,activeCatId,catEmoji,onPick,counts}){
   );
 }
 
+// '08:00' jaise 24h time ko '8:00 AM' mein badlo (footer timings). Module level
+// par hai kyunki Footer App ke bahar define hai — App ke andar hota to Footer
+// ko dikhta hi nahi (wahi blank-page bug tha).
+const fmtT=t=>{ if(!t) return ''; const m=String(t).match(/^(\d{1,2}):(\d{2})/); if(!m) return t; let h=+m[1]; const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+m[2]+' '+ap; };
 function Footer({shopSettings,onNav}){
   const s=shopSettings;
   const socials=[
@@ -1572,8 +1576,6 @@ export default function App(){
     if(user){const r=sessionStorage.getItem('rk_redirect');if(r==='checkout'){sessionStorage.removeItem('rk_redirect');setPage('checkout');}}
   },[user]);
 
-  // '08:00' jaise 24h time ko '8:00 AM' mein badlo (footer timings).
-  const fmtT=t=>{ if(!t) return ''; const m=String(t).match(/^(\d{1,2}):(\d{2})/); if(!m) return t; let h=+m[1]; const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+m[2]+' '+ap; };
   const toastTimer=useRef(null);
   const showToast=(msg,ms=2200)=>{setToast(msg);clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(''),ms);};
   // V4.1: dark-mode toggle moved to Account → Settings → Appearance (see
