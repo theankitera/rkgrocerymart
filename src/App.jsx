@@ -50,7 +50,7 @@ function CategoryRail({cats,catsLoading,catEmoji,onClick,activeCatId=null,headin
     if(!shown)return null;
     return(
       <button onClick={()=>scrollBy(dir)} aria-label={dir<0?'Pichli categories':'Agli categories'}
-        className={`absolute top-1/2 -translate-y-1/2 z-10 w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90 ${edge}`}
+        className={`absolute top-1/2 -translate-y-1/2 z-10 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90 ${edge}`}
         style={{background:'var(--card-bg)',color:'var(--primary)',border:'1px solid var(--border)'}}>
         {dir<0?'◀':'▶'}
       </button>
@@ -172,7 +172,9 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
         <div className="absolute bottom-3 right-4 flex gap-1.5">
           {banners.map((_,i)=>(
             <button key={i} aria-label={`Banner ${i+1} dikhayein`} onClick={()=>setBannerIdx(i)}
-              className={`h-1.5 rounded-full transition-all ${i===bannerIdx?'w-5 bg-white':'w-1.5 bg-white/50'}`}/>
+              className="p-2 flex items-center justify-center">
+              <span className={`block h-1.5 rounded-full transition-all ${i===bannerIdx?'w-5 bg-white':'w-1.5 bg-white/50'}`}/>
+            </button>
           ))}
         </div>
       )}
@@ -459,7 +461,7 @@ function Footer({shopSettings,onNav}){
         <span className="flex items-center gap-1"><span>🌿</span><span className="text-xs">Aapke mohalle ki dukaan</span></span>
       </div>
       {s.contact&&<div>📞 Call/WhatsApp: {s.contact}</div>}
-      <div>⏰ {s.open_time||'7:00 AM'} – {s.close_time||'10:00 PM'}</div>
+      <div>⏰ {fmtT(s.open_time)||'7:00 AM'} – {fmtT(s.close_time)||'10:00 PM'}</div>
       {socials.length>0&&(
         <div className="flex items-center justify-center gap-3" style={{margin:'6px 0'}}>
           {socials.map(x=>(
@@ -536,7 +538,7 @@ function HomeContent({homepageSections,banners,bannersLoading,bannerIdx,setBanne
             <div className="rounded-2xl p-5 md:p-6" style={{background:'var(--card-bg)'}}>
               <div className="font-extrabold font-poppins text-sm md:text-base" style={{color:'var(--dark)'}}>How It Works</div>
               <div className="grid grid-cols-3 gap-3 md:gap-6 mt-4">
-                {[{i:'📱',t:'Open the app',s:'Search what you need'},{i:'🛒',t:'Place an order',s:'Add items to cart & checkout'},{i:'🚴',t:'Get fast delivery',s:'Delivered in 1-2 hours'}].map((h,i)=>(
+                {[{i:'📱',t:'Open the app',s:'Search what you need'},{i:'🛒',t:'Place an order',s:'Add items to cart & checkout'},{i:'🚴',t:'Get fast delivery',s:'Delivered in 20-55 minutes'}].map((h,i)=>(
                   <div key={i} className="text-center">
                     <div className="text-2xl md:text-3xl mb-1.5">{h.i}</div>
                     <div className="font-bold font-poppins text-xs md:text-sm" style={{color:'var(--dark)'}}>{h.t}</div>
@@ -633,16 +635,15 @@ function DesktopShop({allCats,activeCatId,catEmoji,catCounts,visibleShopProds,sh
           }
           {!search&&totalPages>1&&(
             <div className="flex justify-center flex-wrap gap-2 mt-6">
-              {[...Array(totalPages)].map((_,i)=>{
-                const on=shopPage===i+1;
-                return(
-                  <button key={i} onClick={()=>setShopPage(i+1)}
+              {pageWindow(totalPages,shopPage).map((p,i)=>p==='…' ? (
+                  <span key={'e'+i} className="w-8 h-8 flex items-center justify-center text-[13px] font-bold" style={{color:'var(--gray)'}}>…</span>
+                ) : (
+                  <button key={p} onClick={()=>setShopPage(p)}
                     className="w-8 h-8 rounded-lg text-[13px] font-bold font-poppins flex items-center justify-center"
-                    style={{border:`1.5px solid ${on?'var(--primary)':'var(--border)'}`,background:on?'var(--primary)':'transparent',color:on?'#fff':'var(--gray)'}}>
-                    {i+1}
+                    style={{border:`1.5px solid ${shopPage===p?'var(--primary)':'var(--border)'}`,background:shopPage===p?'var(--primary-dark)':'transparent',color:shopPage===p?'#fff':'var(--gray)'}}>
+                    {p}
                   </button>
-                );
-              })}
+                ))}
             </div>
           )}
         </div>
@@ -679,7 +680,7 @@ function FlashSale({prods,loading,cart,addToCart,updQty,onDetail,wishlistIds,onW
         <div className="flex items-center gap-2">
           <span className="text-xl md:text-2xl animate-pulse">⚡</span>
           <h2 className="text-white font-extrabold font-poppins text-base md:text-xl">Flash Sale</h2>
-          <span className="hidden sm:inline-block text-white/70 text-xs font-poppins">Sirf aaj ke liye!</span>
+          <span className="hidden sm:inline-block text-white/70 text-xs font-poppins">Roz naye deals!</span>
         </div>
         <div className="flex items-center gap-1.5" role="timer" aria-label="Flash sale countdown">
           <span className="text-white/80 text-[10px] md:text-xs font-bold font-poppins mr-1">Ends in</span>
@@ -708,12 +709,12 @@ function FlashSale({prods,loading,cart,addToCart,updQty,onDetail,wishlistIds,onW
 // 💚 Why Choose Us — static premium feature grid (product/category count real data se)
 function WhyChooseUs({productCount=0,catCount=0}){
   const feats=[
-    {icon:Zap,title:'Lightning Delivery',desc:'1-2 ghante mein order aapke ghar tak'},
+    {icon:Zap,title:'Lightning Delivery',desc:'20-55 minute mein order aapke ghar tak'},
     {icon:Leaf,title:'Fresh & Natural',desc:'Roz subah mandi se fresh fruits-sabziyan'},
     {icon:BadgePercent,title:'Best Prices',desc:'Market se saste — daily deals & coupons'},
     {icon:ShieldCheck,title:'100% Safe Payments',desc:'UPI, cards, netbanking — secure checkout'},
     {icon:Package,title:'Wide Selection',desc:productCount>0?`${productCount}+ products, ${catCount>0?catCount+' categories':''} — sab kuch ek jagah`:'Sab kuch ek jagah — grocery, dairy, snacks'},
-    {icon:Headphones,title:'24x7 Support',desc:'Ananya AI + WhatsApp — kabhi bhi help'},
+    {icon:Headphones,title:'Help & Support',desc:'Subah 8 se raat 9 — call, WhatsApp ya Ananya AI chat'},
   ];
   return(
     <div>
@@ -737,24 +738,27 @@ function WhyChooseUs({productCount=0,catCount=0}){
   );
 }
 
-// ⭐ Customer Reviews — admin-approved reviews (reviews table) with fallback grid
-// Fix 2026-08-13: hardcoded "4.8/5" + fake "✓ Verified" hata diya — ab average
-// approved reviews se compute hota hai aur sirf tab dikhta hai jab real reviews hon.
+// ⭐ Customer Reviews — admin-approved reviews (reviews table) only.
+// #4 fix: fake fallback reviews hata diye — koi approved review nahi hai to
+// khaali state dikhta hai (nakli review dikhana galat hai).
 function CustomerReviews({reviews=[]}){
-  const fallback=[
-    {name:'Priya Sharma',place:'Jaunpur',stars:5,text:'Roj ka saman ab online — fresh sabziyan aur 1-2 ghante mein delivery! Bahut badhiya service.'},
-    {name:'Rahul Verma',place:'Safiabad',stars:5,text:'Rate market se kam hain aur coupons se aur bachat. UPI payment ekdum aasaan.'},
-    {name:'Sunita Devi',place:'Shahganj',stars:4,text:'Ananya AI se pooch kar order kiya — bilkul sahi product mila. Highly recommended!'},
-    {name:'Amit Yadav',place:'Machhlishahr',stars:5,text:'COD option hone se ghar walon ko bhi bharosa hai. RK Grocery Mart = ghar ki dukaan.'},
-  ];
   const realAvg = reviews.length
     ? (reviews.reduce((s,r)=>s+(Number(r.rating)||0),0)/reviews.length).toFixed(1)
     : null;
-  // Admin ke Reviews page par APPROVED reviews hi yahan aate hain; agar koi
-  // nahi hai to purana curated fallback dikhta hai (khaali section kabhi nahi).
-  const list=reviews.length
-    ?reviews.map(r=>({name:r.customer_name||'Customer',place:'Admin-approved ✓',stars:Math.max(1,Math.min(5,r.rating||5)),text:r.comment||'',reply:r.admin_reply}))
-    :fallback;
+  // Admin ke Reviews page par APPROVED reviews hi yahan aate hain.
+  const list=reviews.map(r=>({name:r.customer_name||'Customer',place:'Admin-approved ✓',stars:Math.max(1,Math.min(5,r.rating||5)),text:r.comment||'',reply:r.admin_reply}));
+  if(!reviews.length){
+    return(
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base md:text-xl font-bold font-poppins" style={{color:'var(--dark)'}}>Kya Kehte Hain <span style={{color:'var(--primary)'}}>Hamare Customers?</span></h2>
+        </div>
+        <div className="rounded-2xl p-5 text-center text-sm font-poppins" style={{background:'var(--card-bg)',color:'var(--muted)',boxShadow:'0 2px 10px rgba(0,0,0,0.06)'}}>
+          ⭐ Abhi tak koi review nahi hai — pehla order karein aur apna experience share karein!
+        </div>
+      </div>
+    );
+  }
   return(
     <div>
       <div className="flex items-center justify-between mb-3">
@@ -859,7 +863,7 @@ function IBullets({items}){
     <ul className="my-2 space-y-1.5">
       {items.map((it,i)=>(
         <li key={i} className="flex gap-2.5 text-[13px] md:text-sm font-poppins leading-relaxed" style={{color:'var(--text)'}}>
-          <span className="mt-1 w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-bold" style={{background:'var(--primary)',color:'#fff'}}>✓</span>
+          <span className="mt-1 w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-bold" style={{background:'var(--primary-dark)',color:'#fff'}}>✓</span>
           <span dangerouslySetInnerHTML={{__html:it}}/>
         </li>
       ))}
@@ -908,7 +912,7 @@ function ITable({head,rows}){
 function ICall({title,children,icon:Icon=HelpCircle}){
   return(
     <div className="rounded-2xl p-4 mt-4 flex gap-3" style={{background:'var(--primary-light)',border:'1px solid var(--border)'}}>
-      <span className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center" style={{background:'var(--primary)'}}><Icon size={16} color="#fff"/></span>
+      <span className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center" style={{background:'var(--primary-dark)'}}><Icon size={16} color="#fff"/></span>
       <div>
         <div className="font-bold font-poppins text-xs md:text-sm" style={{color:'var(--primary-dark)'}}>{title}</div>
         <div className="font-poppins text-[12px] md:text-[13px] leading-relaxed mt-0.5" style={{color:'var(--text)'}}>{children}</div>
@@ -932,7 +936,7 @@ function AboutBody(){
       <IFeatures items={[
         {e:'🌿',t:'100% Fresh Promise',d:'Vegetables, fruits and dairy refreshed daily — a spoiled item replaced free within 24 hours.'},
         {e:'🏷️',t:'Fair & Transparent Pricing',d:'You pay exactly what you see — no hidden charges, no last-minute surprises.'},
-        {e:'⚡',t:'Lightning-Fast Delivery',d:'From 7 AM to 10 PM — your order reaches your door in an average of 60-90 minutes.'},
+        {e:'⚡',t:'Lightning-Fast Delivery',d:'From 7 AM to 10 PM — your order reaches your door in 20–55 minutes.'},
       ]}/>
 
       <IHead icon={Users}>Why Families Love Us</IHead>
@@ -941,14 +945,14 @@ function AboutBody(){
         '<strong style="color:var(--dark)">Quality check on every order</strong> — before picking, our team verifies expiry dates, packaging and freshness of each item.',
         '<strong style="color:var(--dark)">Supporting local vendors</strong> — we source from local farmers and distributors whenever possible, so you get fresher produce and they get a fair price.',
         '<strong style="color:var(--dark)">Easy payments</strong> — UPI, cards, net banking, cash on delivery and wallets — whatever is convenient for you.',
-        '<strong style="color:var(--dark)">Ananya AI support</strong> — a 24x7 chat assistant that instantly answers order status, product and offer questions.',
+        '<strong style="color:var(--dark)">Ananya AI support</strong> — a chat assistant (subah 8 se raat 9) that instantly answers order status, product and offer questions.',
       ]}/>
 
       <IHead icon={Zap}>By The Numbers</IHead>
       <IStats items={[
         {v:'5,000+',l:'Products'},
         {v:'16',l:'Categories'},
-        {v:'60-90 min',l:'Avg. Delivery'},
+        {v:'20-55 min',l:'Avg. Delivery'},
         {v:'7 AM–10 PM',l:'Daily Open'},
       ]}/>
 
@@ -957,7 +961,7 @@ function AboutBody(){
         'A freshness guarantee on every order — not satisfied? Replacement or full refund within 24 hours.',
         'Never a surprise delivery charge — all charges are shown clearly before the order is confirmed.',
         'Your data is used only to process your orders — it is never sold (details: Privacy Policy).',
-        'Whatever the issue, we are available 24x7 — WhatsApp, call or email, whatever is convenient for you.',
+        'Whatever the issue, we are available subah 8 se raat 9 — WhatsApp, call or email, whatever is convenient for you.',
       ]}/>
 
       <ICall title="Talk To Us" icon={MessageCircle}>
@@ -1131,10 +1135,10 @@ function ShippingBody(){
       <ITable
         head={['Service','Details','Charges']}
         rows={[
-          ['⏱️ Standard Delivery','60-90 min (avg.), 7 AM – 10 PM','Free above ₹499'],
-          ['🚀 Express Delivery','Need it faster? Choose an express slot','₹29 flat'],
-          ['🛒 Below ₹499 orders','Any slot, same day delivery','₹29 handling'],
-          ['📅 Scheduled Delivery','Pick a time slot of your choice','Free above ₹499'],
+          ['⏱️ Standard Delivery','20–55 minute (avg.), 7 AM – 10 PM','0–5 km FREE, 5–8 km ₹30'],
+          ['🛒 Minimum order','₹499 se kam ka order nahi liya jaata','₹499'],
+          ['📍 Delivery area','Dukaan se 8 km ke andar (shop settings se)','Distance ke hisaab se'],
+          ['📅 Scheduled Delivery','Pick a time slot of your choice','Same-day delivery'],
         ]}
       />
       <p className="text-[11px] font-poppins" style={{color:'var(--gray)'}}>Note: Charges may depend on your area, order value and ongoing offers. The final amount is shown clearly at checkout — no hidden charges.</p>
@@ -1196,7 +1200,7 @@ function ShippingBody(){
       ]}/>
 
       <ICall title="Need Help With A Delivery?" icon={Truck}>
-        Order status, address change or slot reschedule — anything. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · or ask anything on the 24x7 <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Ananya AI chat</a>.
+        Order status, address change or slot reschedule — anything. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · or ask anything (subah 8 se raat 9) on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Ananya AI chat</a>.
       </ICall>
     </div>
   );
@@ -1221,7 +1225,7 @@ function InfoPage({title,subtitle,body,fallback,onNav,activeKey,children}){
           <button key={t.k} onClick={()=>onNav&&onNav(t.k)}
             className="whitespace-nowrap rounded-full px-4 py-2 text-[11px] md:text-xs font-poppins font-bold transition-all"
             style={activeKey===t.k
-              ?{background:'var(--primary)',color:'#fff',boxShadow:'0 4px 12px rgba(0,0,0,0.12)'}
+              ?{background:'var(--primary-dark)',color:'#fff',boxShadow:'0 4px 12px rgba(0,0,0,0.12)'}
               :{background:'var(--card-bg)',color:'var(--text)',border:'1px solid var(--border)'}}>
             {t.l}
           </button>
@@ -1251,6 +1255,16 @@ function InfoPage({title,subtitle,body,fallback,onNav,activeKey,children}){
 }
 
 // ── Main App ──────────────────────────────────────────────
+// #32 fix: compact windowed pagination — [1, 2, …, p-1, p, p+1, …, N-1, N]
+function pageWindow(total,current){
+  if(total<=7) return Array.from({length:total},(_,i)=>i+1);
+  const keep=new Set([1,2,total-1,total,current-1,current,current+1]);
+  const arr=[...keep].filter(p=>p>=1&&p<=total).sort((a,b)=>a-b);
+  const out=[]; let prev=0;
+  for(const p of arr){ if(p-prev>1) out.push('…'); out.push(p); prev=p; }
+  return out;
+}
+
 export default function App(){
   const [page,setPage]=useState('home');
   const [cart,setCart]=useState([]);
@@ -1339,7 +1353,8 @@ export default function App(){
   const shopOpts={
     categoryId:activeCatId==='all'?null:activeCatId,
     search:search.trim().length>1?search:'',
-    page:shopPage,pageSize:24
+    page:shopPage,pageSize:24,
+    sort:sortBy,
   };
   const {products:shopProds,loading:shopLoading,total:shopTotal,totalPages}=useProducts(shopOpts);
 
@@ -1450,8 +1465,11 @@ export default function App(){
   // Auto-advance: har 4s next slide. Lekin jab user touch/swipe kar raha ho to interval
   // PAUSE ho jaata hai (warna JS smooth-scroll user ke haath se ladta hai aur carousel
   // bhaag ke aakhri slide tak chala jaata hai). touchend par fresh interval shuru.
+  // #24 fix: hover/focus par bhi pause; reduced-motion pasand karne wale user ke
+  // liye auto-rotate band.
   useEffect(()=>{
     if(!banners.length)return;
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     let t=setInterval(()=>setBannerIdx(i=>(i+1)%banners.length),4000);
     const el=bannerWrapRef.current;
     const pause=()=>clearInterval(t);
@@ -1460,8 +1478,12 @@ export default function App(){
       el.addEventListener('touchstart',pause,{passive:true});
       el.addEventListener('touchend',resume,{passive:true});
       el.addEventListener('touchcancel',resume,{passive:true});
+      el.addEventListener('mouseenter',pause);
+      el.addEventListener('mouseleave',resume);
+      el.addEventListener('focusin',pause);
+      el.addEventListener('focusout',resume);
     }
-    return()=>{clearInterval(t);if(el){el.removeEventListener('touchstart',pause);el.removeEventListener('touchend',resume);el.removeEventListener('touchcancel',resume);}};
+    return()=>{clearInterval(t);if(el){el.removeEventListener('touchstart',pause);el.removeEventListener('touchend',resume);el.removeEventListener('touchcancel',resume);el.removeEventListener('mouseenter',pause);el.removeEventListener('mouseleave',resume);el.removeEventListener('focusin',pause);el.removeEventListener('focusout',resume);}};
   },[banners.length]);
 
   // Keep carousel scroll position in sync with bannerIdx (fixes auto-rotate not scrolling).
@@ -1551,7 +1573,10 @@ export default function App(){
     if(user){const r=sessionStorage.getItem('rk_redirect');if(r==='checkout'){sessionStorage.removeItem('rk_redirect');setPage('checkout');}}
   },[user]);
 
-  const showToast=msg=>{setToast(msg);setTimeout(()=>setToast(''),2200);};
+  // '08:00' jaise 24h time ko '8:00 AM' mein badlo (footer timings).
+  const fmtT=t=>{ if(!t) return ''; const m=String(t).match(/^(\d{1,2}):(\d{2})/); if(!m) return t; let h=+m[1]; const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+m[2]+' '+ap; };
+  const toastTimer=useRef(null);
+  const showToast=(msg,ms=2200)=>{setToast(msg);clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(''),ms);};
   // V4.1: dark-mode toggle moved to Account → Settings → Appearance (see
   // AccountPage.jsx SettingsTab). The main page keeps the saved theme applied
   // via the useEffect above, but no longer shows the header switch.
@@ -1577,28 +1602,74 @@ export default function App(){
   // ── Wishlist (heart on every product card) ─────────────────────────
   // Logged-in user ki wishlist rows Supabase 'wishlist' table se load hoti
   // hain (user_id ke andar). Guest ke liye heart tap par login modal khulta
-  // hai — guest wishlist localStorage me nahi rakhte (Account page wahi
-  // source of truth hai). toggleWishlist() optimistic nahi hai — DB ke baad
+  // hai — guest wishlist localStorage ('rk_guest_wishlist') mein rehti hai
+  // aur login par DB mein merge ho jaati hai. toggleWishlist() optimistic
+  // nahi hai — DB ke baad
   // state update hoti hai, taaki Account → Wishlist aur cards hamesha sync
   // rahein.
   const [wishlist,setWishlist]=useState([]);
   const [wishlistBusy,setWishlistBusy]=useState(false);
+  // #18 fix: guest wishlist localStorage mein (login zaroori nahi)
+  const loadGuestWishlist=()=>{
+    try{ const g=JSON.parse(localStorage.getItem('rk_guest_wishlist')||'[]'); return Array.isArray(g)?g.filter(id=>id):[]; }catch{ return []; }
+  };
   useEffect(()=>{
-    if(!user){setWishlist([]);return;}
+    if(!user){setWishlist(loadGuestWishlist().map(id=>({product_id:id})));return;}
     let cancelled=false;
     (async()=>{
       const {data}=await supabase.from('wishlist').select('*').eq('user_id',user.uid).order('created_at',{ascending:false});
-      if(!cancelled)setWishlist(data||[]);
+      if(cancelled)return;
+      let rows=data||[];
+      // Guest wishlist (localStorage) ko login par DB mein merge karo
+      const guest=loadGuestWishlist();
+      if(guest.length){
+        const have=new Set(rows.map(r=>r.product_id));
+        const fresh=guest.filter(id=>!have.has(id));
+        if(fresh.length){
+          const {data:prods}=await supabase.from('products').select('id,name,selling_price,primary_image,categories(name)').in('id',fresh);
+          const toInsert=(prods||[]).map(p=>({user_id:user.uid,product_id:p.id,name:p.name,price:p.selling_price,category:p.categories?.name||null,image:p.primary_image||null}));
+          if(toInsert.length){
+            const {data:ins,error}=await supabase.from('wishlist').insert(toInsert).select();
+            if(!error&&ins&&ins.length){ rows=[...ins,...rows]; try{ localStorage.removeItem('rk_guest_wishlist'); }catch{} }
+          }
+        }else{ try{ localStorage.removeItem('rk_guest_wishlist'); }catch{} }
+        // Merge save nahi ho paya to guest items state mein dikhte rahein (id-less rows)
+        const mergedIds=new Set(rows.map(r=>r.product_id));
+        const pending=guest.filter(id=>!mergedIds.has(id)).map(id=>({product_id:id}));
+        if(pending.length) rows=[...pending,...rows];
+      }
+      if(!cancelled)setWishlist(rows);
     })();
     return()=>{cancelled=true;};
   },[user]);
   const wishlistIds=new Set(wishlist.map(w=>w.product_id));
   const toggleWishlist=async p=>{
-    if(!user){openLogin();showToast('Wishlist ke liye login karein 🔐');return;}
+    if(!user){
+      // #18 fix: guest wishlist localStorage mein (login zaroori nahi)
+      const g=loadGuestWishlist();
+      if(g.includes(p.id)){
+        try{ localStorage.setItem('rk_guest_wishlist',JSON.stringify(g.filter(id=>id!==p.id))); }catch{}
+        setWishlist(l=>l.filter(w=>w.product_id!==p.id));
+        showToast('Wishlist se hata diya 💔');
+      }else{
+        try{ localStorage.setItem('rk_guest_wishlist',JSON.stringify([...g,p.id])); }catch{}
+        setWishlist(l=>[...l,{product_id:p.id}]);
+        showToast(`${p.name} wishlist mein add ho gaya ❤️`);
+      }
+      return;
+    }
     if(wishlistBusy)return;
     setWishlistBusy(true);
     try{
       const existing=wishlist.find(w=>w.product_id===p.id);
+      if(existing&&!existing.id){
+        // Guest wishlist se aaya row jo DB merge mein save nahi ho paya — local se hatao
+        const g=loadGuestWishlist().filter(id=>id!==p.id);
+        try{ localStorage.setItem('rk_guest_wishlist',JSON.stringify(g)); }catch{}
+        setWishlist(l=>l.filter(w=>w.product_id!==p.id));
+        showToast('Wishlist se hata diya 💔');
+        return;
+      }
       if(existing){
         const {error}=await supabase.from('wishlist').delete().eq('id',existing.id).eq('user_id',user.uid);
         if(!error){setWishlist(l=>l.filter(w=>w.id!==existing.id));showToast('Wishlist se hata diya 💔');}
@@ -1651,7 +1722,14 @@ export default function App(){
 
   // ── Save for Later (cart drawer): item cart se nikal kar wishlist me ──
   const saveForLater=async item=>{
-    if(!user){openLogin();showToast('Wishlist ke liye login karein 🔐');return;}
+    if(!user){
+      // #18 fix: guest ke liye wishlist localStorage mein
+      const g=loadGuestWishlist();
+      if(!g.includes(item.id)){ try{ localStorage.setItem('rk_guest_wishlist',JSON.stringify([...g,item.id])); }catch{} setWishlist(l=>[...l,{product_id:item.id}]); }
+      if(window.RKCart)await window.RKCart.removeFromCart(item.id,item.k||item.id);
+      showToast('Cart se nikal kar wishlist mein save ho gaya 🔖');
+      return;
+    }
     const existing=wishlist.find(w=>w.product_id===item.id);
     if(existing){
       if(window.RKCart)await window.RKCart.removeFromCart(item.id,item.k||item.id);
@@ -1799,11 +1877,11 @@ export default function App(){
 
               <button onClick={()=>setCartOpen(true)} aria-label={count?`Cart, ${count} items, ₹${total}`:'Cart is empty'}
                 className="relative flex items-center gap-1.5 px-3 h-9 rounded-xl text-white font-poppins font-bold text-sm"
-                style={{background:`linear-gradient(135deg, var(--primary), var(--primary-dark))`, boxShadow:'0 4px 12px rgba(22,163,74,0.3)'}}>
+                style={{background:`linear-gradient(135deg, var(--primary), var(--primary-dark))`, boxShadow:'0 4px 12px rgba(22,163,74,0.3)',color:'var(--on-primary)'}}>
                 <ShoppingCart size={17}/>
                 <span className="hidden md:inline">Cart</span>
                 {count>0&&<span className="hidden lg:inline text-[10px] font-semibold opacity-90 border-l border-white/25 pl-1.5">₹{total}</span>}
-                {count>0&&<span className="absolute -top-1.5 -right-1.5 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)'}}>{count>9?'9+':count}</span>}
+                {count>0&&<span className="absolute -top-1.5 -right-1.5 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#1A1A2E'}}>{count>9?'9+':count}</span>}
               </button>
 
               {user?
@@ -1813,7 +1891,7 @@ export default function App(){
                   <User size={16}/> <span className="max-w-[64px] truncate">{user.name.split(' ')[0]}</span>
                 </button>
                 :<button onClick={openLogin} className="flex items-center gap-1.5 h-9 px-3 rounded-xl font-poppins font-bold text-xs text-white"
-                  style={{background:'var(--primary)'}}>
+                  style={{background:'var(--primary-dark)'}}>
                   <User size={16}/> Login
                 </button>
               }
@@ -1846,7 +1924,7 @@ export default function App(){
 
       {/* A quiet service-proof strip gives shoppers the reassurance they need
           before browsing, without competing with the promotional ticker. */}
-      <div className="hidden sm:block" style={{background:'var(--card-bg)',borderBottom:'1px solid var(--border)'}}>
+      <div style={{background:'var(--card-bg)',borderBottom:'1px solid var(--border)'}}>
         <div className="max-w-site mx-auto px-4 md:px-8 py-2 flex items-center justify-center gap-x-7 gap-y-1 flex-wrap text-[11px] font-semibold font-poppins" style={{color:'var(--gray)'}}>
           <span className="flex items-center gap-1.5"><span aria-hidden="true">⚡</span> Fast local delivery</span>
           <span className="flex items-center gap-1.5"><span aria-hidden="true">🥬</span> Freshness checked before dispatch</span>
@@ -1948,10 +2026,14 @@ export default function App(){
                   </>
                 }
                 {!search&&totalPages>1&&(
-                  <div className="flex justify-center gap-2 py-3">
-                    {shopPage>1&&<button onClick={()=>setShopPage(p=>p-1)} className="px-4 py-2 rounded-lg font-bold font-poppins text-sm" style={{border:'1.5px solid var(--border)',background:'transparent',color:'var(--dark)'}}>← Prev</button>}
-                    <span className="px-4 py-2 font-bold font-poppins text-sm" style={{color:'var(--gray)'}}>Page {shopPage} of {totalPages}</span>
-                    {shopPage<totalPages&&<button onClick={()=>setShopPage(p=>p+1)} className="px-4 py-2 rounded-lg font-bold font-poppins text-sm text-white" style={{border:'1.5px solid var(--primary)',background:'var(--primary)'}}>Next →</button>}
+                  <div className="flex justify-center items-center flex-wrap gap-1.5 py-3">
+                    {shopPage>1&&<button onClick={()=>setShopPage(p=>p-1)} aria-label="Pichhla page" className="px-3 py-2 rounded-lg font-bold font-poppins text-sm" style={{border:'1.5px solid var(--border)',background:'transparent',color:'var(--dark)'}}>←</button>}
+                    {pageWindow(totalPages,shopPage).map((p,i)=>p==='…' ? (
+                      <span key={'e'+i} className="px-1 text-sm font-bold" style={{color:'var(--gray)'}}>…</span>
+                    ) : (
+                      <button key={p} onClick={()=>setShopPage(p)} aria-label={`Page ${p}`} className="w-9 h-9 rounded-lg text-[13px] font-bold font-poppins flex items-center justify-center" style={{border:`1.5px solid ${shopPage===p?'var(--primary)':'var(--border)'}`,background:shopPage===p?'var(--primary-dark)':'transparent',color:shopPage===p?'#fff':'var(--gray)'}}>{p}</button>
+                    ))}
+                    {shopPage<totalPages&&<button onClick={()=>setShopPage(p=>p+1)} aria-label="Agla page" className="px-3 py-2 rounded-lg font-bold font-poppins text-sm text-white" style={{border:'1.5px solid var(--primary-dark)',background:'var(--primary-dark)'}}>→</button>}
                   </div>
                 )}
               </div>
@@ -1960,12 +2042,12 @@ export default function App(){
 
             {/* Mobile filter/sort bottom sheet (Module 4) */}
             {filterDrawerOpen&&(
-              <div className="fixed inset-0 z-[70] flex items-end md:hidden" onClick={()=>setFilterDrawerOpen(false)}>
+              <div className="fixed inset-0 z-[1010] flex items-end md:hidden" onClick={()=>setFilterDrawerOpen(false)}>
                 <div className="absolute inset-0" style={{background:'rgba(0,0,0,0.4)'}}/>
                 <div className="relative w-full rounded-t-2xl p-4" style={{background:'var(--card-bg)',maxHeight:'80vh',overflowY:'auto'}} onClick={e=>e.stopPropagation()}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="text-sm font-bold font-poppins" style={{color:'var(--dark)'}}>Filters &amp; Sort</div>
-                    <button onClick={()=>setFilterDrawerOpen(false)} aria-label="Band karein"><X size={20} style={{color:'var(--gray)'}}/></button>
+                    <button onClick={()=>setFilterDrawerOpen(false)} aria-label="Band karein" className="w-9 h-9 rounded-full flex items-center justify-center"><X size={20} style={{color:'var(--gray)'}}/></button>
                   </div>
                   <div className="mb-5">
                     <div className="text-xs font-bold font-poppins mb-2 uppercase tracking-wide" style={{color:'var(--gray)'}}>Sort by</div>
@@ -1984,7 +2066,7 @@ export default function App(){
                     In stock only
                   </label>
                   <button onClick={()=>setFilterDrawerOpen(false)}
-                    className="w-full text-white font-bold font-poppins py-3 rounded-xl" style={{background:'var(--primary)'}}>
+                    className="w-full text-white font-bold font-poppins py-3 rounded-xl" style={{background:'var(--primary-dark)'}}>
                     {visibleShopProds.length} results dikhayein
                   </button>
                 </div>
@@ -1995,16 +2077,16 @@ export default function App(){
 
         {/* ── PRODUCT DETAIL ── */}
         {page==='detail'&&detailProduct&&(
-          <ProductDetail key={detailProduct.id} product={detailProduct} cart={cart} addToCart={addToCart} updQty={updQty} onBack={()=>setPage('shop')} onDetail={openDetail} wishlistIds={wishlistIds} onWishlist={toggleWishlist} priceAlerts={priceAlerts} onToggleAlert={toggleAlert}/>
+          <ProductDetail key={detailProduct.id} product={detailProduct} cart={cart} addToCart={addToCart} updQty={updQty} onBack={()=>setPage('shop')} onDetail={openDetail} wishlistIds={wishlistIds} onWishlist={toggleWishlist} priceAlerts={priceAlerts} onToggleAlert={toggleAlert} openLogin={openLogin}/>
         )}
 
         {/* ── CHECKOUT ── */}
         {page==='checkout'&&(
           <div className="checkout-page">
-            <button className="pdp-back" style={{marginBottom:6}} onClick={()=>setPage('home')}>← Checkout se Bahar Jao</button>
+            <button className="pdp-back" style={{marginBottom:6}} onClick={()=>setCartOpen(true)}>← Cart par wapas</button>
             <h2>🚚 Checkout</h2>
             <CheckoutForm cart={cart} total={total} showToast={showToast} user={user}
-              onSuccess={(id,pay)=>{setSuccess({id,pay});setPage('success');}}/>
+              onSuccess={(id,pay,adminReview)=>{setSuccess({id,pay,adminReview:!!adminReview});setPage('success');}}/>
           </div>
         )}
 
@@ -2015,7 +2097,18 @@ export default function App(){
             <h2>Order Place Ho Gaya!</h2>
             <div className="order-pill">Order #{success.id}</div>
             <p>{success.pay==='cod'?'💵 Delivery par cash dena':success.pay==='razorpay'?'💳 Online payment successful — order confirm ho gaya!':'⏳ Payment verify ho rahi hai — 10-15 min mein confirm ho jayega'}</p>
-            <p>⏰ 1-2 ghante mein delivery hogi</p>
+            <p>⏰ 20–55 minute mein delivery hogi</p>
+            {success.adminReview&&<p style={{color:'var(--orange)',fontWeight:700}}>⚠️ Aapka address hamari delivery range se bahar hai — order admin verification ke baad confirm hoga. Hum jald call karke batayenge.</p>}
+            <div className="mt-4 text-left max-w-xs mx-auto">
+              {[['Order mila',true],['Pack ho raha hai',false],['Nikal gaya',false],['Delivered',false]].map(([label,done],i)=>(
+                <div key={label} className="flex items-center gap-2.5 py-1">
+                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold flex-shrink-0" style={{background:done?'var(--primary-dark)':'var(--light)',color:done?'var(--on-primary)':'var(--muted)',border:'1.5px solid '+(done?'var(--primary-dark)':'var(--border)')}}>{done?'✓':i+1}</span>
+                  <span className="text-[12.5px] font-bold" style={{color:done?'var(--dark)':'var(--muted)'}}>{label}</span>
+                  {i===0&&<span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:'var(--light)',color:'var(--muted)'}}>abhi</span>}
+                </div>
+              ))}
+              <div className="text-[11px] mt-1" style={{color:'var(--muted)'}}>Live status ke liye Track Order dekhein — order aage badhte hi update hoga.</div>
+            </div>
             <div className="flex gap-2.5 mt-4 justify-center">
               <button className="home-btn" style={{margin:0}} onClick={()=>{setSuccess(null);setPage('home');}}>🏠 Home Par Jao</button>
               <a className="home-btn" style={{margin:0,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:6}}
@@ -2042,7 +2135,7 @@ export default function App(){
             <div className="flex items-center justify-between px-5 pt-3 pb-2.5 flex-shrink-0" style={{borderBottom:'1px solid var(--border)'}}>
               <div className="font-extrabold font-poppins text-base" style={{color:'var(--dark)'}}>🛒 Mera Cart ({count} items)</div>
               <button aria-label="Cart band karein" onClick={()=>setCartOpen(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-lg" style={{color:'var(--gray)'}}>✕</button>
+                className="w-9 h-9 rounded-full flex items-center justify-center text-lg" style={{color:'var(--gray)'}}>✕</button>
             </div>
             <div className="flex-1 overflow-y-auto px-5 py-3">
               {cart.length===0
@@ -2066,7 +2159,7 @@ export default function App(){
                   return(
                     <div key={i.k||i.id} className="flex items-center gap-3 py-2.5" style={{borderBottom:'1px solid var(--border)'}}>
                       {i.image
-                        ?<img src={i.image} alt={i.name} className="w-11 h-11 rounded-xl object-cover flex-shrink-0" style={{background:'var(--light)'}}/>
+                        ?<img src={i.image} alt={i.name} loading="lazy" decoding="async" className="w-11 h-11 rounded-xl object-cover flex-shrink-0" style={{background:'var(--light)'}}/>
                         :<div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{background:'var(--light)'}}>🛒</div>}
                       <div className="min-w-0 flex-1">
                         <div className="text-[13px] font-bold font-poppins truncate" style={{color:'var(--dark)'}}>{i.name} <span className="font-normal" style={{color:'var(--gray)',fontSize:'0.7rem'}}>({i.unit})</span></div>
@@ -2076,10 +2169,10 @@ export default function App(){
                       </div>
                       <div className="flex items-center rounded-lg overflow-hidden flex-shrink-0" style={{border:'1.5px solid var(--primary)'}}>
                         <button aria-label="Quantity kam karein" onClick={()=>updQty(i.id,-1,null,i.k||i.id)}
-                          className="w-7 h-7 flex items-center justify-center text-white font-bold" style={{background:'var(--primary)'}}>−</button>
+                          className="w-9 h-9 flex items-center justify-center text-white font-bold" style={{background:'var(--primary-dark)'}}>−</button>
                         <span className="w-6 text-center text-xs font-bold font-poppins" style={{color:'var(--dark)'}}>{i.qty}</span>
                         <button aria-label="Quantity badhayein" disabled={atMax} onClick={()=>!atMax&&updQty(i.id,1,knownStock,i.k||i.id)}
-                          className="w-7 h-7 flex items-center justify-center text-white font-bold disabled:opacity-40" style={{background:'var(--primary)'}}>+</button>
+                          className="w-9 h-9 flex items-center justify-center text-white font-bold disabled:opacity-40" style={{background:'var(--primary-dark)'}}>+</button>
                       </div>
                     </div>
                   );
@@ -2094,9 +2187,14 @@ export default function App(){
                   </div>
                 }
                 <div className="total-row font-poppins" style={{color:'var(--dark)'}}><span>Total</span><span style={{color:'var(--primary)'}}>₹{total.toFixed(0)}</span></div>
+                <div className="mt-2 text-[11px] leading-relaxed" style={{color:'var(--muted)'}}>
+                  🚚 Delivery: 0–5 km FREE, 5–8 km ₹30 — final charge checkout par aapke location se pata chalega.
+                </div>
+                {total < (s.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--orange)'}}>⚠️ Minimum order ₹{s.min_order ?? 499} hai — ₹{((s.min_order ?? 499)-total).toFixed(0)} aur add karein.</div>}
+                {total >= (s.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--primary-dark)'}}>✅ Minimum order ₹{s.min_order ?? 499} poora ho gaya.</div>}
                 <button onClick={goToCheckout}
                   className="w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm"
-                  style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(22,163,74,0.35)'}}>
+                  style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(22,163,74,0.35)',color:'var(--on-primary)'}}>
                   {user?`Checkout — ₹${total.toFixed(0)} →`:'Login & Checkout →'}
                 </button>
               </div>
@@ -2135,7 +2233,7 @@ export default function App(){
           </div>
         )}
         <div className="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" onClick={()=>setCartOpen(true)}>
-          {count>0&&<span className="absolute top-1 right-1/4 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)'}}>{count>9?'9+':count}</span>}
+          {count>0&&<span className="absolute top-1 right-1/4 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#1A1A2E'}}>{count>9?'9+':count}</span>}
           <ShoppingCart size={21} strokeWidth={page==='cart'?2.5:1.8} style={{color:page==='cart'?'var(--primary)':'var(--gray)'}}/>
           <span className="text-[10px] font-medium font-poppins" style={{color:page==='cart'?'var(--primary)':'var(--gray)'}}>Cart</span>
         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useCouponValidator } from '../hooks/dataHooks';
+import { useCouponValidator, useShopSettings } from '../hooks/dataHooks';
 import { supabase } from '../lib/supabaseClient';
 
 /* ══════════════════════════════════════════════════════════
@@ -20,12 +20,13 @@ import { supabase } from '../lib/supabaseClient';
 ══════════════════════════════════════════════════════════ */
 export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLocationResolved}){
   const [pay,setPay]=useState('');
+  const {settings:shopSettings}=useShopSettings();
   const [f,setF]=useState({name:user?.name||'',phone:''});
   const [addresses,setAddresses]=useState([]);
   const [loadingAddrs,setLoadingAddrs]=useState(true);
   const [selectedAddrId,setSelectedAddrId]=useState(null);
   const [showNewForm,setShowNewForm]=useState(false);
-  const [newAddr,setNewAddr]=useState({label:'Home',line1:'',line2:'',city:'Jaunpur',pincode:'222001',is_default:false});
+  const [newAddr,setNewAddr]=useState({label:'Home',line1:'',line2:'',city:'',pincode:'',is_default:false});
   const [savingAddr,setSavingAddr]=useState(false);
   const [phoneTouched,setPhoneTouched]=useState(false);
   const [placing,setPlacing]=useState(false);
@@ -77,7 +78,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
   },[user]);
   const handleApplyCoupon=async()=>{
     setCouponError('');
-    const result=await validateCoupon(couponCode,cartTotal);
+    const result=await validateCoupon(couponCode,cartTotal,{userId:user?.uid,productIds:cart.map(i=>i.id)});
     if(!result.valid){setCouponError(result.reason);setAppliedCoupon(null);return;}
     setAppliedCoupon({code:result.code,discount:result.discount});
     showToast(`✅ Coupon applied — ₹${result.discount} OFF`);
@@ -149,7 +150,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     setSavingAddr(true);
     try{
       const saved=await window.RKProfile.saveAddress(user.uid,newAddr);
-      if(saved){setAddresses(prev=>{const next=newAddr.is_default?prev.map(a=>({...a,is_default:false})):prev;return[...next,saved];});setSelectedAddrId(saved.id);setShowNewForm(false);setNewAddr({label:'Home',line1:'',line2:'',city:'Jaunpur',pincode:'222001',is_default:false});showToast('Address save ho gaya! 📍');}
+      if(saved){setAddresses(prev=>{const next=newAddr.is_default?prev.map(a=>({...a,is_default:false})):prev;return[...next,saved];});setSelectedAddrId(saved.id);setShowNewForm(false);setNewAddr({label:'Home',line1:'',line2:'',city:'',pincode:'',is_default:false});showToast('Address save ho gaya! 📍');}
       else showToast('Address save nahi hua.');
     }catch(err){showToast('Error! Dobara try karo.');}
     finally{setSavingAddr(false);}
@@ -239,7 +240,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
             rzpOrderRef.current=null;rzpKeyRef.current='';
             if(window.RKCart)window.RKCart.clearCart();
             setRzpBusy(false);
-            onSuccess(orderNumber,'razorpay');
+            onSuccess(orderNumber,'razorpay',locationPayload.admin_review_needed);
           } else {
             // Payment capture ho chuka hai par verify fail — webhook Razorpay se
             // order ko khud confirm kar dega (tab tak draft pending_payment hai,
@@ -287,7 +288,8 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     if(!isPhoneValid){showToast('Sahi 10-digit mobile number daalein!');return;}
     if(!pay){showToast('Payment method chunein!');return;}
     if(!selectedAddr){showToast('Delivery address chunein ya add karein!');return;}
-    const addressPayload={name:f.name.trim(),phone:f.phone.trim(),line1:selectedAddr.line1,line2:selectedAddr.line2||'',city:selectedAddr.city||'Jaunpur',pincode:selectedAddr.pincode||''};
+    if(cartTotal < (shopSettings.min_order ?? 499)){showToast(`Minimum order ₹${shopSettings.min_order ?? 499} hai — ₹${((shopSettings.min_order ?? 499)-cartTotal).toFixed(0)} aur add karein.`);return;}
+    const addressPayload={name:f.name.trim(),phone:f.phone.trim(),line1:selectedAddr.line1,line2:selectedAddr.line2||'',city:selectedAddr.city||'',pincode:selectedAddr.pincode||''};
     // GPS is optional and never blocks checkout. If it resolved and the
     // location looks out of the normal delivery range, we don't stop the
     // order — we just flag it so the admin can verify and accept/reject.
@@ -326,7 +328,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         const orderNumber=result?.orderNumber||('RK'+Math.floor(1000+Math.random()*9000));
         setPlacing(false);
         if(window.RKCart)window.RKCart.clearCart();
-        onSuccess(orderNumber,'cod');
+        onSuccess(orderNumber,'cod',locationPayload.admin_review_needed);
       }catch(err){
         setPlacing(false);
         setOrderError('⚠️ Kuch galat ho gaya. Kripya dobara try karein.');
@@ -409,6 +411,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         <div className="flex justify-between font-extrabold font-poppins text-sm mt-2 pt-2" style={{borderTop:'1px solid var(--border)'}}>
           <span>Total</span><span style={{color:'var(--primary)'}}>₹{finalAmount.toFixed(0)}</span>
         </div>
+        {cartTotal < (shopSettings.min_order ?? 499) && <div className="text-[11px] font-bold font-poppins mt-1.5" style={{color:'var(--orange)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-cartTotal).toFixed(0)} aur add karein.</div>}
       </div>
 
       <div className={`co-card ${cardCls}`} style={cardStyle}>
@@ -462,8 +465,8 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
                 </div>
                 {!deliveryInfo.available&&(
                   <div className="text-[11px] font-poppins font-semibold mt-2" style={{color:'var(--red)'}}>
-                    ❌ Sorry, aapka location hamari 8 km delivery range se bahar hai.
-                    <br/>Abhi hum sirf Jaunpur aur aas-paas ke areas mein deliver karte hain.
+                    ❌ Sorry, aapka location hamari {shopSettings.delivery_radius||8} km delivery range se bahar hai.
+                    <br/>{shopSettings.base_city?`Abhi hum sirf ${shopSettings.base_city} aur aas-paas ke areas mein deliver karte hain.`:'Abhi hum sirf apne delivery area mein deliver karte hain.'}
                   </div>
                 )}
               </div>
@@ -473,12 +476,12 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         {loadingAddrs?<div className="text-xs font-poppins py-2" style={{color:'var(--gray)'}}>Addresses load ho rahe hain…</div>
           :<>
             {addresses.map(a=>(
-              <div key={a.id} onClick={()=>{setSelectedAddrId(a.id);setShowNewForm(false);}}
+              <div key={a.id} onClick={()=>{setSelectedAddrId(a.id);setShowNewForm(false);}} role="radio" aria-checked={selectedAddrId===a.id} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSelectedAddrId(a.id);setShowNewForm(false);}}}
                 className="addr-card rounded-xl p-3 mb-2 cursor-pointer"
                 style={{border:`1.5px solid ${selectedAddrId===a.id?'var(--primary)':'var(--border)'}`,background:selectedAddrId===a.id?'var(--primary-light)':'transparent'}}>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-extrabold font-poppins" style={{color:'var(--dark)'}}>{a.label}</span>
-                  {a.is_default&&<span className="text-[9px] font-extrabold font-poppins px-1.5 py-0.5 rounded" style={{background:'var(--primary)',color:'#fff'}}>DEFAULT</span>}
+                  {a.is_default&&<span className="text-[9px] font-extrabold font-poppins px-1.5 py-0.5 rounded" style={{background:'var(--primary-dark)',color:'#fff'}}>DEFAULT</span>}
                 </div>
                 <div className="text-xs font-poppins mt-0.5" style={{color:'var(--gray)'}}>{a.line1}{a.line2?', '+a.line2:''}<br/>{a.city}{a.pincode?' - '+a.pincode:''}</div>
               </div>
@@ -501,10 +504,10 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
               </div>
               <div>
                 <label className={labelCls} htmlFor="addr-pin" style={{color:'var(--gray)'}}>Pincode *</label>
-                <input id="addr-pin" className={inputCls} style={inputStyle} placeholder="222001 *" value={newAddr.pincode} onChange={e=>setNewAddr({...newAddr,pincode:e.target.value.replace(/\D/g,'').slice(0,6)})} required/>
+                <input id="addr-pin" className={inputCls} style={inputStyle} placeholder="Pincode *" value={newAddr.pincode} onChange={e=>setNewAddr({...newAddr,pincode:e.target.value.replace(/\D/g,'').slice(0,6)})} required/>
               </div>
             </div>
-            <button className="addr-add-btn w-full rounded-xl py-2.5 text-xs font-bold font-poppins text-white" disabled={savingAddr} onClick={saveNewAddress} style={{background:'var(--primary)'}}>{savingAddr?'Saving…':'💾 Address Save Karke Use Karo'}</button>
+            <button className="addr-add-btn w-full rounded-xl py-2.5 text-xs font-bold font-poppins text-white" disabled={savingAddr} onClick={saveNewAddress} style={{background:'var(--primary-dark)'}}>{savingAddr?'Saving…':'💾 Address Save Karke Use Karo'}</button>
             {addresses.length>0&&<button className="addr-add-btn w-full rounded-xl py-2.5 text-xs font-bold font-poppins mt-1.5" style={{color:'var(--gray)'}} onClick={()=>setShowNewForm(false)}>Cancel</button>}
           </div>
         )}
@@ -515,14 +518,14 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
 
       <div className={`co-card ${cardCls}`} style={cardStyle}>
         <div className="co-card-title font-extrabold font-poppins text-sm mb-2.5" style={{color:'var(--dark)'}}>💳 Payment Method</div>
-        <div className="grid grid-cols-2 gap-2.5">
-          <div onClick={()=>setPay('razorpay')} className="rounded-xl p-3 text-center cursor-pointer"
+        <div className="grid grid-cols-2 gap-2.5" role="radiogroup" aria-label="Payment method">
+          <div onClick={()=>setPay('razorpay')} role="radio" aria-checked={pay==='razorpay'} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setPay('razorpay');}}} className="rounded-xl p-3 text-center cursor-pointer"
             style={{border:`1.5px solid ${pay==='razorpay'?'var(--primary)':'var(--border)'}`,background:pay==='razorpay'?'var(--primary-light)':'transparent'}}>
             <div className="text-2xl">💳</div>
             <div className="text-xs font-bold font-poppins mt-1" style={{color:'var(--dark)'}}>Online Payment</div>
             <div className="text-[10px] font-poppins" style={{color:'var(--gray)'}}>Card / UPI / NetBanking</div>
           </div>
-          <div onClick={()=>setPay('cod')} className="rounded-xl p-3 text-center cursor-pointer"
+          <div onClick={()=>setPay('cod')} role="radio" aria-checked={pay==='cod'} tabIndex={0} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setPay('cod');}}} className="rounded-xl p-3 text-center cursor-pointer"
             style={{border:`1.5px solid ${pay==='cod'?'var(--primary)':'var(--border)'}`,background:pay==='cod'?'var(--primary-light)':'transparent'}}>
             <div className="text-2xl">💵</div>
             <div className="text-xs font-bold font-poppins mt-1" style={{color:'var(--dark)'}}>Cash on Delivery</div>
@@ -539,14 +542,14 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       {orderError&&<div className="rounded-xl px-3.5 py-2.5 mb-3 text-xs font-poppins font-semibold" role="alert" style={{background:'var(--tint-red-bg)',color:'var(--tint-red-text)'}}>⚠️ {orderError.replace(/^⚠️\s*/,'')}</div>}
       {deliveryInfo&&!deliveryInfo.available&&(
         <div className="rounded-xl px-3.5 py-2.5 mb-3 text-xs font-poppins font-semibold" role="status" style={{background:'var(--tint-yellow-bg)',color:'var(--tint-yellow-text)'}}>
-          📍 Aapka location hamari normal delivery area (8 km) se bahar lag raha hai.
+          📍 Aapka location hamari normal delivery area ({shopSettings.delivery_radius||8} km) se bahar lag raha hai.
           Aap order place kar sakte hain — admin location verify karke order confirm ya cancel karega.
         </div>
       )}
       <button className="place-order-btn w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm"
-        style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(22,163,74,0.35)'}}
+        style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(22,163,74,0.35)',color:'var(--on-primary)'}}
         disabled={placing||rzpBusy} onClick={handlePlaceOrder}>
-        {placing||rzpBusy?'⏳ Process Ho Raha Hai...':(pay==='razorpay'?'💳 Pay Now — Online':'📲 Order Confirm Karein')} →
+        {placing||rzpBusy?'⏳ Process Ho Raha Hai...':(pay==='razorpay'?`💳 Pay Now — ₹${finalAmount.toFixed(0)}`:`📲 Order Confirm Karein — ₹${finalAmount.toFixed(0)}`)} →
       </button>
     </>
   );

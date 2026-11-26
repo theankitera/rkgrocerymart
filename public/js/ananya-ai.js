@@ -1,6 +1,6 @@
 /*!
  * ANANYA AI - Smart Shopping Assistant
- * Rinku Kirana Store
+ * RK Grocery Mart
  * Version: 4.0 — Gemini AI + Supabase Product Search Backend
  * UI untouched. Local intents stay instant; unmatched queries now route
  * through /api/chat (Gemini, with Supabase product lookups first).

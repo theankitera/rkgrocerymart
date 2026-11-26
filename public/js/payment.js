@@ -1,5 +1,5 @@
 /**
- * payment.js — Rinku Kirana
+ * payment.js — RK Grocery Mart
  * UPI Payment Verification
  * ─────────────────────────────────────────────────────────────
  * Public API (window.RKPayment):

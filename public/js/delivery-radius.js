@@ -1,6 +1,6 @@
 /**
  * delivery-radius.js
- * Rinku Kirana Store — Smart Delivery Radius Engine
+ * RK Grocery Mart — Smart Delivery Radius Engine
  * Haversine-formula distance calculation + tiered delivery rules.
  */
 
@@ -103,7 +103,7 @@
           sb = this._getClient();
         }
         if (!sb) return;
-        const { data } = await sb.from('shop_settings').select('delivery_radius,delivery_charge').eq('id', 1).maybeSingle();
+        const { data } = await sb.from('shop_settings').select('delivery_radius,delivery_charge,base_city').eq('id', 1).maybeSingle();
         if (!data) return;
         const radius = Number(data.delivery_radius);
         const charge = Number(data.delivery_charge);
@@ -116,6 +116,8 @@
         if (!Number.isNaN(charge) && charge >= 0 && paidTier) {
           paidTier.charge = charge;
         }
+        // #29 fix: base city Admin settings se (hardcoded 'Jaunpur' nahi)
+        if (data.base_city) DeliveryRadius._baseCity = String(data.base_city);
       } catch (err) {
         console.error('[RKDelivery] shop_settings load failed, using defaults:', err);
       }
@@ -268,8 +270,8 @@
         </div>
         ${!info.available ? `
         <div class="dr-unavail-msg">
-          ❌ Sorry, aapka location hamari 8 km delivery range se bahar hai.
-          <br/>Abhi hum sirf Jaunpur aur aas-paas ke areas mein deliver karte hain.
+          ❌ Sorry, aapka location hamari ${TIERS.find(t => t.id === 'paid').maxKm} km delivery range se bahar hai.
+          <br/>${DeliveryRadius._baseCity ? `Abhi hum sirf ${DeliveryRadius._baseCity} aur aas-paas ke areas mein deliver karte hain.` : 'Abhi hum sirf apne delivery area mein deliver karte hain.'}
         </div>` : ''}
       </div>`;
     },

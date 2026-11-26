@@ -1,6 +1,6 @@
 /**
  * /api/razorpay-order — Razorpay Online Payment (server-side order creation)
- * Rinku Kirana & General Store
+ * RK Grocery Mart
  *
  * WHY server-side: Razorpay order creation needs RAZORPAY_KEY_SECRET which
  * must NEVER be exposed in browser code. This Vercel serverless function

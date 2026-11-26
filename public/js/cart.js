@@ -1,5 +1,5 @@
 /**
- * cart.js — Rinku Kirana
+ * cart.js — RK Grocery Mart
  * Guest (localStorage) + Logged-in (Supabase) + Merge on login
  *
  * BUG FIX (High #6): Cart merge race condition fixed.

@@ -1,6 +1,6 @@
 /**
  * /api/razorpay-verify — Razorpay payment signature verification (server-side)
- * Rinku Kirana & General Store
+ * RK Grocery Mart
  *
  * The client NEVER decides whether a payment succeeded — that would be
  * trivially forgeable. This function:

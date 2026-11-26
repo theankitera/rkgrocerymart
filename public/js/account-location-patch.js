@@ -1,6 +1,6 @@
 /**
  * account-location-patch.js
- * Rinku Kirana Store — Address Tab Location Integration
+ * RK Grocery Mart — Address Tab Location Integration
  *
  * Drop this script at the bottom of account.html (before </body>).
  * It patches the address form (showAddrForm) to include the
@@ -117,20 +117,17 @@
               if (line1Input && !line1Input.value.trim() && addr.line1) {
                 line1Input.value = addr.line1;
               }
-              if (cityInput && addr.city && (!cityInput.value.trim() || cityInput.value.trim() === 'Jaunpur')) {
+              if (cityInput && addr.city && !cityInput.value.trim()) {
                 cityInput.value = addr.city;
               }
-              if (pinInput && addr.pincode && (!pinInput.value.trim() || pinInput.value.trim() === '222001')) {
+              if (pinInput && addr.pincode && !pinInput.value.trim()) {
                 pinInput.value = addr.pincode;
               }
             }
           }
 
-          // Fallback: if reverse geocoding didn't run/produce a city, keep the
-          // previous behaviour of defaulting blank city to 'Jaunpur'.
-          if (cityInput && !cityInput.value.trim()) {
-            cityInput.value = 'Jaunpur';
-          }
+          // #29 fix: blank city ko koi hardcoded default nahi — user khud bharega
+          // (city Admin settings se aati hai, hardcoded 'Jaunpur' nahi).
 
           _setButtonState(btn, 'success');
 

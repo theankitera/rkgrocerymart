@@ -1,6 +1,6 @@
 /**
  * maps-utils.js
- * Rinku Kirana Store — Maps & Link Utilities
+ * RK Grocery Mart — Maps & Link Utilities
  * Generates Google Maps links, displays maps buttons, admin navigation helpers.
  */
 

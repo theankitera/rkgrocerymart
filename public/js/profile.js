@@ -1,5 +1,5 @@
 /**
- * profile.js — Rinku Kirana
+ * profile.js — RK Grocery Mart
  * User profile + saved addresses (Supabase)
  * ─────────────────────────────────────────────────────────────
  * Public API (window.RKProfile):

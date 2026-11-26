@@ -1,6 +1,6 @@
 /**
  * checkout-location.js
- * Rinku Kirana Store — Checkout Location Integration
+ * RK Grocery Mart — Checkout Location Integration
  *
  * Provides:
  *  - "Use Current Location" UI injection for checkout / address forms

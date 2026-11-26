@@ -257,7 +257,7 @@ export default function SignupPage() {
       <FeatureChips chips={[
         {icon:'🎁',label:'₹50 OFF pehli order'},
         {icon:'🚀',label:'Fast delivery'},
-        {icon:'💳',label:'UPI & COD'},
+        {icon:'💳',label:'Online payment + COD'},
         {icon:'🛡️',label:'100% safe'},
       ]}/>
     </AuthLayout>

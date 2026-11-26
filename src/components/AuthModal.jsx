@@ -167,7 +167,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
   }, [mode, emailSent]);
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center"
+    <div className="fixed inset-0 z-[1100] flex items-end sm:items-center justify-center"
       style={{ background: 'rgba(0,0,0,0.45)' }} role="dialog" aria-modal="true" aria-label={isLogin ? 'Login' : 'Signup'}
       onClick={onClose}>
       <div ref={scrollRef} className="w-full sm:max-w-sm max-h-[92vh] overflow-y-auto overscroll-contain rounded-t-2xl sm:rounded-2xl"
@@ -258,7 +258,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
               </div>
               <button type="submit" disabled={loading}
                 className="w-full text-white font-extrabold font-poppins rounded-2xl py-3 text-sm flex items-center justify-center gap-2"
-                style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}>
+                style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', color: 'var(--on-primary)' }}>
                 {loading ? <><Loader2 size={16} className="animate-spin" /> Ek second…</> : '🔑 Login Karo'}
               </button>
               <p className="text-center text-xs font-poppins" style={{ color: 'var(--gray)' }}>
@@ -277,7 +277,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
               </p>
               <button type="button" onClick={() => switchTo('login')}
                 className="mt-4 w-full text-white font-extrabold font-poppins rounded-2xl py-3 text-sm"
-                style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}>
+                style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', color: 'var(--on-primary)' }}>
                 🔑 Login Karo →
               </button>
             </div>
@@ -352,7 +352,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
               </label>
               <button type="submit" disabled={loading}
                 className="w-full text-white font-extrabold font-poppins rounded-2xl py-3 text-sm flex items-center justify-center gap-2"
-                style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}>
+                style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', color: 'var(--on-primary)' }}>
                 {loading ? <><Loader2 size={16} className="animate-spin" /> Ek second…</> : '🚀 Account Banao — Free!'}
               </button>
               <p className="text-center text-xs font-poppins" style={{ color: 'var(--gray)' }}>

@@ -26,7 +26,7 @@ function buildGalleryImages(product){
   return imgs;
 }
 
-export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wishlistIds,onWishlist,priceAlerts,onToggleAlert}){
+export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wishlistIds,onWishlist,priceAlerts,onToggleAlert,openLogin}){
   // BUG FIX: overview HAMESHA admin ke ⭐ DEFAULT image se start hoti hai —
   // buildGalleryImages default ko pehli position par rakhti hai (isliye selImg 0).
   // Example: 'लहसुन' ke 6 images hain, default sort position 3 par thi → pehle
@@ -149,18 +149,18 @@ export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wis
     inC
       ?<div className={`flex items-center rounded-xl overflow-hidden flex-shrink-0 ${full?'flex-1':''}`} style={{border:'2px solid var(--primary)'}}>
         <button aria-label="Quantity kam karein" onClick={()=>updQty(product.id,-1,null,lineKey)}
-          className="w-11 h-11 flex items-center justify-center text-white flex-shrink-0" style={{background:'var(--primary)'}}>
+          className="w-11 h-11 flex items-center justify-center text-white flex-shrink-0" style={{background:'var(--primary-dark)'}}>
           <Minus size={17}/>
         </button>
         <span className="flex-1 text-center font-extrabold font-poppins text-base" style={{color:'var(--dark)'}}>{inC.qty}</span>
         <button aria-label="Quantity badhayein" disabled={atMax} onClick={()=>!atMax&&updQty(product.id,1,stockQty,lineKey)}
-          className="w-11 h-11 flex items-center justify-center text-white flex-shrink-0 disabled:opacity-40" style={{background:'var(--primary)'}}>
+          className="w-11 h-11 flex items-center justify-center text-white flex-shrink-0 disabled:opacity-40" style={{background:'var(--primary-dark)'}}>
           <Plus size={17}/>
         </button>
       </div>
       :<button onClick={()=>addToCart(addPayload)}
         className={`font-bold font-poppins text-white rounded-xl px-6 py-3.5 flex items-center justify-center gap-2 ${full?'flex-1':''}`}
-        style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))'}}>
+        style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',color:'var(--on-primary)'}}>
         🛒 Cart Mein Add Karo
       </button>
   );
@@ -248,7 +248,7 @@ export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wis
                     <button key={i} disabled={uOos} onClick={()=>{setSelUnit(i);}}
                       className="rounded-xl px-3.5 py-2 text-left transition-all disabled:opacity-45"
                       style={active
-                        ?{background:'var(--primary)',color:'#fff',boxShadow:'0 4px 12px rgba(22,163,74,0.3)'}
+                        ?{background:'var(--primary-dark)',color:'#fff',boxShadow:'0 4px 12px rgba(22,163,74,0.3)'}
                         :{background:'var(--light)',color:'var(--dark)',border:'1.5px solid var(--border)'}}>
                       <div className="text-xs font-extrabold font-poppins">{u.label}</div>
                       <div className="text-[11px] font-bold font-poppins" style={{color:active?'rgba(255,255,255,0.9)':'var(--primary)'}}>
@@ -317,7 +317,7 @@ export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wis
               <div className="flex items-center gap-1 mb-2">
                 {[1,2,3,4,5].map(s=>(
                   <button key={s} type="button" onClick={()=>setRvRating(s)} aria-label={`${s} star`}
-                    className="transition-transform hover:scale-125 active:scale-90">
+                    className="p-1 transition-transform hover:scale-125 active:scale-90">
                     <Star size={20} style={{color:s<=rvRating?'#FFB800':'var(--border)',fill:s<=rvRating?'#FFB800':'transparent'}}/>
                   </button>
                 ))}
@@ -329,7 +329,7 @@ export function ProductDetail({product,cart,addToCart,updQty,onBack,onDetail,wis
                 style={{border:'1.5px solid var(--border)',background:'var(--card-bg)',color:'var(--dark)'}}/>
               <button onClick={submitReview} disabled={rvSending||rvComment.trim().length<3}
                 className="mt-2.5 text-white text-xs font-bold font-poppins rounded-xl px-4 py-2.5 disabled:opacity-50 transition-transform hover:scale-[1.02] active:scale-95"
-                style={{background:'linear-gradient(135deg,var(--primary),var(--primary-dark))'}}>
+                style={{background:'linear-gradient(135deg,var(--primary),var(--primary-dark))',color:'var(--on-primary)'}}>
                 {rvSending?'Bhej rahe hain…':'📨 Review Bhejein'}
               </button>
               <p className="text-[10px] font-poppins mt-1.5" style={{color:'var(--gray)'}}>

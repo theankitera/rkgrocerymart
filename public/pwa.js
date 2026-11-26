@@ -1,5 +1,5 @@
 /* ============================================
-   RINKU KIRANA — PWA.JS
+   RK GROCERY MART — PWA.JS
    Service worker registration, install prompt,
    iOS "Add to Home Screen" fallback, and the
    update-available banner. Include pwa.css +

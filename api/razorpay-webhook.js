@@ -1,6 +1,6 @@
 /**
  * /api/razorpay-webhook — Razorpay Webhook (server-to-server, idempotent)
- * Rinku Kirana & General Store
+ * RK Grocery Mart
  *
  * Ye endpoint tab bhi order confirm karta hai jab USER ka tab band ho jaye
  * payment ke turant baad (checkout handler kabhi call na kare) — yaani

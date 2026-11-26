@@ -162,7 +162,7 @@ export default function LoginPage() {
 
       <FeatureChips chips={[
         {icon:'🚀',label:'Fast delivery'},
-        {icon:'💳',label:'UPI & COD'},
+        {icon:'💳',label:'Online payment + COD'},
         {icon:'🛡️',label:'Secure login'},
         {icon:'📦',label:productCount ? `${productCount}+ products` : 'Fresh groceries'},
       ]}/>

@@ -1,6 +1,6 @@
 /**
  * push.js — Web Push subscription registration
- * Rinku Kirana & General Store
+ * RK Grocery Mart
  *
  * Service worker ke pass already `push` + `notificationclick` handlers hain —
  * bas koi subscription register nahi karta tha (isliye web push kabhi kaam

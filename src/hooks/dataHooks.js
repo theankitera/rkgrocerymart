@@ -37,7 +37,7 @@ export function useBanners(){
 }
 
 export function useProducts(options={}){
-  const {categoryId,featured,search,page=1,pageSize=24}=options;
+  const {categoryId,featured,search,page=1,pageSize=24,sort}=options;
   const [products,setProducts]=useState([]);
   const [loading,setLoading]=useState(true);
   const [total,setTotal]=useState(0);
@@ -51,13 +51,17 @@ export function useProducts(options={}){
     setLoading(true);
     let q=supabase.from('products')
       .select('*,categories(id,name,slug),product_images(id,image_url,is_default,sort_order)',{count:'exact'})
-      .eq('is_active',true).order('created_at',{ascending:false});
+      .eq('is_active',true);
+    // #9 fix: sort server par hota hai (poori list), sirf current page par nahi.
+    if(sort==='price-low') q=q.order('selling_price',{ascending:true});
+    else if(sort==='price-high') q=q.order('selling_price',{ascending:false});
+    else q=q.order('created_at',{ascending:false});
     if(categoryId&&categoryId!=='all') q=q.eq('category_id',categoryId);
     if(featured) q=q.eq('is_featured',true);
     if(search&&search.trim().length>1)
       // BUG FIX: double-quote wrap (PostgREST) — parentheses wale naam (e.g. "Adrak (Ginger)")
       // pehle or() parser ko tod dete the → product search me nahi aata tha.
-      q=q.or(`name.ilike."%${search.trim()}%",description.ilike."%${search.trim()}%"`);
+      q=q.or(`name.ilike."%${search.trim()}%",description.ilike."%${search.trim()}%",categories.name.ilike."%${search.trim()}%"`);
     const from=(page-1)*pageSize;
     q=q.range(from,from+pageSize-1);
     const {data,count}=await q;
@@ -72,7 +76,7 @@ export function useProducts(options={}){
       primary_image:(()=>{const imgs=(p.product_images||[]).slice().sort((a,b)=>a.sort_order-b.sort_order);return(imgs.find(i=>i.is_default)||imgs[0])?.image_url||null;})(),
     }));
     setProducts(enriched);setTotal(count||0);setLoading(false);
-  },[categoryId,featured,search,page,pageSize]);
+  },[categoryId,featured,search,page,pageSize,sort]);
   useEffect(()=>{
     fetch();
    const ch=supabase.channel(`prods-rt-${instanceId}`)
@@ -95,6 +99,9 @@ const SHOP_SETTINGS_DEFAULTS = {
   whatsapp: '',
   delivery_radius: 8,
   delivery_charge: 30,
+  min_order: 499,
+  base_city: '',
+  base_pincode: '',
   open_time: '08:00',
   close_time: '21:00',
   logo_url: '',
@@ -129,6 +136,9 @@ export function useShopSettings(){
         whatsapp:data.whatsapp||'',
         delivery_radius:data.delivery_radius??SHOP_SETTINGS_DEFAULTS.delivery_radius,
         delivery_charge:data.delivery_charge??SHOP_SETTINGS_DEFAULTS.delivery_charge,
+        min_order:data.min_order??SHOP_SETTINGS_DEFAULTS.min_order,
+        base_city:data.base_city||'',
+        base_pincode:data.base_pincode||'',
         open_time:data.open_time||SHOP_SETTINGS_DEFAULTS.open_time,
         close_time:data.close_time||SHOP_SETTINGS_DEFAULTS.close_time,
         logo_url:data.logo_url||'',
@@ -351,7 +361,7 @@ export function useSearch(query,active){
         .select('*,categories(name),product_images(id,image_url,is_default,sort_order)')
         .eq('is_active',true)
         // BUG FIX: double-quote wrap (PostgREST) — parentheses wale naam sahi search ho sakein
-        .or(`name.ilike."%${query.trim()}%",description.ilike."%${query.trim()}%"`)
+        .or(`name.ilike."%${query.trim()}%",description.ilike."%${query.trim()}%",categories.name.ilike."%${query.trim()}%"`)
         .limit(40);
       setResults((data||[]).map(p=>({
         ...p,

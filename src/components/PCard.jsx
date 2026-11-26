@@ -79,14 +79,14 @@ export function PCard({p,cart,addToCart,updQty,onDetail,wishlistIds,onWishlist})
           {!oos&&(!inC
             ?<button onClick={e=>{e.stopPropagation();addToCart(addPayload);}}
               aria-label={`${p.name} cart mein add karein`}
-              className="flex-shrink-0 text-[10px] font-bold font-poppins px-3 py-2 rounded-lg text-white transition-transform active:scale-95"
-              style={{background:'var(--primary)'}}>ADD</button>
+              className="flex-shrink-0 text-[11px] font-bold font-poppins px-4 py-2.5 rounded-lg text-white transition-transform active:scale-95"
+              style={{background:'var(--primary-dark)',minHeight:36}}>ADD</button>
             :<div className="flex-shrink-0 flex items-center gap-1.5 rounded-lg px-1.5 py-1" style={{background:'var(--primary-light)'}} onClick={e=>e.stopPropagation()}>
               <button aria-label="Quantity kam karein" onClick={()=>updQty(p.id,-1,null,lineKey)}
-                className="w-5 h-5 flex items-center justify-center font-bold text-sm" style={{color:'var(--primary-dark)'}}>−</button>
+                className="w-8 h-8 flex items-center justify-center font-bold text-sm" style={{color:'var(--primary-dark)'}}>−</button>
               <span className="text-xs font-bold font-poppins w-3 text-center" style={{color:'var(--primary-dark)'}}>{inC.qty}</span>
               <button aria-label="Quantity badhayein" disabled={atMax} onClick={()=>!atMax&&updQty(p.id,1,displayStock,lineKey)}
-                className="w-5 h-5 flex items-center justify-center font-bold text-sm disabled:opacity-40" style={{color:'var(--primary-dark)'}}>+</button>
+                className="w-8 h-8 flex items-center justify-center font-bold text-sm disabled:opacity-40" style={{color:'var(--primary-dark)'}}>+</button>
             </div>
           )}
         </div>

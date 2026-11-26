@@ -1,5 +1,5 @@
 /* ============================================
-   RINKU KIRANA — AUTH.JS
+   RK GROCERY MART — AUTH.JS
    Supabase Auth Logic (Shared) — Safe Singleton
 
    BUG FIX (Critical #1): Supabase keys ab hardcoded nahi hain.

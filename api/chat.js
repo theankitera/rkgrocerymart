@@ -1,6 +1,6 @@
 /*!
  * /api/chat — Ananya AI backend
- * Rinku Kirana & General Store
+ * RK Grocery Mart
  *
  * BUG FIX (Medium #9): In-memory rate limiter limitation documented clearly.
  * Vercel par har serverless invocation alag instance mein chal sakta hai.

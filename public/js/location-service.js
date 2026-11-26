@@ -1,6 +1,6 @@
 /**
  * location-service.js
- * Rinku Kirana Store — Smart Delivery System
+ * RK Grocery Mart — Smart Delivery System
  * Handles GPS permission, coordinate retrieval, caching and fallback.
  */
 

@@ -1,6 +1,6 @@
 /**
  * /api/razorpay-failed — Razorpay payment FAILED / modal CANCELLED (server-side)
- * Rinku Kirana & General Store
+ * RK Grocery Mart
  *
  * User jab Razorpay modal cancel karta hai ya payment fail hoti hai, to client
  * ye endpoint call karta hai. Server fail_order_payment() RPC call karta hai jo:

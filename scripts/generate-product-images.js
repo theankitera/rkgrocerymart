@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*!
- * Bulk AI Product Image Generator — Rinku Kirana & General Store
+ * Bulk AI Product Image Generator — RK Grocery Mart
  * ---------------------------------------------------------------
  * Ye script poora flow automate karti hai:
  *   1. Supabase se saare active products padhti hai (category ke saath)

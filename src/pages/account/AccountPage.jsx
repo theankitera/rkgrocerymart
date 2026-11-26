@@ -182,7 +182,7 @@ function OrderRow({ o, onClick, onReorder }) {
       <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background:'var(--light)', border:'1.5px solid var(--border)'}}>🛒</div>
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-extrabold font-poppins" style={{color:'var(--dark)'}}>{o.order_number}</div>
-        <div className="text-[11px] font-poppins mt-0.5" style={{color:'var(--muted)'}}>{o.delivery_name||''} • {o.delivery_city||'Jaunpur'}</div>
+        <div className="text-[11px] font-poppins mt-0.5" style={{color:'var(--muted)'}}>{o.delivery_name||''}{o.delivery_city?` • ${o.delivery_city}`:''}</div>
         <div className="text-[10px] font-poppins mt-0.5" style={{color:'var(--muted)'}}>{fmtTime(o.created_at)}</div>
       </div>
       <div className="text-right flex-shrink-0">
@@ -386,11 +386,11 @@ function AddressesTab({ state, setState, showToast }) {
           <div className="grid grid-cols-2 gap-2.5 mb-3">
             <div>
               <label className={labelCls} style={{color:'var(--gray)'}}>City *</label>
-              <input className={inputCls} style={inputStyle} value={f.city||'Jaunpur'} onChange={e=>upd({city:e.target.value})}/>
+              <input className={inputCls} style={inputStyle} value={f.city||''} onChange={e=>upd({city:e.target.value})}/>
             </div>
             <div>
               <label className={labelCls} style={{color:'var(--gray)'}}>Pincode *</label>
-              <input className={inputCls} style={inputStyle} placeholder="222001" type="tel" value={f.pincode||''} onChange={e=>upd({pincode:e.target.value})}/>
+              <input className={inputCls} style={inputStyle} placeholder="6-digit pincode" type="tel" value={f.pincode||''} onChange={e=>upd({pincode:e.target.value})}/>
             </div>
           </div>
           <div className="flex items-center gap-2.5 mb-4">
@@ -852,7 +852,7 @@ function SettingsTab({ switchTab, user, showToast }) {
     {icon:'📍',bg:'var(--tint-purple-bg)',label:'Manage Addresses',  sub:'Delivery addresses',             fn:()=>switchTab('addresses')},
     {icon:'⭐',bg:'var(--tint-yellow-bg)',label:'Rewards & Referral',sub:'Points aur cashback',            fn:()=>switchTab('rewards')},
     {icon:'📦',bg:'var(--tint-green-bg)',label:'Order History',     sub:'Purane orders dekhein',          fn:()=>switchTab('orders')},
-    {icon:'💬',bg:'var(--tint-green-bg)',label:'Help & Support',    sub:'Ananya AI — 24x7 assistant',      fn:()=>window.location.href='support.html'},
+    {icon:'💬',bg:'var(--tint-green-bg)',label:'Help & Support',    sub:'Ananya AI — subah 8 se raat 9',      fn:()=>window.location.href='support.html'},
     {icon:'📱',bg:'var(--tint-neutral-bg)',label:'App Version',       sub:'v1.0.0 • RK Grocery Mart',        fn:null},
   ];
 

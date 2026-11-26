@@ -1,5 +1,5 @@
 /* ============================================
-   RINKU KIRANA — SERVICE WORKER
+   RK GROCERY MART — SERVICE WORKER
 
    BUG FIX (Info #13): CACHE_VERSION ab auto-bump ke liye ready hai.
    Build step ya Vercel deployment script se ye value inject kar sakte ho.
@@ -30,7 +30,7 @@ importScripts("/js/sync-queue.js");
 
 // BUG FIX (Info #13): Version string ab comments mein clearly marked hai.
 // Har deploy par yahan ka number badhao agar OPTION C use kar rahe ho.
-const CACHE_VERSION = "v1792699081269"; // ← 2026-08-13: fixes bundle (auth.css precache fix, offline page cleanup, etc.)
+const CACHE_VERSION = "v1795666197641"; // ← 2026-08-13: fixes bundle (auth.css precache fix, offline page cleanup, etc.)
 const CACHE_NAME = `rk-cache-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline.html";
 

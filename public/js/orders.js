@@ -1,5 +1,5 @@
 /**
- * orders.js — Rinku Kirana
+ * orders.js — RK Grocery Mart
  * Order creation, history, details, reorder (Supabase)
  *
  * BUG FIXES in this version:
@@ -180,7 +180,7 @@
   }
 
   /**
-   * createOrder — REAL order (COD / UPI-QR verification flow).
+   * createOrder — REAL order (COD / Razorpay).
    * (Razorpay flow ke liye createDraft() use hota hai — neeche.)
    * SECURITY (audit follow-up, 2026-08-09): ab order SIRF create_order() RPC se
    * banta hai — server-side DB selling_price se subtotal recompute hota hai aur

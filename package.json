@@ -1,8 +1,8 @@
 {
-  "name": "rinku-kirana-store",
+  "name": "rk-grocery-mart",
   "version": "1.0.0",
   "private": true,
-  "description": "Rinku Kirana & General Store — Vite MPA frontend + Ananya AI serverless backend",
+  "description": "RK Grocery Mart — Vite MPA frontend + Ananya AI serverless backend",
   "engines": {
     "node": ">=18"
   },
@@ -16,7 +16,6 @@
     "@supabase/supabase-js": "^2.108.2",
     "lucide-react": "^0.400.0",
     "nodemailer": "^9.0.5",
-    "qrcode": "^1.5.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "web-push": "^3.6.7"
