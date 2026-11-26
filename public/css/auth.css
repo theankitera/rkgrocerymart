@@ -13,10 +13,10 @@
 }
 
 :root {
-  --primary: #16A34A;
-  --primary-dark: #15803D;
-  --primary-light: #E8F5E9;
-  --primary-mid: #16A34A;
+  --primary: #D32F2F;
+  --primary-dark: #B71C1C;
+  --primary-light: #FDECEA;
+  --primary-mid: #D32F2F;
   --orange: #FF9933;
   --yellow: #FFB800;
   --red: #E63946;
@@ -29,7 +29,7 @@
   --glass-bg: rgba(255,255,255,0.92);
   --glass-border: rgba(255,255,255,0.6);
   --shadow-card: 0 20px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
-  --shadow-btn: 0 8px 24px rgba(22,163,74,0.4);
+  --shadow-btn: 0 8px 24px rgba(211,47,47,0.4);
   --radius: 20px;
   --radius-sm: 12px;
   --radius-xs: 8px;
@@ -59,7 +59,7 @@ body {
   content: '';
   position: absolute;
   width: 700px; height: 700px;
-  background: radial-gradient(circle, rgba(22,163,74,0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(211,47,47,0.25) 0%, transparent 70%);
   top: -200px; left: -200px;
   animation: orbFloat1 12s ease-in-out infinite;
 }
@@ -152,7 +152,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
-  box-shadow: 0 4px 16px rgba(22,163,74,0.4);
+  box-shadow: 0 4px 16px rgba(211,47,47,0.4);
 }
 
 .brand-name {
@@ -251,7 +251,7 @@ body {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--orange), var(--yellow), var(--primary));
+  background: linear-gradient(90deg, var(--primary), var(--yellow), #1A365D, var(--primary));
   background-size: 300%;
   animation: shimmerBar 4s linear infinite;
 }
@@ -270,14 +270,14 @@ body {
 .head-icon {
   width: 60px; height: 60px;
   border-radius: 18px;
-  background: linear-gradient(135deg, var(--primary-light), #C8F0DF);
+  background: linear-gradient(135deg, var(--primary-light), #FCD9D9);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
   margin: 0 auto 14px;
-  border: 2px solid rgba(22,163,74,0.2);
-  box-shadow: 0 4px 16px rgba(22,163,74,0.15);
+  border: 2px solid rgba(211,47,47,0.2);
+  box-shadow: 0 4px 16px rgba(211,47,47,0.15);
 }
 
 .card-title {
@@ -348,7 +348,7 @@ body {
 .field-input:focus {
   background: #fff;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(22,163,74,0.12);
+  box-shadow: 0 0 0 3px rgba(211,47,47,0.12);
 }
 
 .field-input.error {
@@ -526,7 +526,7 @@ body {
 }
 
 .submit-btn:hover:not(:disabled)::after { opacity: 1; }
-.submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(22,163,74,0.5); }
+.submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(211,47,47,0.5); }
 .submit-btn:active:not(:disabled) { transform: translateY(0); }
 .submit-btn:disabled { opacity: 0.75; cursor: not-allowed; }
 
@@ -565,7 +565,7 @@ body {
 .msg-box.success {
   background: #F0FDF4;
   border: 1.5px solid #BBF7D0;
-  color: #15803D;
+  color: #B71C1C;
 }
 
 .msg-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
@@ -655,7 +655,7 @@ body {
   align-items: center;
   gap: 8px;
   background: var(--primary-light);
-  border: 1.5px solid rgba(22,163,74,0.3);
+  border: 1.5px solid rgba(211,47,47,0.3);
   border-radius: 50px;
   padding: 8px 18px;
   font-size: 0.78rem;
@@ -687,8 +687,8 @@ body {
 
 /* ── INFO STRIP ───────────────────────────────── */
 .info-strip {
-  background: linear-gradient(135deg, rgba(22,163,74,0.08), rgba(14,168,106,0.05));
-  border: 1.5px solid rgba(22,163,74,0.2);
+  background: linear-gradient(135deg, rgba(211,47,47,0.08), rgba(229,57,53,0.05));
+  border: 1.5px solid rgba(211,47,47,0.2);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   display: flex;

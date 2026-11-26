@@ -684,17 +684,17 @@ function RewardsTab({ state, showToast }) {
         </div>
       )}
 
-      <div className="rounded-2xl p-4 md:p-5 mb-3.5" style={{background:'linear-gradient(135deg,var(--tint-orange-bg),var(--tint-orange-border))', border:'1.5px solid var(--tint-orange-border)'}}>
-        <div className="text-[13px] font-extrabold font-poppins" style={{color:'var(--tint-orange-text)'}}>🎁 Dost ko refer karo, dono ko ₹30 cashback!</div>
-        <div className="rounded-xl px-3.5 py-2.5 flex items-center justify-between my-3" style={{background:'var(--card-bg)',border:'1.5px dashed var(--tint-orange-border)'}}>
+      <div className="rounded-2xl p-4 md:p-5 mb-3.5" style={{background:'linear-gradient(135deg,var(--tint-red-bg),var(--tint-red-border))', border:'1.5px solid var(--tint-red-border)'}}>
+        <div className="text-[13px] font-extrabold font-poppins" style={{color:'var(--tint-red-text)'}}>🎁 Dost ko refer karo, dono ko ₹30 cashback!</div>
+        <div className="rounded-xl px-3.5 py-2.5 flex items-center justify-between my-3" style={{background:'var(--card-bg)',border:'1.5px dashed var(--tint-red-border)'}}>
           <span className="text-lg font-black font-poppins" style={{color:'var(--dark)', letterSpacing:'3px'}}>{refCode}</span>
-          <button onClick={copy} className="text-white text-[11px] font-bold font-poppins rounded-md px-3 py-1.5 flex items-center gap-1" style={{background:'var(--orange)'}}><Copy size={12}/> Copy</button>
+          <button onClick={copy} className="text-white text-[11px] font-bold font-poppins rounded-md px-3 py-1.5 flex items-center gap-1" style={{background:'var(--primary)'}}><Copy size={12}/> Copy</button>
         </div>
-        <div className="text-[11px] font-poppins mb-1" style={{color:'var(--tint-orange-text)'}}>
+        <div className="text-[11px] font-poppins mb-1" style={{color:'var(--tint-red-text)'}}>
           {referredCount>0 ? `🎉 ${referredCount} dost refer kiye — pehla order confirm hote hi ₹30 milega` : 'Abhi tak koi dost refer nahi hua — link share karo!'}
         </div>
-        <div className="text-[11px] font-poppins mb-2.5" style={{color:'var(--tint-orange-text)'}}>Dost signup karte waqt ye code daalein • dono ko pehla order confirm hone par ₹30 (300 pts)</div>
-        <button onClick={share} className="w-full text-white rounded-xl py-3 font-extrabold font-poppins text-sm flex items-center justify-center gap-1.5" style={{background:'linear-gradient(135deg,#EA580C,#DC2626)'}}><Share2 size={15}/> WhatsApp Par Share Karo</button>
+        <div className="text-[11px] font-poppins mb-2.5" style={{color:'var(--tint-red-text)'}}>Dost signup karte waqt ye code daalein • dono ko pehla order confirm hone par ₹30 (300 pts)</div>
+        <button onClick={share} className="w-full text-white rounded-xl py-3 font-extrabold font-poppins text-sm flex items-center justify-center gap-1.5" style={{background:'linear-gradient(135deg,#D32F2F,#B71C1C)'}}><Share2 size={15}/> WhatsApp Par Share Karo</button>
       </div>
 
       <Card title="Points Kaise Milenge?" icon="ℹ️">

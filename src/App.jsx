@@ -169,10 +169,10 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
         }
       </div>
       {banners.length>1&&(
-        <div className="absolute bottom-3 right-4 flex gap-1.5">
+        <div className="absolute bottom-3 right-4 flex gap-1">
           {banners.map((_,i)=>(
             <button key={i} aria-label={`Banner ${i+1} dikhayein`} onClick={()=>setBannerIdx(i)}
-              className="p-2 flex items-center justify-center bg-transparent">
+              className="p-1 flex items-center justify-center bg-transparent">
               <span className={`block h-1.5 rounded-full transition-all ${i===bannerIdx?'w-5 bg-white':'w-1.5 bg-white/50'}`}/>
             </button>
           ))}
