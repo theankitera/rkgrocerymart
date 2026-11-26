@@ -356,6 +356,44 @@ export function useAdStrips(){
   return{strips,loading,refetch:fetch};
 }
 
+// ── Search normalisation (Roman-Hindi spelling variants) ──────────────
+// "aalu" likhne par "Aloo" milna chahiye: server-side ilike exact substring
+// maangta hai, isliye "aalu" → 0 results aata tha. Dono taraf (query aur
+// product naam) ko ek hi canonical form mein badlo: lambe vowels chhote
+// (aa→a, ee→i, oo→u), double letters single. "aalu" aur "aloo" dono "alu"
+// ban jate hain; "pyaaz"/"pyaz" dono "pyaz"; "ghee"/"ghi" dono "ghi".
+export const normalizeSearchText=t=>String(t||'').toLowerCase()
+  .replace(/aa/g,'a').replace(/ee/g,'i').replace(/oo/g,'u')
+  .replace(/(.)\1+/g,'$1')
+  .replace(/[^a-z0-9]+/g,' ').trim();
+
+function enrichSearchProduct(p){
+  return{
+    ...p,
+    discount:calcDiscount(p.selling_price,p.original_price),
+    images:(p.product_images||[]).slice().sort((a,b)=>a.sort_order-b.sort_order),
+    // primary_image = admin ka ⭐ DEFAULT image (is_default) — fallback imgs[0].
+    primary_image:(()=>{const imgs=(p.product_images||[]).slice().sort((a,b)=>a.sort_order-b.sort_order);return(imgs.find(i=>i.is_default)||imgs[0])?.image_url||null;})(),
+  };
+}
+
+// Poori active catalogue ek baar fetch karke cache karo (page-load tak).
+// ~153 products — ek query, har keystroke par server call nahi. Admin se
+// naya product aane par page reload ke baad search mein dikhega.
+let searchIndexCache=null;
+let searchIndexPromise=null;
+function getSearchIndex(){
+  if(searchIndexCache) return Promise.resolve(searchIndexCache);
+  if(!searchIndexPromise){
+    searchIndexPromise=supabase.from('products')
+      .select('*,categories(name),product_images(id,image_url,is_default,sort_order)')
+      .eq('is_active',true).order('created_at',{ascending:false}).limit(500)
+      .then(({data})=>{searchIndexCache=(data||[]).map(p=>({...enrichSearchProduct(p),_hay:normalizeSearchText(`${p.name||''} ${p.description||''} ${p.categories?.name||''}`)}));return searchIndexCache;})
+      .catch(()=>{searchIndexPromise=null;return[];});
+  }
+  return searchIndexPromise;
+}
+
 export function useSearch(query,active){
   const [results,setResults]=useState([]);
   const [loading,setLoading]=useState(false);
@@ -367,19 +405,12 @@ export function useSearch(query,active){
     clearTimeout(timer.current);
     timer.current=setTimeout(async()=>{
       setLoading(true);
-      const {data}=await supabase.from('products')
-        .select('*,categories(name),product_images(id,image_url,is_default,sort_order)')
-        .eq('is_active',true)
-        // BUG FIX: double-quote wrap (PostgREST) — parentheses wale naam sahi search ho sakein
-        .or(`name.ilike."%${sanitizeSearch(query)}%",description.ilike."%${sanitizeSearch(query)}%",categories.name.ilike."%${sanitizeSearch(query)}%"`)
-        .limit(40);
-      setResults((data||[]).map(p=>({
-        ...p,
-        discount:calcDiscount(p.selling_price,p.original_price),
-        images:(p.product_images||[]).slice().sort((a,b)=>a.sort_order-b.sort_order),
-        // primary_image = admin ka ⭐ DEFAULT image (is_default) — fallback imgs[0].
-        primary_image:(()=>{const imgs=(p.product_images||[]).slice().sort((a,b)=>a.sort_order-b.sort_order);return(imgs.find(i=>i.is_default)||imgs[0])?.image_url||null;})(),
-      })));
+      const words=normalizeSearchText(query).split(' ').filter(Boolean);
+      const index=await getSearchIndex();
+      // Har query-word haystack mein substring hona chahiye ("lal aloo" →
+      // "Lal Aloo" milega, "Haldiram Aloo Bhujia" bhi; "aalu" → "Aloo" milega).
+      const hits=index.filter(p=>words.every(w=>p._hay.includes(w))).slice(0,40);
+      setResults(hits.map(({_hay,...p})=>p));
       setLoading(false);
     },350);
     return()=>clearTimeout(timer.current);
