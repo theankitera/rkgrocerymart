@@ -875,7 +875,7 @@ function SettingsTab({ switchTab, user, showToast }) {
     {icon:'📍',bg:'var(--tint-purple-bg)',label:'Manage Addresses',  sub:'Delivery addresses',             fn:()=>switchTab('addresses')},
     {icon:'⭐',bg:'var(--tint-yellow-bg)',label:'Rewards & Referral',sub:'Points aur cashback',            fn:()=>switchTab('rewards')},
     {icon:'📦',bg:'var(--tint-green-bg)',label:'Order History',     sub:'Purane orders dekhein',          fn:()=>switchTab('orders')},
-    {icon:'💬',bg:'var(--tint-green-bg)',label:'Help & Support',    sub:'Ananya AI — subah 8 se raat 9',      fn:()=>window.location.href='support.html'},
+    {icon:'💬',bg:'var(--tint-green-bg)',label:'Help & Support',    sub: shopSettings.open_time?`Ananya AI — roz ${String(shopSettings.open_time).slice(0,5)}–${String(shopSettings.close_time||'').slice(0,5)}`:'Ananya AI — Help & Support',      fn:()=>window.location.href='support.html'},
     {icon:'📱',bg:'var(--tint-neutral-bg)',label:'App Version',       sub:'v1.0.0 • RK Grocery Mart',        fn:null},
   ];
 

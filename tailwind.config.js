@@ -33,23 +33,22 @@ export default {
 
   theme: {
     extend: {
-      // Design tokens — mapped from rk-grocery-website (the new UI/UX
-      // reference) onto this project's ACTUAL existing CSS variables
-      // (see index.html <style>, public/css/auth.css, account.css,
-      // ananya-ai.css — all updated in Module 1 to use these same values).
-      // Using Tailwind classes like bg-green-600 or the CSS var
-      // var(--primary) will now produce the identical color either way.
+      // Design tokens — brand palette (red + dark pink). NOTE: purane
+      // hare/narangi token naam (green/saffron) ab bhi maujood hain taaki
+      // purani classes tootein nahi, lekin unke VALUES laal palette se
+      // map hain — koi bhi `bg-green-600` ya `bg-saffron-500` class ab
+      // hara/narangi nahi, brand red/pink banayegi.
       colors: {
         green: {
-          50: '#E8F5E9',   // == var(--primary-light)
-          100: '#C8E6C9',
-          500: '#22C55E',
-          600: '#16A34A',  // == var(--primary)
-          700: '#15803D',  // == var(--primary-dark)
+          50: '#FDECEA',   // == var(--primary-light)
+          100: '#FADBD8',
+          500: '#D32F2F',  // == var(--primary)
+          600: '#B71C1C',  // == var(--primary-dark)
+          700: '#7F1D1D',
         },
         saffron: {
-          500: '#FF9933',  // == var(--orange) (accent)
-          600: '#E64A19',
+          500: '#C2185B',  // == var(--orange) — dark pink accent
+          600: '#AD1457',
         },
         cream: '#FFFBF5',
         charcoal: '#1A1A1A',

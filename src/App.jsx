@@ -972,13 +972,13 @@ function AboutBody({s,pc}){
       ]}/>
 
       <ICall title="Talk To Us" icon={MessageCircle}>
-        Any question, feedback or suggestion? Our team would love to hear from you. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · or chat with Ananya AI directly on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Help &amp; Support</a> page.
+        Any question, feedback or suggestion? Our team would love to hear from you. {s?.contact?<>📞 <strong>+91 {String(s.contact).replace(/(\d{5})(\d{5})/,'$1 $2')}</strong> · </>:null}📧 <strong>support@rkgrocerymart.com</strong> · or chat with Ananya AI directly on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Help &amp; Support</a> page.
       </ICall>
     </div>
   );
 }
 
-function PrivacyBody(){
+function PrivacyBody({s}){
   return(
     <div>
       <IP><strong style={{color:'var(--dark)'}}>RK Grocery Mart</strong> ("we", "our") takes your privacy seriously. This Privacy Policy explains what information we collect when you use our site or app, how we use it, and how we protect it. This policy applies to every visitor, customer and vendor.</IP>
@@ -1038,13 +1038,13 @@ function PrivacyBody(){
       <IP>We may update this policy from time to time. For significant changes, we will notify you through a prominent notice on the site or by SMS. Continuing to use the service means you accept the updated policy.</IP>
 
       <ICall title="Questions About Your Privacy" icon={Mail}>
-        Need access, correction or deletion of your data? 📧 Email us at <strong>support@rkgrocerymart.com</strong> or call 📞 <strong>+91 63931 96765</strong>. We will respond to your request within 7 working days.
+        Need access, correction or deletion of your data? 📧 Email us at <strong>support@rkgrocerymart.com</strong>{s?.contact?<> or call 📞 <strong>+91 {String(s.contact).replace(/(\d{5})(\d{5})/,'$1 $2')}</strong></>:null}. We will respond to your request within 7 working days.
       </ICall>
     </div>
   );
 }
 
-function TermsBody(){
+function TermsBody({s}){
   return(
     <div>
       <IP>These Terms &amp; Conditions ("Terms") govern your use of the <strong style={{color:'var(--dark)'}}>RK Grocery Mart</strong> website, app and services. By using the site or placing an order, you agree to these Terms. If you do not agree, please do not use the site or service.</IP>
@@ -1127,7 +1127,7 @@ function TermsBody(){
       <IP>We may update these Terms at any time. New changes take effect as soon as they are published on the site. You can always check the latest version by looking at the "Last updated" date. Continued use means acceptance of the updated Terms.</IP>
 
       <ICall title="Questions About These Terms?" icon={HelpCircle}>
-        If you have any question, ask us before placing your order — we will be happy to explain. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · or on our <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Help &amp; Support</a> page.
+        If you have any question, ask us before placing your order — we will be happy to explain. {s?.contact?<>📞 <strong>+91 {String(s.contact).replace(/(\d{5})(\d{5})/,'$1 $2')}</strong> · </>:null}📧 <strong>support@rkgrocerymart.com</strong> · or on our <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Help &amp; Support</a> page.
       </ICall>
     </div>
   );
@@ -1207,7 +1207,7 @@ function ShippingBody({s}){
       ]}/>
 
       <ICall title="Need Help With A Delivery?" icon={Truck}>
-        Order status, address change — anything. 📞 <strong>+91 63931 96765</strong> · 📧 <strong>support@rkgrocerymart.com</strong> · or ask anything (subah 8 se raat 9) on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Ananya AI chat</a>.
+        Order status, address change — anything. {s?.contact?<>📞 <strong>+91 {String(s.contact).replace(/(\d{5})(\d{5})/,'$1 $2')}</strong> · </>:null}📧 <strong>support@rkgrocerymart.com</strong> · or ask anything (subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9}) on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Ananya AI chat</a>.
       </ICall>
     </div>
   );
@@ -1971,12 +1971,12 @@ export default function App(){
         </InfoPage>}
         {page==='privacy'&&<InfoPage title="Privacy Policy" activeKey="privacy" onNav={setPage}
           subtitle="Your information is our responsibility — what we collect, how we use it and how we protect it."
-          body={shopSettings.privacy_policy} fallback={<PrivacyBody/>}>
+          body={shopSettings.privacy_policy} fallback={<PrivacyBody s={shopSettings}/>}>
           <div className="mt-6 md:mt-8"><Footer shopSettings={shopSettings} onNav={setPage}/></div>
         </InfoPage>}
         {page==='terms'&&<InfoPage title="Terms & Conditions" activeKey="terms" onNav={setPage}
           subtitle="Orders, payments, delivery and returns — all the rules for shopping with RK Grocery Mart."
-          body={shopSettings.terms_text} fallback={<TermsBody/>}>
+          body={shopSettings.terms_text} fallback={<TermsBody s={shopSettings}/>}>
           <div className="mt-6 md:mt-8"><Footer shopSettings={shopSettings} onNav={setPage}/></div>
         </InfoPage>}
         {page==='shipping'&&<InfoPage title="Delivery & Shipping" activeKey="shipping" onNav={setPage}

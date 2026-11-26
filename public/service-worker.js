@@ -30,7 +30,7 @@ importScripts("/js/sync-queue.js");
 
 // BUG FIX (Info #13): Version string ab comments mein clearly marked hai.
 // Har deploy par yahan ka number badhao agar OPTION C use kar rahe ho.
-const CACHE_VERSION = "v1795703977617"; // ← 2026-08-13: fixes bundle (auth.css precache fix, offline page cleanup, etc.)
+const CACHE_VERSION = "v1795704196163"; // ← 2026-08-13: fixes bundle (auth.css precache fix, offline page cleanup, etc.)
 const CACHE_NAME = `rk-cache-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline.html";
 
@@ -93,6 +93,7 @@ self.addEventListener("fetch", (event) => {
   // Supabase calls aur non-GET kabhi intercept nahi karo
   if (
     req.method !== "GET" ||
+    url.pathname.startsWith("/api/") ||
     url.hostname.endsWith("supabase.co") ||
     url.hostname.endsWith("supabase.in")
   ) {
@@ -107,8 +108,12 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          // Sirf HTTP 200 navigation hi cache karo — 404/500 error page
+          // cache ho gaya to user ko baar-baar wahi dikhega.
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          }
           return res;
         })
         .catch(() =>

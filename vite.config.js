@@ -91,6 +91,12 @@ export default defineConfig({
   plugins: [react(), apiFunctionsPlugin()],
   build: {
     rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
       input: {
         main: resolve(__dirname, 'index.html'),
         account: resolve(__dirname, 'account.html'),

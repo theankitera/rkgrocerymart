@@ -15,15 +15,15 @@
     supabaseKey:    'sb_publishable_u5a41INjYZJ81r7QGCiLaQ_B3PxsTm9',
 
     storeInfo: {
-      timings:   'Monday–Saturday: 8 AM – 9 PM | Sunday: 9 AM – 7 PM',
+      timings:   'Roz: subah 5:30 – dopahar 12:00 (5:30 AM – 12:00 PM)',
       phone:     '+91 63931 96765',
       whatsapp:  '6393196765',
       address:   'RK Grocery Mart, Uttar Pradesh, India',
       email:     'support@rkgrocerymart.com',
-      delivery:  '5 km ke andar same-day delivery hoti hai',
-      minOrder:  '₹200 minimum order delivery ke liye',
-      freeDeliv: '₹200 se upar FREE delivery',
-      payment:   'Cash, UPI (GPay, PhonePe, Paytm), Debit/Credit Cards',
+      delivery:  '8 km ke andar same-day delivery hoti hai (0–5 km FREE, 5–8 km ₹30)',
+      minOrder:  '₹499 minimum order delivery ke liye',
+      freeDeliv: '0–5 km FREE delivery, 5–8 km ₹30',
+      payment:   'Cash on Delivery ya Online Payment via Razorpay (UPI, cards, net banking uske andar)',
       returns:   'Fresh items: 24 ghante | Packaged: 7 din',
       firstOffer:'First order par 10% OFF — code: WELCOME10',
       appOffer:  'App install karo aur weekly special offers paao!',
@@ -31,11 +31,11 @@
 
     faqs: [
       { q: 'Store timings kya hain?',
-        a: '🕐 Hamare store ke timings:\nMonday–Saturday: 8 AM – 9 PM\nSunday: 9 AM – 7 PM\n\nOnline order 24/7 place kar sakte hain! 😊' },
+        a: '🕐 Hamare store ke timings:\nRoz: subah 5:30 – dopahar 12:00 (5:30 AM – 12:00 PM)\n\nOnline order kabhi bhi place kar sakte hain — delivery subah 5:30 se dopahar 12 ke beech hoti hai! 😊' },
       { q: 'Delivery kitni door tak hoti hai?',
-        a: '🚚 Hum 5 km ke andar same-day delivery karte hain.\n\n✅ ₹200 se upar FREE delivery\n⏱️ Delivery time: 2–4 ghante\n📦 Order track kar sakte hain account mein.' },
+        a: '🚚 Hum 8 km ke andar same-day delivery karte hain.\n\n✅ 0–5 km FREE delivery, 5–8 km ₹30\n⏱️ Delivery time: 20–55 minute\n📦 Order track kar sakte hain account mein.' },
       { q: 'Kaunse payment methods accepted hain?',
-        a: '💳 Hum ye payment methods accept karte hain:\n\n• Cash on Delivery\n• Google Pay (GPay)\n• PhonePe\n• Paytm\n• Debit/Credit Cards\n• Net Banking' },
+        a: '💳 Hum ye payment methods accept karte hain:\n\n• Cash on Delivery (COD)\n• Online Payment via Razorpay — uske andar UPI, debit/credit cards aur net banking' },
       { q: 'Return policy kya hai?',
         a: '↩️ Return Policy:\n\n🥦 Fresh items (sabzi, fruits, dairy): 24 ghante\n📦 Packaged goods: 7 din\n\nReturn ke liye WhatsApp par contact karein order ID ke saath.' },
       { q: 'Order track kaise karein?',
@@ -43,15 +43,15 @@
       { q: 'Koi discount ya offer hai?',
         a: '🎉 Current Offers:\n\n🆕 WELCOME10 — First order par 10% OFF\n📱 App install karo — weekly special offers\n🛒 ₹500+ order par extra 5% off\n\nOffer use karne ke liye checkout pe apply karein!' },
       { q: 'Minimum order kya hai?',
-        a: '📦 Delivery ke liye minimum order ₹200 hai.\n\nIn-store shopping ke liye koi minimum nahi.\n\n💡 Tip: ₹200+ order karo aur FREE delivery paao!' },
+        a: '📦 Delivery ke liye minimum order ₹499 hai.\n\nIn-store shopping ke liye koi minimum nahi.\n\n💡 Tip: 0–5 km ke andar delivery FREE hai!' },
       { q: 'Organic products available hain?',
         a: '🌿 Haan! Hamare paas organic products available hain:\n\n• Organic fruits & vegetables\n• Organic dal & atta\n• Natural spices\n\n"Organic" filter use karke products search karein.' },
     ],
 
     infoCards: [
-      { icon: '🕐', title: 'Store Timings',  body: 'Mon–Sat: 8 AM – 9 PM\nSun: 9 AM – 7 PM' },
-      { icon: '🚚', title: 'Delivery',        body: 'Same-day within 5 km\nFREE delivery above ₹200' },
-      { icon: '💳', title: 'Payment Methods', body: 'Cash · UPI · GPay\nPhonePe · Paytm · Cards' },
+      { icon: '🕐', title: 'Store Timings',  body: 'Roz: 5:30 AM – 12:00 PM' },
+      { icon: '🚚', title: 'Delivery',        body: 'Same-day within 8 km\n0–5 km FREE, 5–8 km ₹30' },
+      { icon: '💳', title: 'Payment Methods', body: 'COD · Online Payment\n(Razorpay)' },
       { icon: '↩️', title: 'Return Policy',   body: 'Fresh items: 24 hours\nPackaged goods: 7 days' },
       { icon: '📞', title: 'Contact',         body: '+91 63931 96765\n(WhatsApp available)' },
       { icon: '🎁', title: 'Current Offer',   body: 'WELCOME10 — 10% OFF\non your first order!' },
@@ -61,17 +61,17 @@
       {
         keys: ['timing','time','open','close','band','kab khula','kab band','schedule','hours','khula'],
         reply: ({ storeInfo: s }) =>
-          `🕐 *Store Timings:*\n\n📅 Monday–Saturday: 8 AM – 9 PM\n📅 Sunday: 9 AM – 7 PM\n\nOnline order 24/7 kar sakte hain! 😊`,
+          `🕐 *Store Timings:*\n\n📅 Roz: subah 5:30 – dopahar 12:00 (5:30 AM – 12:00 PM)\n\nOnline order kabhi bhi place kar sakte hain — delivery subah 5:30 se dopahar 12 ke beech hoti hai! 😊`,
       },
       {
         keys: ['deliver','delivery','ship','door','ghar','kitna time','courier','home'],
         reply: ({ storeInfo: s }) =>
-          `🚚 *Delivery Info:*\n\n📍 Area: ${s.delivery}\n✅ ${s.freeDeliv}\n⏱️ Time: 2–4 ghante\n\nOrder place karne ke baad track kar sakte hain account mein!`,
+          `🚚 *Delivery Info:*\n\n📍 Area: ${s.delivery}\n✅ ${s.freeDeliv}\n⏱️ Time: 20–55 minute\n\nOrder place karne ke baad track kar sakte hain account mein!`,
       },
       {
         keys: ['payment','pay','upi','gpay','google pay','cash','card','paytm','phonepe','online pay','paise'],
         reply: ({ storeInfo: s }) =>
-          `💳 *Payment Methods:*\n\n✅ Cash on Delivery\n✅ Google Pay (GPay)\n✅ PhonePe\n✅ Paytm\n✅ Debit/Credit Cards\n✅ Net Banking\n\nSabse safe: UPI payment recommend karte hain! 😊`,
+          `💳 *Payment Methods:*\n\n✅ Cash on Delivery (COD)\n✅ Online Payment via Razorpay — uske andar UPI, debit/credit cards aur net banking\n\nOnline payment safe hai — Razorpay PCI-DSS compliant gateway use karta hai! 😊`,
       },
       {
         keys: ['return','refund','wapas','vapas','exchange','damage','toot','kharab'],
@@ -101,7 +101,7 @@
       {
         keys: ['minimum','min order','kitna order','minimum order'],
         reply: ({ storeInfo: s }) =>
-          `📦 *Minimum Order:*\n\nDelivery ke liye: ${s.minOrder}\nIn-store: Koi minimum nahi!\n\n💡 ₹200+ order karo → FREE delivery milegi! ✅`,
+          `📦 *Minimum Order:*\n\nDelivery ke liye: ${s.minOrder}\nIn-store: Koi minimum nahi!\n\n💡 0–5 km ke andar delivery FREE hai! ✅`,
       },
       {
         keys: ['organic','natural','fresh','healthy','pesticide free','jaivik'],
@@ -316,6 +316,50 @@
         }
       }
     } catch (e) { /* supabase optional */ }
+    // M34: shop settings live lao — admin phone/timings/delivery badle to
+    // chatbot + support page khud update ho jayein (koi hardcoded fallback
+    // nahi; fail ho to upar wale sahi static values hi rehte hain).
+    loadShopSettings();
+  }
+
+  // Shop settings (id=1) padhkar storeInfo + support-page contact update karo.
+  async function loadShopSettings() {
+    try {
+      if (!state.supabase) return;
+      const { data } = await state.supabase.from('shop_settings')
+        .select('contact,whatsapp,open_time,close_time,delivery_radius,delivery_charge')
+        .eq('id', 1).maybeSingle();
+      if (!data) return;
+      const s = CONFIG.storeInfo;
+      const fmtT = (t) => { if (!t) return ''; const p = String(t).split(':'); let h = +p[0]; const m = p[1] || '00'; const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + m + ' ' + ap; };
+      const fmtPh = (c) => c ? '+91 ' + String(c).replace(/(\d{5})(\d{5})/, '$1 $2') : '';
+      if (data.contact) {
+        const ph = fmtPh(data.contact);
+        s.phone = ph; s.whatsapp = String(data.contact);
+        CONFIG.whatsappNumber = '91' + String(data.contact);
+        const wa = document.getElementById('sp-wa-link'); if (wa) wa.href = 'https://wa.me/91' + data.contact + '?text=Namaste!%20RK%20Grocery%20Mart%20se%20help%20chahiye.';
+        const wan = document.getElementById('sp-wa-num'); if (wan) wan.textContent = ph;
+        const cl = document.getElementById('sp-call-link'); if (cl) cl.href = 'tel:+91' + data.contact;
+        const cln = document.getElementById('sp-call-num'); if (cln) cln.textContent = ph;
+      }
+      if (data.open_time && data.close_time) {
+        s.timings = 'Roz: subah ' + data.open_time.slice(0, 5) + ' – dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ')';
+        const hl = document.getElementById('sp-hours-line');
+        if (hl) hl.textContent = 'Ask anything — products, prices, orders, delivery or offers. Ananya AI se kabhi bhi pooch sakte hain — human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ').';
+        const fq = CONFIG.faqs.find((f) => /timing/i.test(f.q));
+        if (fq) fq.a = '🕐 Hamare store ke timings:\n' + s.timings + '\n\nOnline order kabhi bhi place kar sakte hain — delivery ' + s.timings.replace(/^Roz: /, '') + ' ke beech hoti hai! 😊';
+        const tc = CONFIG.infoCards.find((c) => c.title === 'Store Timings');
+        if (tc) tc.body = 'Roz: ' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time);
+      }
+      if (data.delivery_radius) {
+        s.delivery = data.delivery_radius + ' km ke andar same-day delivery hoti hai (0–5 km FREE, 5–8 km ₹' + (data.delivery_charge ?? 30) + ')';
+        s.freeDeliv = '0–5 km FREE delivery, 5–8 km ₹' + (data.delivery_charge ?? 30);
+        const fq = CONFIG.faqs.find((f) => /delivery kitni door/i.test(f.q));
+        if (fq) fq.a = '🚚 Hum ' + data.delivery_radius + ' km ke andar same-day delivery karte hain.\n\n✅ ' + s.freeDeliv + '\n⏱️ Delivery time: 20–55 minute\n📦 Order track kar sakte hain account mein.';
+        const dc = CONFIG.infoCards.find((c) => c.title === 'Delivery');
+        if (dc) dc.body = 'Same-day within ' + data.delivery_radius + ' km\n' + s.freeDeliv;
+      }
+    } catch (e) { /* settings optional — static values rehte hain */ }
   }
 
   async function getOrCreateSession() {
