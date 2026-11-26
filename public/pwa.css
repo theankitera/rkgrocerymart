@@ -117,8 +117,7 @@ html[data-theme="dark"] .rk-pwa-btn-ghost { color: #6B7280; }
 
 /* ── Update banner ───────────────────────────── */
 .rk-pwa-update-banner {
-  position: fixed;
-  top: 0; left: 0; right: 0;
+  position: relative;
   z-index: 1000002;
   background: var(--rk-pwa-primary);
   color: #fff;

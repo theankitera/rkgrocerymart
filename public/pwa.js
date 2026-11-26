@@ -61,7 +61,7 @@
         '<button class="rk-pwa-btn" id="rkPwaUpdateBtn">Refresh Karein</button>'
     );
     banner.id = "rkPwaUpdateBanner";
-    document.body.appendChild(banner);
+    document.body.insertBefore(banner, document.body.firstChild);
     requestAnimationFrame(function () {
       banner.classList.add("rk-pwa-show");
     });

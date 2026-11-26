@@ -1926,10 +1926,10 @@ export default function App(){
       {/* A quiet service-proof strip gives shoppers the reassurance they need
           before browsing, without competing with the promotional ticker. */}
       <div style={{background:'var(--card-bg)',borderBottom:'1px solid var(--border)'}}>
-        <div className="max-w-site mx-auto px-4 md:px-8 py-2 flex items-center justify-center gap-x-7 gap-y-1 flex-wrap text-[11px] font-semibold font-poppins" style={{color:'var(--gray)'}}>
-          <span className="flex items-center gap-1.5"><span aria-hidden="true">⚡</span> Fast local delivery</span>
-          <span className="flex items-center gap-1.5"><span aria-hidden="true">🥬</span> Freshness checked before dispatch</span>
-          <span className="flex items-center gap-1.5"><ShieldCheck size={13} style={{color:'var(--primary)'}}/> Secure payments</span>
+        <div className="max-w-site mx-auto px-3 md:px-8 py-2 flex items-center justify-center gap-x-3 md:gap-x-7 flex-nowrap text-[10px] md:text-[11px] font-semibold font-poppins" style={{color:'var(--gray)'}}>
+          <span className="flex items-center gap-1.5 whitespace-nowrap"><span aria-hidden="true">⚡</span> Fast local delivery</span>
+          <span className="flex items-center gap-1.5 whitespace-nowrap"><span aria-hidden="true">🥬</span> Freshness checked</span>
+          <span className="flex items-center gap-1.5 whitespace-nowrap"><ShieldCheck size={13} style={{color:'var(--primary)'}}/> Secure payments</span>
         </div>
       </div>
 
