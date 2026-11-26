@@ -658,7 +658,7 @@ function RewardsTab({ state, showToast }) {
         <div className="text-4xl font-black font-poppins text-white" style={{letterSpacing:'-1px'}}>{pts}</div>
         <div className="text-xs font-semibold font-poppins mt-0.5" style={{color:'rgba(255,255,255,0.65)'}}>Total Reward Points</div>
         <div className="rounded-full h-[7px] mt-4" style={{background:'rgba(255,255,255,0.15)'}}>
-          <div className="h-[7px] rounded-full transition-all duration-1000" style={{width:progress+'%', background:'linear-gradient(90deg,#FFB800,#FF6B35)'}}/>
+          <div className="h-[7px] rounded-full transition-all duration-1000" style={{width:progress+'%', background:'linear-gradient(90deg,#FFB300,#C2185B)'}}/>
         </div>
         <div className="flex justify-between text-[11px] font-poppins mt-1.5" style={{color:'rgba(255,255,255,0.6)'}}><span>{loyalty.label}</span><span>{totalOrders}/{nextTarget} orders</span></div>
         <div className="flex gap-2 mt-4 flex-wrap">

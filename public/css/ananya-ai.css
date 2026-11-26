@@ -7,11 +7,11 @@
 
 /* ── CSS Variables ── */
 :root {
-  /* Brand — matched to Rinku Kirana site palette (green primary, yellow accent) */
-  --an-primary:        #16A34A;
-  --an-primary-light:  #4ECB99;
-  --an-primary-dark:   #15803D;
-  --an-accent:         #FF9933;
+  /* Brand — matched to Rinku Kirana site palette (red primary, dark pink accent) */
+  --an-primary:        #D32F2F;
+  --an-primary-light:  #EF5350;
+  --an-primary-dark:   #B71C1C;
+  --an-accent:         #C2185B;
 
   /* Light Theme */
   --an-bg:             #FFFFFF;
@@ -33,10 +33,10 @@
   --an-user-text:      #FFFFFF;
 
   /* Header */
-  --an-header-bg:      linear-gradient(135deg, #1BA672 0%, #15803D 50%, #0EA86B 100%);
+  --an-header-bg:      linear-gradient(135deg, #D32F2F 0%, #B71C1C 50%, #EF5350 100%);
 
   /* Tabs */
-  --an-tab-active:     #1BA672;
+  --an-tab-active:     #E53935;
 
   /* Input */
   --an-input-bg:       #F7F8FA;
@@ -59,7 +59,7 @@
 [data-ananya-theme="dark"] {
   --an-primary:      #4ADE80;
   --an-primary-light:#5FE0A8;
-  --an-primary-dark: #16A34A;
+  --an-primary-dark: #D32F2F;
   --an-accent:       #FFCB47;
   --an-bg:           #1C1C1E;
   --an-surface:      #2C2C2E;
@@ -74,8 +74,8 @@
   --an-bot-text:     #F2F2F7;
   --an-input-bg:     #2C2C2E;
   --an-input-border: #3A3A3C;
-  --an-header-bg:    linear-gradient(135deg, #16A34A 0%, #15803D 50%, #2ECC82 100%);
-  --an-tab-active:   #2ECC82;
+  --an-header-bg:    linear-gradient(135deg, #D32F2F 0%, #B71C1C 50%, #EF5350 100%);
+  --an-tab-active:   #E53935;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -684,7 +684,7 @@
 
 @keyframes an-typing {
   0%, 60%, 100% { transform: translateY(0); background: #9CA3AF; }
-  30%            { transform: translateY(-6px); background: #1BA672; }
+  30%            { transform: translateY(-6px); background: #E53935; }
 }
 
 /* Avatar for typing — small emoji */
@@ -721,7 +721,7 @@
   width: 26px;
   height: 26px;
   border-radius: var(--an-r-full);
-  background: linear-gradient(135deg, var(--an-primary, #16A34A), var(--an-accent, #FF9933));
+  background: linear-gradient(135deg, var(--an-primary, #D32F2F), var(--an-accent, #C2185B));
   color: #fff;
   display: flex;
   align-items: center;
@@ -784,7 +784,7 @@
 
 .ananya-login-gate-btn {
   margin-top: 6px;
-  background: linear-gradient(135deg, var(--an-primary, #1BA672), var(--an-primary-dark, #158A5E));
+  background: linear-gradient(135deg, var(--an-primary, #D32F2F), var(--an-primary-dark, #B71C1C));
   color: #fff;
   border: none;
   padding: 12px 24px;
@@ -810,7 +810,7 @@
 .ananya-msg.bot .ananya-sender-name {
   font-size: 12px;
   font-weight: 600;
-  color: #1BA672;
+  color: #E53935;
   margin-bottom: 3px;
   padding-left: 2px;
   font-family: 'Poppins', sans-serif;

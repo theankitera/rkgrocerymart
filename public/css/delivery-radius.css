@@ -94,10 +94,10 @@
 }
 
 .rk-loc-btn--denied:hover:not(:disabled) {
-  background: #FF6B35;
+  background: #C2185B;
   color: #fff;
-  border-color: #FF6B35;
-  box-shadow: 0 4px 18px rgba(255, 107, 53, 0.3);
+  border-color: #C2185B;
+  box-shadow: 0 4px 18px rgba(194, 24, 91, 0.3);
 }
 
 /* ────────────────────────────────────────────────────────────────────
@@ -426,7 +426,7 @@ html[data-theme="dark"] .rk-loc-btn--denied {
 }
 
 html[data-theme="dark"] .rk-loc-btn--denied:hover:not(:disabled) {
-  background: #FF6B35;
+  background: #C2185B;
   color: #fff;
 }
 

@@ -1882,7 +1882,7 @@ export default function App(){
                 <ShoppingCart size={17}/>
                 <span className="hidden md:inline">Cart</span>
                 {count>0&&<span className="hidden lg:inline text-[10px] font-semibold opacity-90 border-l border-white/25 pl-1.5">₹{total}</span>}
-                {count>0&&<span className="absolute -top-1.5 -right-1.5 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#1A1A2E'}}>{count>9?'9+':count}</span>}
+                {count>0&&<span className="absolute -top-1.5 -right-1.5 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#fff'}}>{count>9?'9+':count}</span>}
               </button>
 
               {user?
@@ -2234,7 +2234,7 @@ export default function App(){
           </div>
         )}
         <div className="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" onClick={()=>setCartOpen(true)}>
-          {count>0&&<span className="absolute top-1 right-1/4 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#1A1A2E'}}>{count>9?'9+':count}</span>}
+          {count>0&&<span className="absolute top-1 right-1/4 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#fff'}}>{count>9?'9+':count}</span>}
           <ShoppingCart size={21} strokeWidth={page==='cart'?2.5:1.8} style={{color:page==='cart'?'var(--primary)':'var(--gray)'}}/>
           <span className="text-[10px] font-medium font-poppins" style={{color:page==='cart'?'var(--primary)':'var(--gray)'}}>Cart</span>
         </div>
