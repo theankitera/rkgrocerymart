@@ -402,7 +402,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         <div className="flex justify-between font-extrabold font-poppins text-sm mt-2 pt-2" style={{borderTop:'1px solid var(--border)'}}>
           <span>Total</span><span style={{color:'var(--primary)'}}>₹{finalAmount.toFixed(0)}</span>
         </div>
-        {cartTotal < (shopSettings.min_order ?? 499) && <div className="text-[11px] font-bold font-poppins mt-1.5" style={{color:'var(--orange)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-cartTotal).toFixed(0)} aur add karein.</div>}
+        {cartTotal < (shopSettings.min_order ?? 499) && <div className="text-[11px] font-bold font-poppins mt-1.5" style={{color:'var(--accent-pink)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-cartTotal).toFixed(0)} aur add karein.</div>}
       </div>
 
       <div className={`co-card ${cardCls}`} style={cardStyle}>

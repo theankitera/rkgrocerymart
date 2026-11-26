@@ -45,7 +45,7 @@ const loyaltyLevel = n => {
   return { label:'🌱 New Member', color:'#10B981' };
 };
 const statusLabel = s => ({ pending:'Pending', confirmed:'Confirmed', out_for_delivery:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled' }[s]||s);
-const notifColor  = t => ({ offer:'var(--tint-orange-bg)', order:'var(--tint-blue-bg)', delivery:'var(--tint-purple-bg)', stock:'var(--tint-green-bg)', system:'var(--tint-neutral-bg)' }[t]||'var(--tint-neutral-bg)');
+const notifColor  = t => ({ offer:'var(--tint-pink-bg)', order:'var(--tint-blue-bg)', delivery:'var(--tint-purple-bg)', stock:'var(--tint-green-bg)', system:'var(--tint-neutral-bg)' }[t]||'var(--tint-neutral-bg)');
 const notifIcon   = t => ({ offer:'🎁', order:'📦', delivery:'🚴', stock:'📢', system:'ℹ️' }[t]||'🔔');
 const addrIcon    = l => { const s=(l||'').toLowerCase(); if(s.includes('home')) return '🏠'; if(s.includes('office')||s.includes('work')) return '🏢'; return '📍'; };
 
@@ -870,7 +870,7 @@ function SettingsTab({ switchTab, user, showToast }) {
 
   const rows = [
     {icon:'🔒',bg:'var(--tint-blue-bg)',label:'Change Password',   sub:'Password update karo',          fn:()=>setPwModal(true)},
-    {icon:'🔔',bg:'var(--tint-orange-bg)',label:'Notifications',     sub:'Offers aur updates manage karo', fn:()=>switchTab('notifications')},
+    {icon:'🔔',bg:'var(--tint-pink-bg)',label:'Notifications',     sub:'Offers aur updates manage karo', fn:()=>switchTab('notifications')},
     {icon:'👤',bg:'var(--tint-green-bg)',label:'Edit Profile',      sub:'Name, phone update karo',        fn:()=>switchTab('profile')},
     {icon:'📍',bg:'var(--tint-purple-bg)',label:'Manage Addresses',  sub:'Delivery addresses',             fn:()=>switchTab('addresses')},
     {icon:'⭐',bg:'var(--tint-yellow-bg)',label:'Rewards & Referral',sub:'Points aur cashback',            fn:()=>switchTab('rewards')},

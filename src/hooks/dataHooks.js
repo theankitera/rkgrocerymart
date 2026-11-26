@@ -36,6 +36,10 @@ export function useBanners(){
   return{banners,loading};
 }
 
+// Search text ko PostgREST or()/ilike ke liye safe banao — `%`/`_` wildcard
+// hain, `"` quoting todta hai, `,`/`(`/`)` or() parser todte hain.
+export const sanitizeSearch=t=>String(t||'').replace(/["(),]/g,'').replace(/[%_\\]/g,'\\$&').trim();
+
 export function useProducts(options={}){
   const {categoryId,featured,search,page=1,pageSize=24,sort}=options;
   const [products,setProducts]=useState([]);
@@ -58,10 +62,11 @@ export function useProducts(options={}){
     else q=q.order('created_at',{ascending:false});
     if(categoryId&&categoryId!=='all') q=q.eq('category_id',categoryId);
     if(featured) q=q.eq('is_featured',true);
-    if(search&&search.trim().length>1)
+    if(search&&sanitizeSearch(search).length>=1)
       // BUG FIX: double-quote wrap (PostgREST) — parentheses wale naam (e.g. "Adrak (Ginger)")
       // pehle or() parser ko tod dete the → product search me nahi aata tha.
-      q=q.or(`name.ilike."%${search.trim()}%",description.ilike."%${search.trim()}%",categories.name.ilike."%${search.trim()}%"`);
+      // sanitizeSearch: `%`/`_`/`"`/`,`/`(`/`)` se query tootne se bachao.
+      q=q.or(`name.ilike."%${sanitizeSearch(search)}%",description.ilike."%${sanitizeSearch(search)}%",categories.name.ilike."%${sanitizeSearch(search)}%"`);
     const from=(page-1)*pageSize;
     q=q.range(from,from+pageSize-1);
     const {data,count}=await q;
@@ -224,7 +229,10 @@ export function useHomeSections(){
         .eq('is_active',true)
         .order('is_featured',{ascending:false})
         .order('created_at',{ascending:false})
-        .limit(80);
+        // Home sections (Flash Sale/Deals) sirf pehle 80 products se bante
+        // the — purane discount wale products kabhi nahi aate the. 300 tak
+        // poora catalogue (~153) aa jata hai; usse upar pagination chahiye.
+        .limit(300);
       const enriched=(data||[]).map(p=>{
         const imgs=(p.product_images||[]).slice().sort((a,b)=>a.sort_order-b.sort_order);
         return{
@@ -363,7 +371,7 @@ export function useSearch(query,active){
         .select('*,categories(name),product_images(id,image_url,is_default,sort_order)')
         .eq('is_active',true)
         // BUG FIX: double-quote wrap (PostgREST) — parentheses wale naam sahi search ho sakein
-        .or(`name.ilike."%${query.trim()}%",description.ilike."%${query.trim()}%",categories.name.ilike."%${query.trim()}%"`)
+        .or(`name.ilike."%${sanitizeSearch(query)}%",description.ilike."%${sanitizeSearch(query)}%",categories.name.ilike."%${sanitizeSearch(query)}%"`)
         .limit(40);
       setResults((data||[]).map(p=>({
         ...p,

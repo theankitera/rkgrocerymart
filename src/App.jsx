@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
-import { Search, ShoppingCart, User, Download, Home, ShoppingBag, SlidersHorizontal, X, Zap, Leaf, BadgePercent, ShieldCheck, Package, Headphones, Send, MessageCircle, ChevronLeft, ChevronRight, Store, Users, Star, Truck, Clock, MapPin, Wallet, RotateCcw, FileText, Lock, Phone, Mail, HelpCircle, CheckCircle2, ScrollText } from 'lucide-react';
+import { Search, ShoppingCart, User, Download, Home, ShoppingBag, SlidersHorizontal, X, Zap, Leaf, BadgePercent, ShieldCheck, Package, Headphones, Send, MessageCircle, ChevronLeft, ChevronRight, Store, Users, Star, Truck, Clock, MapPin, Wallet, RotateCcw, FileText, Lock, Mail, HelpCircle, CheckCircle2, ScrollText } from 'lucide-react';
 import { supabase } from './lib/supabaseClient';
 import { TICKER, calcDiscount, catEmoji } from './lib/helpers';
 import { openAppDownload } from './lib/appDownload';
@@ -17,7 +17,7 @@ import AuthModal from './components/AuthModal';
 //   • Shop page (mobile) → active category highlight, chhota rounded card, bina header
 // Design: Blinkit-style image-first tiles — rounded-square card jisme category
 // ka real image poora bhar jata hai (clean object-cover) + neeche chhota bold
-// label. Hover par image zoom + card lift. Active category green ring se highlight.
+// label. Hover par image zoom + card lift. Active category pink ring se highlight.
 // Scroll affordance: ◀ ▶ arrow buttons + right-edge fade SIRF tab dikhte hain
 // jab rail actually scrollable ho (scrollWidth > clientWidth) — boundary par
 // auto-hide. Pehle users ko pata hi nahi tha ki rail scroll hoti hai; ab fade/
@@ -133,6 +133,7 @@ const SORT_OPTIONS=[
 ];
 
 function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handleBannerClick}){
+  if(!bannersLoading&&banners.length===0)return null;
   return(
     <div className="relative rounded-2xl overflow-hidden h-40 md:h-64">
       <div ref={wrapRef} className="flex h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide">
@@ -185,11 +186,11 @@ function HeroBanner({banners,bannersLoading,bannerIdx,setBannerIdx,wrapRef,handl
 
 
 // 🔤 MultiColorName — Blinkit-jaisa multicolor shop name: words alternate
-// colors me (default orange/green — header jaisa). Dark surfaces par alag
-// pair pass kar sakte hain (footer: yellow/white — green gradient background
-// par green word gayab ho jata). Text size/typography parent ke classes se
+// colors me (default pink/red — header jaisa). Dark surfaces par alag
+// pair pass kar sakte hain (footer: yellow/white — red gradient background
+// par red word gayab ho jata). Text size/typography parent ke classes se
 // hi aati hai — yeh sirf color split karta hai.
-function MultiColorName({name,colors=['var(--orange)','var(--primary)']}){
+function MultiColorName({name,colors=['var(--accent-pink)','var(--primary)']}){
   const words=String(name||'').trim().split(/\s+/).filter(Boolean);
   return(
     <>
@@ -323,7 +324,9 @@ function AdStripSection({strip,onAdClick}){
   for(let i=0;i<clones;i++)track.push({img:imgs[i],i,clone:true});
   return(
     <div className="relative" onMouseEnter={()=>{pausedRef.current=true;}}
-      onMouseLeave={()=>{pausedRef.current=false;}}>
+      onMouseLeave={()=>{pausedRef.current=false;}}
+      onTouchStart={()=>{pausedRef.current=true;}}
+      onTouchEnd={()=>{pausedRef.current=false;}}>
       <div ref={wrapRef} className="overflow-hidden">
         <div className="flex" style={{transform:`translateX(${shift}px)`,
           transition:ready?`transform ${tdur}ms var(--ease-standard)`:'none',
@@ -350,12 +353,12 @@ function AdStripSection({strip,onAdClick}){
       {canScroll&&(
         <>
           <button type="button" aria-label="Pichli ad" onClick={()=>stepBy(-1)}
-            className="hidden md:flex absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90"
+            className="flex absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90"
             style={{background:'var(--card-bg)',color:'var(--text)',border:'1px solid var(--border)'}}>
             <ChevronLeft size={18}/>
           </button>
           <button type="button" aria-label="Agli ad" onClick={()=>stepBy(1)}
-            className="hidden md:flex absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90"
+            className="flex absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full items-center justify-center shadow-md transition-transform hover:scale-110 active:scale-90"
             style={{background:'var(--card-bg)',color:'var(--text)',border:'1px solid var(--border)'}}>
             <ChevronRight size={18}/>
           </button>
@@ -771,7 +774,7 @@ function CustomerReviews({reviews=[]}){
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-base md:text-xl font-bold font-poppins" style={{color:'var(--dark)'}}>Kya Kehte Hain <span style={{color:'var(--primary)'}}>Hamare Customers?</span></h2>
         {realAvg&&(
-          <span className="hidden md:flex items-center gap-1 text-xs font-bold font-poppins px-3 py-1.5 rounded-full" style={{background:'var(--primary-light)',color:'var(--primary-dark)'}}>⭐ {realAvg}/5 average ({reviews.length} reviews)</span>
+          <span className="flex items-center gap-1 text-[10px] md:text-xs font-bold font-poppins px-2 md:px-3 py-1 md:py-1.5 rounded-full" style={{background:'var(--primary-light)',color:'var(--primary-dark)'}}>⭐ {realAvg}/5<span className="hidden sm:inline"> average ({reviews.length} reviews)</span><span className="sm:hidden"> ({reviews.length})</span></span>
         )}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
@@ -780,7 +783,7 @@ function CustomerReviews({reviews=[]}){
             <div className="text-[#B45309] text-sm tracking-tight">{"★★★★★".slice(0,r.stars)}{"☆".repeat(5-r.stars)}</div>
             <p className="mt-2.5 text-xs md:text-[13px] font-poppins leading-relaxed" style={{color:'var(--text)'}}>“{r.text}”</p>
             <div className="mt-3 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{background:'linear-gradient(135deg,var(--primary),var(--orange))'}}>{r.name[0]}</div>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{background:'linear-gradient(135deg,var(--primary),var(--accent-pink))'}}>{r.name[0]}</div>
               <div>
                 <div className="text-xs font-bold font-poppins" style={{color:'var(--dark)'}}>{r.name}</div>
                 <div className="text-[10px] font-poppins" style={{color:'var(--gray)'}}>{r.place}</div>
@@ -800,9 +803,9 @@ function DownloadApp({onInstall}){
       style={{background:'linear-gradient(135deg,#D32F2F,#B71C1C)'}}>
       <div className="flex-1 text-center md:text-left">
         <h2 className="text-white font-extrabold font-poppins text-lg md:text-2xl">App Install Karein 📱</h2>
-        <p className="text-white/80 text-xs md:text-sm font-poppins mt-1.5 leading-relaxed">Fast loading, offline access aur home screen se ek-tap shopping — bilkul free!</p>
+        <p className="text-white/80 text-xs md:text-sm font-poppins mt-1.5 leading-relaxed">Fast loading aur home screen se ek-tap shopping — bilkul free!</p>
         <ul className="mt-3 space-y-1.5 text-left inline-block">
-          {['Offline mein bhi browse karein','Weekly app-exclusive offers','1-tap reorder & notifications'].map(t=>(
+          {['Lightning-fast loading','Weekly app-exclusive offers','1-tap reorder & notifications'].map(t=>(
             <li key={t} className="flex items-center gap-2 text-white/90 text-xs md:text-[13px] font-poppins"><span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[9px]">✓</span>{t}</li>
           ))}
         </ul>
@@ -1285,24 +1288,17 @@ export default function App(){
   const [user,setUser]=useState(null);
   const [detailProduct,setDetailProduct]=useState(null);
   const [shopPage,setShopPage]=useState(1);
-  // Module 4: listing-page sort + in-stock filter. These are purely
-  // display-layer — they re-order/filter the products array that
-  // useProducts() already fetched for the current page. They do NOT touch
-  // the Supabase query in dataHooks.js, so pagination/category/search logic
-  // is 100% unchanged. (Trade-off: since pagination is server-side, "Price:
-  // Low to High" etc. sorts within the current page of results, not across
-  // the entire catalog — flagged here for the next session.)
+  // Module 4: listing-page in-stock filter (display-layer only).
+  // Sorting server-side hoti hai (shopOpts.sort → useProducts → Supabase
+  // .order()), poori list par — yahan dobara sort karna bekaar tha.
   const [sortBy,setSortBy]=useState('default');
   const [inStockOnly,setInStockOnly]=useState(false);
   const [filterDrawerOpen,setFilterDrawerOpen]=useState(false);
   const sortFilterProds=(list)=>{
-    let out=inStockOnly?list.filter(p=>!(p.stock_quantity<=0)):list;
-    if(sortBy==='price-low') out=[...out].sort((a,b)=>a.selling_price-b.selling_price);
-    else if(sortBy==='price-high') out=[...out].sort((a,b)=>b.selling_price-a.selling_price);
-    return out;
+    return inStockOnly?list.filter(p=>!(p.stock_quantity<=0)):list;
   };
   const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true || document.referrer.includes('android-app://');
-  const [theme,setTheme]=useState(()=>{
+  const [theme]=useState(()=>{
     try{const s=localStorage.getItem('rk_theme');if(s==='dark'||s==='light')return s;}catch(e){}
     return window.matchMedia?.('(prefers-color-scheme:dark)').matches?'dark':'light';
   });
@@ -1361,10 +1357,18 @@ export default function App(){
     return()=>window.removeEventListener('hashchange',applyHash);
   },[]);
 
+  // Esc se cart drawer / filter sheet band karo (keyboard users ke liye).
+  useEffect(()=>{
+    if(!cartOpen&&!filterDrawerOpen)return;
+    const h=e=>{if(e.key==='Escape'){setCartOpen(false);setFilterDrawerOpen(false);}};
+    window.addEventListener('keydown',h);
+    return()=>window.removeEventListener('keydown',h);
+  },[cartOpen,filterDrawerOpen]);
+
   // Shop products (filtered)
   const shopOpts={
     categoryId:activeCatId==='all'?null:activeCatId,
-    search:search.trim().length>1?search:'',
+    search:search.trim().length>=1?search:'',
     page:shopPage,pageSize:24,
     sort:sortBy,
   };
@@ -1428,7 +1432,7 @@ export default function App(){
       // try/catch: query fail hone par bhi ready=true set hota hai — warna saari
       // category rails hamesha skeleton dikhati rehti thin (useHomeSections jaisa
       // pattern). limit(1000): PostgREST/Supabase ka default cap — catalog 1000
-      // se zyada ho to yahan pagination chahiye (aaj 150 products hain).
+      // se zyada ho to yahan pagination chahiye (aaj ~153 products hain).
       let data=null;
       try{
         const res=await supabase.from('products')
@@ -1842,7 +1846,7 @@ export default function App(){
       {/* ── HEADER (Module 2: unified Tailwind header, same look on mobile+desktop
            as the new design — replaces the old separate desktop-header/.header
            blocks). All state/handlers below are UNCHANGED from before: setPage,
-           showToast, search/setSearch/setShopPage, toggleTheme, isPWA, user,
+           showToast, search/setSearch/setShopPage, isPWA, user,
            openLogin (Module 7: opens AuthModal in place of the old goLogin
            full-page nav), setCartOpen, count. desktopHeaderRef stays attached so the
            --header-h ResizeObserver (used by the desktop sidebar's sticky
@@ -1867,11 +1871,11 @@ export default function App(){
               <div className="w-full flex items-center gap-3 rounded-2xl p-2.5"
                 style={{background:'var(--light)',border:'1.5px solid var(--border)',opacity:searchDisabled?0.5:1}}>
                 <Search size={18} style={{color:'var(--gray)'}} className="flex-shrink-0"/>
-                <input placeholder="Search groceries, snacks, dairy..." value={search} disabled={searchDisabled}
-                  onFocus={()=>{if(searchDisabled)showToast('Pehle yeh kaam poora karein 🙏');}}
+                <input placeholder="Search groceries, snacks, dairy..." value={search} readOnly={searchDisabled}
+                  onClick={()=>{if(searchDisabled)showToast('Pehle yeh kaam poora karein 🙏');}}
                   onChange={e=>{setSearch(e.target.value);setPage('shop');setShopPage(1);}}
                   className="flex-1 bg-transparent text-sm font-poppins outline-none" style={{color:'var(--dark)'}}/>
-                {search&&!searchDisabled&&<button onClick={()=>setSearch('')} style={{color:'#A0AEC0',background:'none'}}>✕</button>}
+                {search&&!searchDisabled&&<button aria-label="Search saaf karein" onClick={()=>setSearch('')} style={{color:'#A0AEC0',background:'none'}}>✕</button>}
               </div>
             </div>
 
@@ -1891,7 +1895,7 @@ export default function App(){
                 <ShoppingCart size={17}/>
                 <span className="hidden md:inline">Cart</span>
                 {count>0&&<span className="hidden lg:inline text-[10px] font-semibold opacity-90 border-l border-white/25 pl-1.5">₹{total}</span>}
-                {count>0&&<span className="absolute -top-1.5 -right-1.5 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#fff'}}>{count>9?'9+':count}</span>}
+                {count>0&&<span className="absolute -top-1.5 -right-1.5 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--accent-pink)',color:'#fff'}}>{count>9?'9+':count}</span>}
               </button>
 
               {user?
@@ -1913,11 +1917,11 @@ export default function App(){
             <div className="w-full flex items-center gap-3 rounded-2xl p-3"
               style={{background:'var(--light)',border:'1.5px solid var(--border)',opacity:searchDisabled?0.5:1}}>
               <Search size={16} style={{color:'var(--gray)'}} className="flex-shrink-0"/>
-              <input placeholder="Search groceries, snacks, dairy..." value={search} disabled={searchDisabled}
-                onFocus={()=>{if(searchDisabled)showToast('Pehle yeh kaam poora karein 🙏');}}
+              <input placeholder="Search groceries, snacks, dairy..." value={search} readOnly={searchDisabled}
+                onClick={()=>{if(searchDisabled)showToast('Pehle yeh kaam poora karein 🙏');}}
                 onChange={e=>{setSearch(e.target.value);setPage('shop');setShopPage(1);}}
                 className="flex-1 bg-transparent text-sm font-poppins outline-none" style={{color:'var(--dark)',fontSize:16}}/>
-              {search&&!searchDisabled&&<button onClick={()=>setSearch('')} style={{color:'#A0AEC0',background:'none'}}>✕</button>}
+              {search&&!searchDisabled&&<button aria-label="Search saaf karein" onClick={()=>setSearch('')} style={{color:'#A0AEC0',background:'none'}}>✕</button>}
             </div>
           </div>
         </div>
@@ -2052,7 +2056,7 @@ export default function App(){
 
             {/* Mobile filter/sort bottom sheet (Module 4) */}
             {filterDrawerOpen&&(
-              <div className="fixed inset-0 z-[1010] flex items-end md:hidden" onClick={()=>setFilterDrawerOpen(false)}>
+              <div className="fixed inset-0 z-[1010] flex items-end md:hidden" role="dialog" aria-modal="true" aria-label="Filters aur sort" onClick={()=>setFilterDrawerOpen(false)}>
                 <div className="absolute inset-0" style={{background:'rgba(0,0,0,0.4)'}}/>
                 <div className="relative w-full rounded-t-2xl p-4" style={{background:'var(--card-bg)',maxHeight:'80vh',overflowY:'auto'}} onClick={e=>e.stopPropagation()}>
                   <div className="flex items-center justify-between mb-4">
@@ -2108,7 +2112,7 @@ export default function App(){
             <div className="order-pill">Order #{success.id}</div>
             <p>{success.pay==='cod'?'💵 Delivery par cash dena':success.pay==='razorpay'?'💳 Online payment successful — order confirm ho gaya!':'⏳ Payment verify ho rahi hai — 10-15 min mein confirm ho jayega'}</p>
             {!success.adminReview&&<p>⏰ 20–55 minute mein delivery hogi</p>}
-            {success.adminReview&&<p style={{color:'var(--orange)',fontWeight:700}}>⚠️ Aapka address hamari delivery range se bahar hai — order admin verification ke baad confirm hoga. Hum jald call karke batayenge.</p>}
+            {success.adminReview&&<p style={{color:'var(--accent-pink)',fontWeight:700}}>⚠️ Aapka address hamari delivery range se bahar hai — order admin verification ke baad confirm hoga. Hum jald call karke batayenge.</p>}
             <p className="text-[12px] mt-3" style={{color:'var(--muted)'}}>Live status ke liye neeche Track Order dabayein — order aage badhte hi update hoga.</p>
             <div className="flex gap-2.5 mt-4 justify-center">
               <button className="home-btn" style={{margin:0}} onClick={()=>{setSuccess(null);setPage('home');}}>🏠 Home Par Jao</button>
@@ -2131,7 +2135,7 @@ export default function App(){
       {cartOpen&&(
         <>
           <div className="drawer-bg" onClick={()=>setCartOpen(false)}/>
-          <div className="cart-drawer flex flex-col" style={{background:'var(--card-bg)'}}>
+          <div className="cart-drawer flex flex-col" role="dialog" aria-modal="true" aria-label="Mera cart" style={{background:'var(--card-bg)'}}>
             <div className="w-10 h-1 rounded-full mx-auto mt-3 flex-shrink-0" style={{background:'var(--border)'}}/>
             <div className="flex items-center justify-between px-5 pt-3 pb-2.5 flex-shrink-0" style={{borderBottom:'1px solid var(--border)'}}>
               <div className="font-extrabold font-poppins text-base" style={{color:'var(--dark)'}}>🛒 Mera Cart ({count} items)</div>
@@ -2191,7 +2195,7 @@ export default function App(){
                 <div className="mt-2 text-[11px] leading-relaxed" style={{color:'var(--muted)'}}>
                   🚚 Delivery: 0–5 km FREE, 5–8 km ₹30 — final charge checkout par aapke location se pata chalega.
                 </div>
-                {total < (shopSettings.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--orange)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-total).toFixed(0)} aur add karein.</div>}
+                {total < (shopSettings.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--accent-pink)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-total).toFixed(0)} aur add karein.</div>}
                 {total >= (shopSettings.min_order ?? 499) && <div className="mt-1 text-[11px] font-bold" style={{color:'var(--primary-dark)'}}>✅ Minimum order ₹{shopSettings.min_order ?? 499} poora ho gaya.</div>}
                 <button onClick={goToCheckout} disabled={total < (shopSettings.min_order ?? 499)}
                   className="w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm disabled:cursor-not-allowed"
@@ -2238,7 +2242,7 @@ export default function App(){
         )}
         <div className="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5" role="button" tabIndex={0} aria-label="Cart" onClick={()=>setCartOpen(true)}
           onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setCartOpen(true);}}}>
-          {count>0&&<span className="absolute top-1 right-1/4 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--orange)',color:'#fff'}}>{count>9?'9+':count}</span>}
+          {count>0&&<span className="absolute top-1 right-1/4 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center font-poppins" style={{background:'var(--accent-pink)',color:'#fff'}}>{count>9?'9+':count}</span>}
           <ShoppingCart size={21} strokeWidth={cartOpen?2.5:1.8} style={{color:cartOpen?'var(--primary)':'var(--gray)'}}/>
           <span className="text-[10px] font-medium font-poppins" style={{color:cartOpen?'var(--primary)':'var(--gray)'}}>Cart</span>
         </div>
