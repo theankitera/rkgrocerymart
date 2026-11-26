@@ -153,7 +153,7 @@
       if (!info.available) {
         return {
           valid : false,
-          reason: `Aapka location hamari delivery range se bahar hai (${info.distanceKm} km). Hum sirf 8 km tak deliver karte hain.`,
+          reason: `Aapka location hamari delivery range se bahar hai (${info.distanceKm} km). Hum sirf ${(TIERS.find(t => t.id === 'paid') || {}).maxKm || 8} km tak deliver karte hain.`,
           info,
         };
       }

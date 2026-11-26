@@ -51,7 +51,6 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
   // It only auto-triggers (asks for permission) once an address is on screen.
   const [locState,setLocState]=useState('idle'); // idle | loading | success | denied | error
   const [deliveryInfo,setDeliveryInfo]=useState(null);
-  const total=cartTotal;
   // BUG FIX (Critical #3): Coupon code input — pehle checkout mein ye field tha hi nahi,
   // isliye admin ke banaye coupons kabhi customer use nahi kar paata tha.
   const {validate:validateCoupon,checking:couponChecking}=useCouponValidator();
@@ -66,7 +65,9 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
   const discount=couponDiscount+rewardDiscount;
   // Is order par max kitne points use ho sakte hain (subtotal − coupon tak) —
   // server bhi yahi cap karta hai, taaki chhote order par saare points na burn hon.
-  const maxRewardPts=Math.min(rewardBalance,Math.max(0,Math.floor((total-couponDiscount)*10)));
+  const maxRewardPts=Math.min(rewardBalance,Math.max(0,Math.floor((cartTotal-couponDiscount)*10)));
+  // Cart/coupon badalne par applied points naye max se zyada na rahein.
+  useEffect(()=>{setRewardApplied(prev=>Math.min(prev,maxRewardPts));},[maxRewardPts]);
   useEffect(()=>{
     let active=true;
     (async()=>{
@@ -85,7 +86,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
   };
   const handleRemoveCoupon=()=>{setAppliedCoupon(null);setCouponCode('');setCouponError('');};
   const deliveryCharge=(deliveryInfo&&deliveryInfo.available)?deliveryInfo.charge:(shopSettings.delivery_charge ?? 30);
-  const finalAmount=Math.max(0,total-discount+deliveryCharge);
+  const finalAmount=Math.max(0,cartTotal-discount+deliveryCharge);
   useEffect(()=>{
     let active=true;
     (async()=>{
@@ -173,7 +174,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       const wantKey=JSON.stringify([Math.round(finalAmount*100),addressPayload,locationPayload]);
       let result=(rzpKeyRef.current===wantKey)?rzpOrderRef.current:null;
       if(!result){
-        result=await window.RKOrders.createDraft(user.uid,{cart,total,address:addressPayload,paymentMethod:'razorpay',promoCode:appliedCoupon?.code||null,discount,rewardsPoints:rewardApplied,...locationPayload});
+        result=await window.RKOrders.createDraft(user.uid,{cart,cartTotal,address:addressPayload,paymentMethod:'razorpay',promoCode:appliedCoupon?.code||null,discount,rewardsPoints:rewardApplied,...locationPayload});
         if(!result){setRzpBusy(false);setOrderError('⚠️ Order save nahi hua. Kripya dobara try karein.');return;}
         if(result.migrationRequired){setRzpBusy(false);setOrderError('⚠️ Payment system update pending — thodi der baad try karein ya COD chunein.');return;}
         if(result.blocked){setRzpBusy(false);setOrderError('⚠️ Aapka account blocked hai — admin se sampark karein.');return;}
@@ -273,13 +274,16 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
     }
   };
   const handlePlaceOrder=async()=>{
+    // Session checkout ke beech mein expire ho to bina save hue order ka
+    // fake success screen kabhi na dikhe — pehle hi login mango.
+    if(!user){showToast('Order place karne ke liye pehle login karein!');return;}
     setPhoneTouched(true);
     setOrderError('');
     if(!f.name.trim()){showToast('Naam zaroori hai!');return;}
     if(!isPhoneValid){showToast('Sahi 10-digit mobile number daalein!');return;}
     if(!pay){showToast('Payment method chunein!');return;}
     if(!selectedAddr){showToast('Delivery address chunein ya add karein!');return;}
-    if(cartTotal < (shopSettings.min_order ?? 499)){showToast(`Minimum order ₹${shopSettings.min_order ?? 499} hai — ₹${((shopSettings.min_order ?? 499)-cartTotal).toFixed(0)} aur add karein.`);return;}
+    if(finalAmount < (shopSettings.min_order ?? 499)){showToast(`Minimum order ₹${shopSettings.min_order ?? 499} hai — ₹${((shopSettings.min_order ?? 499)-finalAmount).toFixed(0)} aur add karein.`);return;}
     const addressPayload={name:f.name.trim(),phone:f.phone.trim(),line1:selectedAddr.line1,line2:selectedAddr.line2||'',city:selectedAddr.city||'',pincode:selectedAddr.pincode||''};
     // GPS is optional and never blocks checkout. If it resolved and the
     // location looks out of the normal delivery range, we don't stop the
@@ -289,13 +293,13 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       const validation=window.RKDelivery.validate(deliveryInfo.lat,deliveryInfo.lng);
       locationPayload={
         latitude:deliveryInfo.lat,longitude:deliveryInfo.lng,distance_km:deliveryInfo.distanceKm,
-        // delivery_charge bhi store karo — server-side total verify (razorpay-order)
+        // delivery_charge bhi store karo — server-side cartTotal verify (razorpay-order)
         // isi order row se delivery fee add karta hai, warna fee wale orders reject ho jaate
         delivery_charge:deliveryInfo.charge||0,
         delivery_status:deliveryInfo.tier.id,admin_review_needed:!validation.valid,
       };
       if(!validation.valid){
-        showToast('📍 Out of service area — your order is confirmed after admin verification.',4500);
+        showToast('📍 Aapka address delivery range se bahar hai — admin verify karke confirm karega.',4500);
       }
     }
     if(pay==='razorpay'){
@@ -305,18 +309,16 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       setPlacing(true);
       try{
         let result=null;
-        if(window.RKOrders&&user)result=await window.RKOrders.createOrder(user.uid,{cart,total,address:addressPayload,paymentMethod:pay,promoCode:appliedCoupon?.code||null,discount,rewardsPoints:rewardApplied,...locationPayload});
-        // Frontend-only fix: previously a failed/null createOrder() still showed the
-        // success screen with a randomly-generated fake order number. Now we only
-        // show success if the order actually saved (or if no backend hook exists at all,
-        // which preserves old behaviour for environments without window.RKOrders).
-        if(window.RKOrders&&user&&!result){
+        if(window.RKOrders&&user)result=await window.RKOrders.createOrder(user.uid,{cart,cartTotal,address:addressPayload,paymentMethod:pay,promoCode:appliedCoupon?.code||null,discount,rewardsPoints:rewardApplied,...locationPayload});
+        // Order save nahi hua to kabhi success mat dikhao — na random
+        // number, na cart clear. User dobara try karega.
+        if(!result){
           setPlacing(false);
           setOrderError('⚠️ Order save nahi hua. Kripya dobara try karein ya thodi der baad try karein.');
           showToast('Order place nahi ho saka, dobara try karein');
           return;
         }
-        const orderNumber=result?.orderNumber||('RK'+Math.floor(1000+Math.random()*9000));
+        const orderNumber=result.orderNumber;
         setPlacing(false);
         if(window.RKCart)window.RKCart.clearCart();
         onSuccess(orderNumber,'cod',locationPayload.admin_review_needed);
@@ -394,7 +396,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
           </div>
         )}
         <div className="mt-2 text-xs font-poppins" style={{color:'var(--gray)'}}>
-          <div className="flex justify-between"><span>Subtotal</span><span>₹{total.toFixed(0)}</span></div>
+          <div className="flex justify-between"><span>Subtotal</span><span>₹{cartTotal.toFixed(0)}</span></div>
           {couponDiscount>0&&<div className="flex justify-between" style={{color:'var(--primary)'}}><span>Coupon Discount</span><span>−₹{couponDiscount.toFixed(0)}</span></div>}
           {rewardDiscount>0&&<div className="flex justify-between" style={{color:'var(--tint-yellow-text)'}}><span>⭐ Reward Discount</span><span>−₹{rewardDiscount.toFixed(0)}</span></div>}
           {deliveryCharge>0&&<div className="flex justify-between"><span>Delivery Charge</span><span>₹{deliveryCharge.toFixed(0)}</span></div>}
@@ -402,7 +404,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         <div className="flex justify-between font-extrabold font-poppins text-sm mt-2 pt-2" style={{borderTop:'1px solid var(--border)'}}>
           <span>Total</span><span style={{color:'var(--primary)'}}>₹{finalAmount.toFixed(0)}</span>
         </div>
-        {cartTotal < (shopSettings.min_order ?? 499) && <div className="text-[11px] font-bold font-poppins mt-1.5" style={{color:'var(--accent-pink)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-cartTotal).toFixed(0)} aur add karein.</div>}
+        {finalAmount < (shopSettings.min_order ?? 499) && <div className="text-[11px] font-bold font-poppins mt-1.5" style={{color:'var(--accent-pink)'}}>⚠️ Minimum order ₹{shopSettings.min_order ?? 499} hai — ₹{((shopSettings.min_order ?? 499)-finalAmount).toFixed(0)} aur add karein.</div>}
       </div>
 
       <div className={`co-card ${cardCls}`} style={cardStyle}>
@@ -540,7 +542,7 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
       <button className="place-order-btn w-full text-white font-extrabold font-poppins rounded-2xl py-3.5 text-sm"
         style={{background:'linear-gradient(135deg, var(--primary), var(--primary-dark))',boxShadow:'0 6px 16px rgba(211,47,47,0.35)',color:'var(--on-primary)'}}
         disabled={placing||rzpBusy} onClick={handlePlaceOrder}>
-        {placing||rzpBusy?'⏳ Process Ho Raha Hai...':(pay==='razorpay'?`💳 Pay Now — ₹${finalAmount.toFixed(0)}`:`📲 Order Confirm Karein — ₹${finalAmount.toFixed(0)}`)} →
+        {placing||rzpBusy?'⏳ Process Ho Raha Hai...':(!pay?`💳 Payment Method Chunein — ₹${finalAmount.toFixed(0)}`:pay==='razorpay'?`💳 Pay Now — ₹${finalAmount.toFixed(0)}`:`📲 Order Confirm Karein — ₹${finalAmount.toFixed(0)}`)} →
       </button>
     </>
   );
