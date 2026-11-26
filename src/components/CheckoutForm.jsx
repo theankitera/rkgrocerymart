@@ -368,8 +368,8 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         <div className="mt-2.5 pt-2 " style={{borderTop:'1px dashed var(--border)'}}>
           {!appliedCoupon?(
             <div className="flex gap-2">
-              <input className="flex-1 px-3 py-2 rounded-xl text-xs font-poppins outline-none" style={inputStyle} placeholder="Coupon code (e.g. WELCOME50)" value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setCouponError('');}}/>
-              <button type="button" className="addr-add-btn px-3.5 rounded-xl text-xs font-bold font-poppins" style={{background:'var(--primary-light)',color:'var(--primary-dark)'}} disabled={couponChecking||!couponCode.trim()} onClick={handleApplyCoupon}>{couponChecking?'...':'Apply'}</button>
+              <input className="flex-1 min-w-0 px-3 py-2 rounded-xl text-xs font-poppins outline-none" style={inputStyle} placeholder="Coupon code (e.g. WELCOME50)" value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setCouponError('');}}/>
+              <button type="button" className="addr-add-btn px-3.5 rounded-xl text-xs font-bold font-poppins flex-shrink-0" style={{background:'var(--primary-light)',color:'var(--primary-dark)',width:'auto',flexShrink:0}} disabled={couponChecking||!couponCode.trim()} onClick={handleApplyCoupon}>{couponChecking?'...':'Apply'}</button>
             </div>
           ):(
             <div className="flex justify-between items-center rounded-xl px-3 py-2 text-xs font-poppins" style={{background:'var(--light)'}}>
