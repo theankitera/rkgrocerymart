@@ -1348,11 +1348,17 @@ export default function App(){
   // karta hai — hash routing. Home par aane par #shop hash ho to shop page
   // khul jata hai (pehle ye hash ignore hota tha, hamesha home state).
   useEffect(()=>{
-    if(window.location.hash==='#shop'){setPage('shop');setActiveCatId('all');setSearch('');setShopPage(1);}
-    if(window.location.hash==='#cart'){setCartOpen(true);}
-    // Legal/info pages bhi deep-link ho sakte hain (index.html#about etc.)
-    const legalHash=window.location.hash.replace('#','');
-    if(['about','privacy','terms','shipping'].includes(legalHash)) setPage(legalHash);
+    const applyHash=()=>{
+      const h=window.location.hash;
+      if(h==='#shop'){setPage('shop');setActiveCatId('all');setSearch('');setShopPage(1);}
+      if(h==='#cart'){setCartOpen(true);}
+      // Legal/info pages bhi deep-link ho sakte hain (index.html#about etc.)
+      const legalHash=h.replace('#','');
+      if(['about','privacy','terms','shipping'].includes(legalHash)) setPage(legalHash);
+    };
+    applyHash();
+    window.addEventListener('hashchange',applyHash);
+    return()=>window.removeEventListener('hashchange',applyHash);
   },[]);
 
   // Shop products (filtered)

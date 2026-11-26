@@ -125,6 +125,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
     if (suPassword.length < 6)          { setError('Password kam se kam 6 characters ka hona chahiye!'); return; }
     if (suPassword !== confirm)         { setError('Dono passwords match nahi kar rahe!'); return; }
     if (!terms)                         { setError('Terms & Conditions accept karein!'); return; }
+    if (phone.trim() && !/^[6-9]\d{9}$/.test(phone.trim())) { setError('Sahi 10-digit mobile number daalein!'); return; }
     const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(' ');
     // Fix: referral link (?ref=CODE) user_metadata mein — DB trigger register karta hai
     const refCode = new URLSearchParams(window.location.search).get('ref') || '';
@@ -132,7 +133,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
     const { data, error: err } = await supabase.auth.signUp({
       email: suEmail, password: suPassword,
       options: {
-        data: { name: fullName, ...(refCode.trim() ? { referral_code: refCode.trim().toUpperCase() } : {}) },
+        data: { name: fullName, ...(phone.trim() ? { phone: phone.trim() } : {}), ...(refCode.trim() ? { referral_code: refCode.trim().toUpperCase() } : {}) },
         emailRedirectTo: window.location.origin + '/email-verified.html',
       },
     });
@@ -348,7 +349,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode }) {
               </FieldWrap>
               <label className="flex items-start gap-2 cursor-pointer text-[11px] font-poppins" style={{ color: 'var(--gray)' }}>
                 <input type="checkbox" checked={terms} onChange={e => setTerms(e.target.checked)} className="mt-0.5" />
-                <span>Main Terms &amp; Conditions aur Privacy Policy se agree karta/karti hoon.</span>
+                <span>Main <a href="index.html#terms" style={{color:'var(--primary)',textDecoration:'underline'}}>Terms &amp; Conditions</a> aur <a href="index.html#privacy" style={{color:'var(--primary)',textDecoration:'underline'}}>Privacy Policy</a> se agree karta/karti hoon.</span>
               </label>
               <button type="submit" disabled={loading}
                 className="w-full text-white font-extrabold font-poppins rounded-2xl py-3 text-sm flex items-center justify-center gap-2"

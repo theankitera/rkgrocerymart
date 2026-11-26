@@ -29,10 +29,11 @@ export default function ForgotPasswordPage() {
   }
 
   async function resendLink() {
-    setResending(true);
+    setResending(true); setError('');
     const redirectUrl = window.location.origin + '/reset-password.html';
-    await supabase.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
     setResending(false);
+    if (err) { setError(friendly(err)); return; }
     setResent(true);
     setTimeout(() => setResent(false), 4000);
   }

@@ -55,6 +55,7 @@ export default function SignupPage() {
     if (password.length < 6)        { setError('Password kam se kam 6 characters ka hona chahiye!'); return; }
     if (password !== confirm)       { setError('Dono passwords match nahi kar rahe!'); return; }
     if (!terms)                     { setError('Terms & Conditions accept karein!'); return; }
+    if (phone.trim() && !/^[6-9]\d{9}$/.test(phone.trim())) { setError('Sahi 10-digit mobile number daalein!'); return; }
     const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(' ');
     // Fix: referral link (?ref=CODE) se aaya code user_metadata mein — DB trigger
     // signup par hi referral register kar deta hai (real referral system).
@@ -63,7 +64,7 @@ export default function SignupPage() {
     const { data, error: err } = await supabase.auth.signUp({
       email, password,
       options: {
-        data: { name: fullName, ...(refCode.trim() ? { referral_code: refCode.trim().toUpperCase() } : {}) },
+        data: { name: fullName, ...(phone.trim() ? { phone: phone.trim() } : {}), ...(refCode.trim() ? { referral_code: refCode.trim().toUpperCase() } : {}) },
         emailRedirectTo: window.location.origin + '/email-verified.html',
       },
     });
@@ -90,7 +91,7 @@ export default function SignupPage() {
   if (emailSent) {
     return (
       <AuthLayout>
-        <BrandBar badge1="🎁 ₹50 OFF first order" badge2="⚡ Free signup"/>
+        <BrandBar badge1="🎁 Roz naye deals" badge2="⚡ Free signup"/>
         <div className="glass-card">
           <div className="email-sent-wrap">
             <div className="email-sent-icon">📧</div>
@@ -114,7 +115,7 @@ export default function SignupPage() {
 
   return (
     <AuthLayout>
-      <BrandBar badge1="🎁 ₹50 OFF first order" badge2="⚡ Free signup"/>
+      <BrandBar badge1="🎁 Roz naye deals" badge2="⚡ Free signup"/>
 
       <div className="illus-strip">
         {[['🥭','Fruits'],['🧈','Dairy'],['🫙','Masale'],['🍞','Bread'],['🥚','Eggs']].map(([e,l]) => (
@@ -126,13 +127,13 @@ export default function SignupPage() {
         <div className="card-head">
           <div className="head-icon">✨</div>
           <div className="card-title">Account Banayein</div>
-          <div className="card-subtitle">Bilkul free • 30 seconds mein ready<br/>Pehli order par ₹50 OFF!</div>
+          <div className="card-subtitle">Bilkul free • 30 seconds mein ready<br/>Jaldi order karo — 20-55 minute delivery</div>
         </div>
 
         <div className="delivery-badge">
           <div className="db-icon">🚴</div>
           <div>
-            <div className="db-title">10 Minute Delivery Guarantee!</div>
+            <div className="db-title">20–55 Minute Delivery!</div>
             <div className="db-sub">Signup karo, order karo — hum ghar pahuncha denge</div>
           </div>
         </div>
@@ -236,8 +237,8 @@ export default function SignupPage() {
         <label className="check-row" style={{cursor:'pointer'}}>
           <input type="checkbox" className="check-box" checked={terms} onChange={e => setTerms(e.target.checked)}/>
           <span className="check-label">
-            Main <a href="#" onClick={e => {e.preventDefault();alert('Terms coming soon!');}}>Terms &amp; Conditions</a> aur{' '}
-            <a href="#" onClick={e => {e.preventDefault();alert('Privacy Policy coming soon!');}}>Privacy Policy</a>{' '}
+            Main <a href="index.html#terms">Terms &amp; Conditions</a> aur{' '}
+            <a href="index.html#privacy">Privacy Policy</a>{' '}
             se agree karta/karti hoon. WhatsApp updates bhi chahiye.
           </span>
         </label>
@@ -255,7 +256,7 @@ export default function SignupPage() {
       </div>
 
       <FeatureChips chips={[
-        {icon:'🎁',label:'₹50 OFF pehli order'},
+        {icon:'🚴',label:'20-55 minute delivery'},
         {icon:'🚀',label:'Fast delivery'},
         {icon:'💳',label:'Online payment + COD'},
         {icon:'🛡️',label:'100% safe'},
