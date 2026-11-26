@@ -1039,8 +1039,8 @@ export default function AccountPage() {
               <div className="text-[11px] font-semibold font-poppins uppercase tracking-wide" style={{color:'rgba(255,255,255,0.65)'}}>👋 Namaste,</div>
               <div className="text-xl md:text-2xl font-black font-poppins text-white truncate" style={{letterSpacing:'-.4px'}}>{p?.name||'User'}</div>
               <div className="text-xs font-poppins truncate mt-0.5" style={{color:'rgba(255,255,255,0.7)'}}>{p?.email||''}</div>
-              <div className="inline-flex items-center gap-1 rounded-full px-3 py-1 mt-2" style={{background:'rgba(194,24,91,0.15)', border:'1.5px solid rgba(194,24,91,0.4)'}}>
-                <span className="text-[11px] font-extrabold font-poppins" style={{color:'#F06292'}}>{loyalty.label}</span>
+              <div className="inline-flex items-center gap-1 rounded-full px-3 py-1 mt-2" style={{background:'#FFFFFF', border:'1.5px solid rgba(255,255,255,0.9)', boxShadow:'0 2px 8px rgba(0,0,0,0.15)'}}>
+                <span className="text-[11px] font-extrabold font-poppins" style={{color:'#B71C1C'}}>{loyalty.label}</span>
               </div>
             </div>
           </div>
