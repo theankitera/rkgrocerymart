@@ -1324,11 +1324,10 @@ export default function App(){
   // Bug fix #4: only let the search hook run while the search UI is actually active/visible
   const {results:searchResults,loading:searchLoading}=useSearch(search,!searchDisabled);
 
-  // Bug fix #4 (continued): clear stale search text when navigating to a page where
-  // search is locked, so re-opening shop/home doesn't silently resume an old query.
-  useEffect(()=>{
-    if(searchDisabled&&search) setSearch('');
-  },[page]);
+  // #34 fix: locked pages (checkout/detail/success) par search clear karna
+  // band kar diya — useSearch pehle se gated hai (locked pages par query run
+  // nahi hoti) aur input wahan disabled hai. User ka likha search waapas
+  // aane par intact rehta hai.
 
   // Page change par window ko TOP par le jao. Home se "Shop by Category" ke
   // kisi tile par tap karne par (user neeche scroll kiya hua tha) shop page
