@@ -463,7 +463,7 @@ function Footer({shopSettings,onNav}){
         <img src={s.logo_url||'/icons/rk-logo.svg'} alt={s.shop_name||'RK Grocery Mart'} width={38} height={38} style={{width:38,height:38,borderRadius:12}}/>
         <div className="text-left">
           <div className="text-white font-extrabold font-poppins" style={{fontSize:'1.15rem',lineHeight:1.1}}>{s.shop_name||'RK Grocery Mart'}</div>
-          <div className="text-white/75 font-poppins" style={{fontSize:'0.7rem'}}>{s.footer_text||'Delivery in 5 minutes'}</div>
+          <div className="text-white/75 font-poppins font-bold" style={{fontSize:'0.7rem'}}>{s.footer_text||'Delivery in 5 minutes'}</div>
         </div>
       </div>
       <div className="flex items-center justify-center gap-4 flex-wrap" style={{margin:'8px 0'}}>
@@ -1861,7 +1861,7 @@ export default function App(){
                 <img src={shopSettings.logo_url||'/icons/rk-logo.svg'} alt={shopSettings.shop_name||'RK Grocery Mart'} width={36} height={36} className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex-shrink-0"/>
                 <span className="flex flex-col min-w-0">
                   <span className="text-[13px] sm:text-base md:text-lg font-extrabold font-poppins leading-none truncate" style={{color:'var(--dark)'}}><MultiColorName name={shopSettings.shop_name||'RK Grocery Mart'}/></span>
-                  <span className="text-[8px] sm:text-[9px] md:text-[10px] font-poppins font-medium mt-0.5 truncate" style={{color:'var(--dark)'}}>{shopSettings.footer_text||(<><span>Delivery in </span><span style={{color:'var(--primary)',fontWeight:800}}>5 minutes</span></>)}</span>
+                  <span className="text-[8px] sm:text-[9px] md:text-[10px] font-poppins font-extrabold mt-0.5 truncate" style={{color:'var(--dark)'}}>{shopSettings.footer_text||(<><span>Delivery in </span><span style={{color:'var(--primary)',fontWeight:900}}>5 minutes</span></>)}</span>
                 </span>
               </button>
             </div>
