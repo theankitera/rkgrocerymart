@@ -21,7 +21,7 @@ export function BrandBar({ badge1, badge2 }) {
         <img src="/icons/rk-logo.svg" alt="RK Grocery Mart" style={{width:46,height:46,borderRadius:14}}/>
         <div>
           <div className="brand-name">RK Grocery Mart</div>
-          <div className="brand-tagline">हर घर की पसंद · ONLINE GROCERY</div>
+          <div className="brand-tagline">Delivery in 5 minutes · ONLINE GROCERY</div>
         </div>
       </a>
       <div className="trust-badges">
