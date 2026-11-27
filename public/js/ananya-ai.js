@@ -1,9 +1,11 @@
 /*!
  * ANANYA AI - Smart Shopping Assistant
  * RK Grocery Mart
- * Version: 4.0 — Gemini AI + Supabase Product Search Backend
+ * Version: 5.0 — Groq Qwen AI + Supabase Product Search Backend
  * UI untouched. Local intents stay instant; unmatched queries now route
- * through /api/chat (Gemini, with Supabase product lookups first).
+ * through /api/chat (Qwen via Groq, with Supabase product lookups first).
+ * Coupons kabhi hardcode nahi hote — Admin jo coupon set karta hai, Ananya
+ * live database se wahi dikhati hai (loadLiveCoupons).
  */
 (function () {
   'use strict';
@@ -25,7 +27,7 @@
       freeDeliv: '0–5 km FREE delivery, 5–8 km ₹30',
       payment:   'Cash on Delivery ya Online Payment via Razorpay (UPI, cards, net banking uske andar)',
       returns:   'Fresh items: 24 ghante | Packaged: 7 din',
-      firstOffer:'First order par 10% OFF — code: WELCOME10',
+      firstOffer:'Abhi koi active offer nahi hai — naye offers ke liye bane rahiye!',
       appOffer:  'App install karo aur weekly special offers paao!',
     },
 
@@ -41,7 +43,7 @@
       { q: 'Order track kaise karein?',
         a: '🛒 Order track karne ke 2 tarike:\n\n1️⃣ Account → Orders section mein jaayein\n2️⃣ WhatsApp par order ID share karein\n\nHum jaldi update denge! 😊' },
       { q: 'Koi discount ya offer hai?',
-        a: '🎉 Current Offers:\n\n🆕 WELCOME10 — First order par 10% OFF\n📱 App install karo — weekly special offers\n🛒 ₹500+ order par extra 5% off\n\nOffer use karne ke liye checkout pe apply karein!' },
+        a: '🎉 Current Offers:\n\nAbhi koi active offer nahi hai — naye offers ke liye bane rahiye!\n📱 App install karo — weekly special offers' },
       { q: 'Minimum order kya hai?',
         a: '📦 Delivery ke liye minimum order ₹499 hai.\n\nIn-store shopping ke liye koi minimum nahi.\n\n💡 Tip: 0–5 km ke andar delivery FREE hai!' },
       { q: 'Organic products available hain?',
@@ -54,7 +56,7 @@
       { icon: '💳', title: 'Payment Methods', body: 'COD · Online Payment\n(Razorpay)' },
       { icon: '↩️', title: 'Return Policy',   body: 'Fresh items: 24 hours\nPackaged goods: 7 days' },
       { icon: '📞', title: 'Contact',         body: '+91 63931 96765\n(WhatsApp available)' },
-      { icon: '🎁', title: 'Current Offer',   body: 'WELCOME10 — 10% OFF\non your first order!' },
+      { icon: '🎁', title: 'Current Offer',   body: 'Abhi koi active offer nahi hai' },
     ],
 
     intents: [
@@ -81,7 +83,7 @@
       {
         keys: ['contact','phone','call','number','email','helpline','support','help'],
         reply: ({ storeInfo: s }) =>
-          `📞 *Contact Us:*\n\n📱 Phone/WhatsApp: ${s.phone}\n📧 Email: ${s.email}\n📍 ${s.address}\n\nHum 9 AM–8 PM available hain! 😊`,
+          `📞 *Contact Us:*\n\n📱 Phone/WhatsApp: ${s.phone}\n📧 Email: ${s.email}\n📍 ${s.address}\n\nHum ${s.timings.replace(/^Roz: /, '')} available hain! 😊`,
       },
       {
         keys: ['address','location','where','kahan','shop','store','map','place','area'],
@@ -96,7 +98,7 @@
       {
         keys: ['discount','offer','coupon','sale','promo','cashback','deal','off','scheme'],
         reply: ({ storeInfo: s }) =>
-          `🎉 *Current Offers:*\n\n🆕 Code: WELCOME10 — ${s.firstOffer}\n📱 ${s.appOffer}\n🛒 ₹500+ order par extra 5% off\n\nCheckout pe code apply karein!`,
+          `🎉 *Current Offers:*\n\n${s.firstOffer}\n📱 ${s.appOffer}\n\nCheckout pe code apply karein!`,
       },
       {
         keys: ['minimum','min order','kitna order','minimum order'],
@@ -320,6 +322,7 @@
     // chatbot + support page khud update ho jayein (koi hardcoded fallback
     // nahi; fail ho to upar wale sahi static values hi rehte hain).
     loadShopSettings();
+    loadLiveCoupons();
   }
 
   // Shop settings (id=1) padhkar storeInfo + support-page contact update karo.
@@ -367,6 +370,58 @@
         if (dc) dc.body = 'Same-day within ' + data.delivery_radius + ' km\n' + s.freeDeliv;
       }
     } catch (e) { /* settings optional — static values rehte hain */ }
+  }
+
+  // Live coupons (Admin se set hote hain) — Ananya sirf wahi offers bataye
+  // jo database mein active hain. Koi coupon na ho to "koi offer nahi"
+  // dikhao; code mein kabhi coupon hardcode mat karo. Widget banne se pehle
+  // chale to CONFIG update hota hai; baad mein chale to rendered FAQ/card
+  // bhi update hote hain.
+  async function loadLiveCoupons() {
+    try {
+      const sb = state.supabase || _getClient();
+      if (!sb) return;
+      const today = new Date().toISOString().slice(0, 10);
+      const { data } = await sb.from('coupons')
+        .select('code,discount_type,discount_value,min_order,expiry_date,description')
+        .eq('is_active', true).order('created_at', { ascending: false }).limit(5);
+      const live = (data || []).filter(c => c.code && (!c.expiry_date || c.expiry_date >= today));
+      const s = CONFIG.storeInfo;
+      let offerText, cardBody;
+      if (!live.length) {
+        offerText = 'Abhi koi active offer nahi hai — naye offers ke liye bane rahiye!';
+        cardBody = 'Abhi koi active offer nahi hai';
+      } else {
+        const fmt = (c) => {
+          const disc = c.discount_type === 'flat' ? `Flat ₹${c.discount_value} OFF` : `${c.discount_value}% OFF`;
+          const min = c.min_order ? ` (min order ₹${c.min_order})` : '';
+          return `🆕 ${c.code} — ${disc}${min}`;
+        };
+        offerText = live.map(fmt).join('\n');
+        cardBody = live.map(c => `${c.code} — ${c.discount_type === 'flat' ? 'Flat ₹' + c.discount_value + ' OFF' : c.discount_value + '% OFF'}`).join('\n');
+      }
+      s.firstOffer = offerText;
+      const fq = CONFIG.faqs.find((f) => /discount|offer/i.test(f.q));
+      if (fq) fq.a = '🎉 Current Offers:\n\n' + offerText + '\n📱 App install karo — weekly special offers' + (live.length ? '\n\nOffer use karne ke liye checkout pe apply karein!' : '');
+      const card = CONFIG.infoCards.find((c) => c.title === 'Current Offer');
+      if (card) card.body = cardBody;
+      // Widget already bana hua ho to rendered FAQ/card bhi update karo.
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      document.querySelectorAll('.ananya-faq-item').forEach(item => {
+        const q = item.querySelector('.ananya-faq-q');
+        if (q && /discount|offer/i.test(q.textContent || '')) {
+          const a = item.querySelector('.ananya-faq-a');
+          if (a && fq) a.innerHTML = esc(fq.a).replace(/\n/g, '<br>');
+        }
+      });
+      document.querySelectorAll('.ananya-info-card').forEach(cEl => {
+        const t = cEl.querySelector('strong');
+        if (t && t.textContent.trim() === 'Current Offer') {
+          const p = cEl.querySelector('p');
+          if (p) p.innerHTML = esc(cardBody).replace(/\n/g, '<br>');
+        }
+      });
+    } catch (e) { /* coupons optional — static values rehte hain */ }
   }
 
   async function getOrCreateSession() {
@@ -513,10 +568,10 @@
   }
 
   /* ══════════════════════════════════════════
-     BACKEND AI — /api/chat (Gemini + Supabase)
+     BACKEND AI — /api/chat (Qwen via Groq + Supabase)
      Only called when no local intent matches,
      so store-policy FAQs stay instant & free —
-     this keeps Gemini usage to the queries that
+     this keeps Qwen usage to the queries that
      actually need it (products, open-ended Qs).
   ══════════════════════════════════════════ */
   async function fetchBackendReply(text) {
@@ -1121,6 +1176,9 @@
       if (data.phone || data.contact) CONFIG.storeInfo.phone = data.contact || CONFIG.storeInfo.phone;
       if (data.whatsapp) { CONFIG.whatsappNumber = data.whatsapp.replace(/\D/g, ''); CONFIG.storeInfo.whatsapp = data.whatsapp; }
     } catch (e) { /* best-effort only */ }
+    // Coupons bhi live lao (widget banne se pehle — taaki pehli paint se hi
+    // sahi offer dikhe).
+    await loadLiveCoupons();
   }
 
   async function init() {
