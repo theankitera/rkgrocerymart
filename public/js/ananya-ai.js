@@ -17,7 +17,7 @@
     supabaseKey:    'sb_publishable_u5a41INjYZJ81r7QGCiLaQ_B3PxsTm9',
 
     storeInfo: {
-      timings:   'Roz: subah 5:30 – dopahar 12:00 (5:30 AM – 12:00 PM)',
+      timings:   'Roz: subah 5:30 – raat 12:00 (5:30 AM – 12:00 AM)',
       phone:     '+91 63931 96765',
       whatsapp:  '6393196765',
       address:   'RK Grocery Mart, Uttar Pradesh, India',
@@ -33,7 +33,7 @@
 
     faqs: [
       { q: 'Store timings kya hain?',
-        a: '🕐 Hamare store ke timings:\nRoz: subah 5:30 – dopahar 12:00 (5:30 AM – 12:00 PM)\n\nOnline order kabhi bhi place kar sakte hain — delivery subah 5:30 se dopahar 12 ke beech hoti hai! 😊' },
+        a: '🕐 Hamare store ke timings:\nRoz: subah 5:30 – raat 12:00 (5:30 AM – 12:00 AM)\n\nOnline order kabhi bhi place kar sakte hain — delivery subah 5:30 se raat 12 ke beech hoti hai! 😊' },
       { q: 'Delivery kitni door tak hoti hai?',
         a: '🚚 Hum 8 km ke andar same-day delivery karte hain.\n\n✅ 0–5 km FREE delivery, 5–8 km ₹30\n⏱️ Delivery time: 20–55 minute\n📦 Order track kar sakte hain account mein.' },
       { q: 'Kaunse payment methods accepted hain?',
@@ -51,7 +51,7 @@
     ],
 
     infoCards: [
-      { icon: '🕐', title: 'Store Timings',  body: 'Roz: 5:30 AM – 12:00 PM' },
+      { icon: '🕐', title: 'Store Timings',  body: 'Roz: 5:30 AM – 12:00 AM' },
       { icon: '🚚', title: 'Delivery',        body: 'Same-day within 8 km\n0–5 km FREE, 5–8 km ₹30' },
       { icon: '💳', title: 'Payment Methods', body: 'COD · Online Payment\n(Razorpay)' },
       { icon: '↩️', title: 'Return Policy',   body: 'Fresh items: 24 hours\nPackaged goods: 7 days' },
@@ -336,6 +336,8 @@
       if (!data) return;
       const s = CONFIG.storeInfo;
       const fmtT = (t) => { if (!t) return ''; const p = String(t).split(':'); let h = +p[0]; const m = p[1] || '00'; const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + m + ' ' + ap; };
+      // Day-part (subah/dopahar/shaam/raat) — close_time raat 12 (00:00) ho to "raat" aaye, "dopahar" nahi.
+      const dayPart = (t) => { const h = +String(t || '').split(':')[0]; return (h >= 20 || h < 5) ? 'raat' : h < 12 ? 'subah' : h < 17 ? 'dopahar' : 'shaam'; };
       const fmtPh = (c) => c ? '+91 ' + String(c).replace(/(\d{5})(\d{5})/, '$1 $2') : '';
       if (data.contact) {
         const ph = fmtPh(data.contact);
@@ -347,12 +349,12 @@
         const cln = document.getElementById('sp-call-num'); if (cln) cln.textContent = ph;
       }
       if (data.open_time && data.close_time) {
-        s.timings = 'Roz: subah ' + data.open_time.slice(0, 5) + ' – dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ')';
+        s.timings = 'Roz: ' + dayPart(data.open_time) + ' ' + data.open_time.slice(0, 5) + ' – ' + dayPart(data.close_time) + ' ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ')';
         const hl = document.getElementById('sp-hours-line');
-        if (hl) hl.textContent = 'Ask anything — products, prices, orders, delivery or offers. RK Mart Assistant se kabhi bhi pooch sakte hain — human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ').';
+        if (hl) hl.textContent = 'Ask anything — products, prices, orders, delivery or offers. RK Mart Assistant se kabhi bhi pooch sakte hain — human support ' + dayPart(data.open_time) + ' ' + data.open_time.slice(0, 5) + ' se ' + dayPart(data.close_time) + ' ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ').';
         const hShort = fmtT(data.open_time) + ' – ' + fmtT(data.close_time);
         const setT = (id, txt) => { const n = document.getElementById(id); if (n) n.textContent = txt; };
-        setT('sp-hours-faq', 'Didn\'t find your answer? Ask RK Mart Assistant directly in the chat box above — RK Mart Assistant se kabhi bhi pooch sakte hain; human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + hShort + ').');
+        setT('sp-hours-faq', 'Didn\'t find your answer? Ask RK Mart Assistant directly in the chat box above — RK Mart Assistant se kabhi bhi pooch sakte hain; human support ' + dayPart(data.open_time) + ' ' + data.open_time.slice(0, 5) + ' se ' + dayPart(data.close_time) + ' ' + data.close_time.slice(0, 5) + ' (' + hShort + ').');
         setT('sp-hours-chat', 'RK Mart Assistant chat: kabhi bhi (instant answers).');
         setT('sp-hours-daily', '🕒 Daily ' + hShort);
         setT('sp-hours-chat2', '💬 Chat — kabhi bhi');
@@ -1175,7 +1177,9 @@
         // wala ek hi format rakho ("Roz: subah … – dopahar … (12h – 12h)"), taaki
         // contact intent ka .replace(/^Roz: /, '') bhi kaam kare.
         const fmtT = (t) => { if (!t) return ''; const p = String(t).split(':'); let h = +p[0]; const m = p[1] || '00'; const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + m + ' ' + ap; };
-        CONFIG.storeInfo.timings = 'Roz: subah ' + data.open_time.slice(0, 5) + ' – dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ')';
+        // Day-part (subah/dopahar/shaam/raat) — close_time raat 12 (00:00) ho to "raat" aaye, "dopahar" nahi.
+        const dayPart = (t) => { const h = +String(t || '').split(':')[0]; return (h >= 20 || h < 5) ? 'raat' : h < 12 ? 'subah' : h < 17 ? 'dopahar' : 'shaam'; };
+        CONFIG.storeInfo.timings = 'Roz: ' + dayPart(data.open_time) + ' ' + data.open_time.slice(0, 5) + ' – ' + dayPart(data.close_time) + ' ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ')';
       }
       if (data.shop_name) CONFIG.storeName = data.shop_name;
       if (data.phone || data.contact) CONFIG.storeInfo.phone = data.contact || CONFIG.storeInfo.phone;

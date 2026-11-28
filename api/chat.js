@@ -103,7 +103,7 @@ function buildStoreContext(settings, coupons) {
   const s = settings || {};
   const name = s.shop_name || 'RK Grocery Mart';
   const open = s.open_time ? formatTime12(s.open_time) : '5:30 AM';
-  const close = s.close_time ? formatTime12(s.close_time) : '12:00 PM';
+  const close = s.close_time ? formatTime12(s.close_time) : '12:00 AM';
   const radius = s.delivery_radius || 8;
   const charge = s.delivery_charge != null ? s.delivery_charge : 30;
   const freeKm = s.free_delivery_km != null ? s.free_delivery_km : 5;
