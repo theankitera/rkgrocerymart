@@ -43,7 +43,7 @@ const loyaltyLevel = n => {
   if (n>=5)  return { label:'🥉 Bronze Member' };
   return { label:'🌱 New Member' };
 };
-const statusLabel = s => ({ pending:'Pending', confirmed:'Confirmed', out_for_delivery:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled' }[s]||s);
+const statusLabel = s => ({ pending:'Pending', confirmed:'Confirmed', packed:'Pack ho gaya', out_for_delivery:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled', returned:'Wapas', pending_payment:'Payment baaki' }[s]||s);
 const notifColor  = t => ({ offer:'var(--tint-pink-bg)', order:'var(--tint-blue-bg)', delivery:'var(--tint-purple-bg)', stock:'var(--tint-neutral-bg)', system:'var(--tint-neutral-bg)' }[t]||'var(--tint-neutral-bg)');
 const notifIcon   = t => ({ offer:'🎁', order:'📦', delivery:'🚴', stock:'📢', system:'ℹ️' }[t]||'🔔');
 const addrIcon    = l => { const s=(l||'').toLowerCase(); if(s.includes('home')) return '🏠'; if(s.includes('office')||s.includes('work')) return '🏢'; return '📍'; };
@@ -123,9 +123,12 @@ function Badge({ status }) {
   const map = {
     pending:          ['var(--badge-yellow-bg)','var(--badge-yellow-text)'],
     confirmed:        ['var(--badge-blue-bg)','var(--badge-blue-text)'],
+    packed:           ['var(--badge-blue-bg)','var(--badge-blue-text)'],
     out_for_delivery: ['var(--badge-purple-bg)','var(--badge-purple-text)'],
     delivered:        ['var(--badge-green-bg)','var(--badge-green-text)'],
     cancelled:        ['var(--badge-red-bg)','var(--badge-red-text)'],
+    returned:         ['var(--badge-red-bg)','var(--badge-red-text)'],
+    pending_payment:  ['var(--badge-yellow-bg)','var(--badge-yellow-text)'],
   };
   const [bg,text] = map[status]||['var(--light)','var(--gray)'];
   return <span className="inline-block px-2.5 py-1 rounded-full text-[10px] font-extrabold font-poppins tracking-wide mt-1" style={{background:bg,color:text}}>{statusLabel(status)}</span>;

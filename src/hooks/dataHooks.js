@@ -208,7 +208,8 @@ export function useCouponValidator(){
     }
 
     const discount=data.discount_type==='percent'?Math.round(orderTotal*(data.discount_value/100)):data.discount_value;
-    const finalDiscount=Math.min(discount,orderTotal);
+    // S-M3: percent discount ko admin-set max_discount se cap karo (display == charged)
+    const finalDiscount=Math.min(discount,data.max_discount ?? Infinity,orderTotal);
     return{valid:true,code:data.code,discount:finalDiscount,coupon:data};
   },[]);
   return{validate,checking};

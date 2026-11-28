@@ -62,8 +62,9 @@
     intents: [
       {
         keys: ['timing','time','open','close','band','kab khula','kab band','schedule','hours','khula'],
+        // S-M6: hardcoded timings nahi — s.timings (live shop_settings se sync) se banao
         reply: ({ storeInfo: s }) =>
-          `🕐 *Store Timings:*\n\n📅 Roz: subah 5:30 – dopahar 12:00 (5:30 AM – 12:00 PM)\n\nOnline order kabhi bhi place kar sakte hain — delivery subah 5:30 se dopahar 12 ke beech hoti hai! 😊`,
+          `🕐 *Store Timings:*\n\n📅 ${s.timings}\n\nOnline order kabhi bhi place kar sakte hain — delivery ${s.timings.replace(/^Roz: /, '')} ke beech hoti hai! 😊`,
       },
       {
         keys: ['deliver','delivery','ship','door','ghar','kitna time','courier','home'],
@@ -1170,7 +1171,11 @@
       const { data } = await SB.from('shop_settings').select('shop_name,contact,whatsapp,open_time,close_time').eq('id', 1).maybeSingle();
       if (!data) return;
       if (data.open_time && data.close_time) {
-        CONFIG.storeInfo.timings = `Daily: ${data.open_time} – ${data.close_time}`;
+        // S-M6: "Daily: 05:30 – 12:00" raw 24h overwrite HATAO — loadShopSettings
+        // wala ek hi format rakho ("Roz: subah … – dopahar … (12h – 12h)"), taaki
+        // contact intent ka .replace(/^Roz: /, '') bhi kaam kare.
+        const fmtT = (t) => { if (!t) return ''; const p = String(t).split(':'); let h = +p[0]; const m = p[1] || '00'; const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + m + ' ' + ap; };
+        CONFIG.storeInfo.timings = 'Roz: subah ' + data.open_time.slice(0, 5) + ' – dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ')';
       }
       if (data.shop_name) CONFIG.storeName = data.shop_name;
       if (data.phone || data.contact) CONFIG.storeInfo.phone = data.contact || CONFIG.storeInfo.phone;

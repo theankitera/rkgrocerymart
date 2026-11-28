@@ -14,6 +14,8 @@ const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://fheewnarnocdzcvvshrj.supabase.co';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+// S-M7: caller auth ke liye anon key (api/chat.js jaisa — /auth/v1/user call ke liye)
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 
 function authHeader() {
   return 'Basic ' + Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64');
@@ -39,6 +41,21 @@ async function fetchJson(path, opts = {}) {
   return data;
 }
 
+// S-M7: Supabase accessToken se caller ka user id nikalo (api/chat.js pattern).
+async function resolveUserIdFromToken(accessToken) {
+  if (!accessToken || typeof accessToken !== 'string' || !SUPABASE_ANON_KEY) return null;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'GET',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.id || null;
+  } catch (e) { return null; }
+}
+
 // ── SECURITY (2026-08-09 → 2026-10-18 refactor) ────────────────────────────
 // Ab amount ka SOURCE OF TRUTH orders.final_amount hai, jo create_order_draft()
 // (SECURITY DEFINER RPC, supabase/migrations/20261018_payment_lifecycle.sql)
@@ -49,12 +66,32 @@ async function fetchJson(path, opts = {}) {
 //   3. razorpay order id draft par attach (webhook correlation) + retry reset
 // (Purana code dobara se prices recompute karta tha jo variant-priced items par
 //  selling_price se mismatch karke legit orders reject kar deta tha.)
-async function preparePaymentAttempt(orderId, requestedPaise) {
+async function preparePaymentAttempt(orderId, requestedPaise, accessToken) {
   const order = await fetchJson(
-    `orders?select=final_amount,status,payment_status,razorpay_order_id&id=eq.${encodeURIComponent(orderId)}`
+    `orders?select=final_amount,status,payment_status,razorpay_order_id,user_id&id=eq.${encodeURIComponent(orderId)}`
   );
   const orderRow = Array.isArray(order) ? order[0] : null;
   if (!orderRow) return { ok: false, status: 404, error: 'Order not found' };
+
+  // S-M7: caller auth / order-ownership check. Draft ka user_id set ho to
+  // request wala token usi user ka hona chahiye, warna 403. Guest draft
+  // (user_id null) bina auth ke allow — guest checkout tootna nahi chahiye.
+  // Env configure nahi hai to check chal hi nahi sakta — us haal mein
+  // fail-open (warn karke aage badho), warna Vercel mein key missing hone
+  // par saare logged-in online checkout 403 ho jayenge.
+  if (orderRow.user_id) {
+    if (!SUPABASE_ANON_KEY) {
+      console.warn('[razorpay-order] SUPABASE_ANON_KEY not configured — ownership check skipped (Vercel env mein set karein)');
+    } else {
+      if (!accessToken) {
+        return { ok: false, status: 403, error: 'Login session nahi mila — dobara login karke try karein' };
+      }
+      const callerUserId = await resolveUserIdFromToken(accessToken);
+      if (!callerUserId || callerUserId !== orderRow.user_id) {
+        return { ok: false, status: 403, error: 'Ye order aapke account ka nahi hai' };
+      }
+    }
+  }
 
   // State machine guard: sirf DRAFT orders payment ke liye eligible hain.
   // (COD/UPI wale real orders yahan se pay nahi karwa sakte, na hi paid order
@@ -130,8 +167,10 @@ module.exports = async (req, res) => {
   if (!orderId) {
     return res.status(400).json({ error: 'Missing order id' });
   }
+  // S-M7: caller ka Supabase accessToken (CheckoutForm bhejta hai)
+  const accessToken = typeof body.accessToken === 'string' ? body.accessToken.slice(0, 2000) : null;
   try {
-    const check = await preparePaymentAttempt(orderId, amount);
+    const check = await preparePaymentAttempt(orderId, amount, accessToken);
     if (!check.ok) {
       console.warn('[razorpay-order] attempt rejected:', check.error);
       return res.status(check.status).json({ error: check.error });

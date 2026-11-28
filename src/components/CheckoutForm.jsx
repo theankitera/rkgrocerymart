@@ -190,12 +190,18 @@ export function CheckoutForm({cart,total:cartTotal,showToast,onSuccess,user,onLo
         ? result.serverPaise
         : Math.round(Number(result.finalAmount||finalAmount)*100);
       // 2) Server se Razorpay order banao (secret server par hai)
+      // S-M7: caller auth — session ho to token bhejo; guest ho to null bhejo
+      // (server guest draft ko bina auth ke allow karta hai, logged-in draft
+      // par bina token ke 403 deta hai). Yahan fail-closed mat karo — guest
+      // checkout toot jayega.
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token || null;
       const r=await fetch('/api/razorpay-order',{
         method:'POST',headers:{'Content-Type':'application/json'},
         // orderId server ko bhi bhejo — server DB ke final_amount se amount
         // verify karta hai aur DRAFT state guard lagata hai (paid/non-draft
         // order par dobara payment initiate hi nahi hoga)
-        body:JSON.stringify({amount:payPaise,receipt:orderNumber,orderId,notes:{orderNumber,orderId:orderId||''}}),
+        body:JSON.stringify({amount:payPaise,receipt:orderNumber,orderId,accessToken,notes:{orderNumber,orderId:orderId||''}}),
       });
       const o=await r.json().catch(()=>({}));
       if(!r.ok||!o.orderId){setRzpBusy(false);setOrderError(o.error?'⚠️ '+o.error:'⚠️ Online payment shuru nahi hua — thodi der baad try karein ya COD chunein.');return;}

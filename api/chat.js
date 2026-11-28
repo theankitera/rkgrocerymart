@@ -31,7 +31,7 @@ if (!SUPABASE_ANON_KEY) {
 // (cached ~6h), aur hardcoded fallback bhi hai.
 const GROQ_API_URL = 'https://api.groq.com/openai/v1';
 const GROQ_PRIMARY_MODEL = 'qwen/qwen3.8-27b'; // free tier
-const GROQ_FALLBACK_MODEL = 'qwen/qwen3.8-27b';
+const GROQ_FALLBACK_MODEL = 'llama-3.1-8b-instant'; // S-M2: primary se ALAG stable free model (fallback bekaar na ho)
 
 let _qwenModelCache = null; // { primary, fallback, expiresAt }
 const MODEL_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6h per serverless instance
@@ -485,6 +485,15 @@ module.exports = async (req, res) => {
           source: 'database',
         });
       }
+      // S-M1: logged-in user, koi order nahi → Groq call kiye bina seedha DB jawab.
+      // (Pehle ye case Groq ko bheja jata tha; key missing hone par user ko
+      // jhootha "technical issue" milta tha, "koi order nahi" ki jagah.)
+      if (userId && orders.length === 0) {
+        const reply = orderNumberAsked
+          ? `📦 Order "${orderNumberAsked}" aapke account mein nahi mila — order number galat ho sakta hai ya ye kisi aur account ka order hai. Sahi order number se dobara poochhein! 😊`
+          : '📦 Abhi tak aapka koi order record nahi mila. Pehla order place karte hi main uski status yahin bata sakti hoon! 😊';
+        return res.status(200).json({ reply, source: 'database' });
+      }
       const historyContents = rawHistory
         .filter(m => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'))
         .map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: sanitizeText(m.content) }] }));
@@ -523,6 +532,14 @@ module.exports = async (req, res) => {
 
   } catch (err) {
     console.error('[ananya /api/chat] error:', err?.message || err);
+    // S-M1: GROQ key set nahi hai to generic fake "technical issue" mat do —
+    // saaf batao ki AI assistant abhi uplabdh nahi hai (key user ko banani hai).
+    if (String(err?.message || '').includes('GROQ_API_KEY')) {
+      return res.status(200).json({
+        error: 'ai_unavailable',
+        reply: 'RK Mart Assistant ka AI hissa abhi uplabdh nahi hai 🙏\n\nJald hi wapas aayega. Tab tak aap website par products browse kar sakte hain, ya seedha WhatsApp par sampark karein: +91 63931 96765',
+      });
+    }
     return res.status(200).json({
       error: 'upstream_error',
       reply: 'Sorry, abhi thoda issue aa raha hai mujhe jawab dene mein 🙏\n\nKripya thodi der mein dobara try karein, ya seedha WhatsApp par sampark karein: +91 63931 96765',
