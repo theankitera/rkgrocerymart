@@ -1,10 +1,10 @@
 /*!
- * ANANYA AI - Smart Shopping Assistant
+ * RK MART ASSISTANT - Smart Shopping Assistant
  * RK Grocery Mart
  * Version: 5.0 — Groq Qwen AI + Supabase Product Search Backend
  * UI untouched. Local intents stay instant; unmatched queries now route
  * through /api/chat (Qwen via Groq, with Supabase product lookups first).
- * Coupons kabhi hardcode nahi hote — Admin jo coupon set karta hai, Ananya
+ * Coupons kabhi hardcode nahi hote — Admin jo coupon set karta hai, RK Mart Assistant
  * live database se wahi dikhati hai (loadLiveCoupons).
  */
 (function () {
@@ -138,7 +138,7 @@
       {
         keys: ['namaste','hello','hi','hey','helo','namaskar','good morning','good evening','salam'],
         reply: () =>
-          `Namaste! 🙏😊\n\nMain Ananya hoon — RK Grocery Mart ki smart assistant.\n\nMain in topics mein help kar sakti hoon:\n🚚 Delivery · 💳 Payment · ↩️ Returns\n🎁 Offers · 📞 Contact · 🛒 Orders\n\nKya poochna chahte hain? 😊`,
+          `Namaste! 🙏😊\n\nMain RK Mart Assistant hoon — RK Grocery Mart ki smart assistant.\n\nMain in topics mein help kar sakti hoon:\n🚚 Delivery · 💳 Payment · ↩️ Returns\n🎁 Offers · 📞 Contact · 🛒 Orders\n\nKya poochna chahte hain? 😊`,
       },
       {
         keys: ['thanks','thank you','shukriya','dhanyawad','theek hai','ok','okay','achha'],
@@ -348,11 +348,11 @@
       if (data.open_time && data.close_time) {
         s.timings = 'Roz: subah ' + data.open_time.slice(0, 5) + ' – dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ')';
         const hl = document.getElementById('sp-hours-line');
-        if (hl) hl.textContent = 'Ask anything — products, prices, orders, delivery or offers. Ananya AI se kabhi bhi pooch sakte hain — human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ').';
+        if (hl) hl.textContent = 'Ask anything — products, prices, orders, delivery or offers. RK Mart Assistant se kabhi bhi pooch sakte hain — human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + fmtT(data.open_time) + ' – ' + fmtT(data.close_time) + ').';
         const hShort = fmtT(data.open_time) + ' – ' + fmtT(data.close_time);
         const setT = (id, txt) => { const n = document.getElementById(id); if (n) n.textContent = txt; };
-        setT('sp-hours-faq', 'Didn\'t find your answer? Ask Ananya directly in the chat box above — Ananya AI se kabhi bhi pooch sakte hain; human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + hShort + ').');
-        setT('sp-hours-chat', 'Ananya AI chat: kabhi bhi (instant answers).');
+        setT('sp-hours-faq', 'Didn\'t find your answer? Ask RK Mart Assistant directly in the chat box above — RK Mart Assistant se kabhi bhi pooch sakte hain; human support subah ' + data.open_time.slice(0, 5) + ' se dopahar ' + data.close_time.slice(0, 5) + ' (' + hShort + ').');
+        setT('sp-hours-chat', 'RK Mart Assistant chat: kabhi bhi (instant answers).');
         setT('sp-hours-daily', '🕒 Daily ' + hShort);
         setT('sp-hours-chat2', '💬 Chat — kabhi bhi');
         setT('sp-hours-phone', 'Phone & WhatsApp support: daily ' + hShort + '.');
@@ -372,7 +372,7 @@
     } catch (e) { /* settings optional — static values rehte hain */ }
   }
 
-  // Live coupons (Admin se set hote hain) — Ananya sirf wahi offers bataye
+  // Live coupons (Admin se set hote hain) — RK Mart Assistant sirf wahi offers bataye
   // jo database mein active hain. Koi coupon na ho to "koi offer nahi"
   // dikhao; code mein kabhi coupon hardcode mat karo. Widget banne se pehle
   // chale to CONFIG update hota hai; baad mein chale to rendered FAQ/card
@@ -664,7 +664,7 @@
     if (role === 'bot') {
       const nameEl = document.createElement('div');
       nameEl.className = 'ananya-sender-name';
-      nameEl.textContent = opts.senderLabel || '🌸 Ananya';
+      nameEl.textContent = opts.senderLabel || '🌸 RK Mart Assistant';
       msgDiv.appendChild(nameEl);
     }
 
@@ -871,12 +871,12 @@
     const widget = document.createElement('div');
     widget.id = 'ananya-widget';
     widget.setAttribute('role', 'dialog');
-    widget.setAttribute('aria-label', 'Ananya AI Chat');
+    widget.setAttribute('aria-label', 'RK Mart Assistant Chat');
     widget.innerHTML = `
       <div class="ananya-header">
         <div class="ananya-header-avatar">🌸</div>
         <div class="ananya-header-info">
-          <div class="ananya-header-name">Ananya AI</div>
+          <div class="ananya-header-name">RK Mart Assistant</div>
           <div class="ananya-header-status">Online · Shopping Assistant</div>
         </div>
         <div class="ananya-header-actions">
@@ -1105,7 +1105,7 @@
     removeTyping();
 
     const welcome =
-      `Namaste 👋\n\nMain Ananya hoon.\n\nRK Grocery Mart ki smart shopping assistant. 🌸\n\nMain products, orders, delivery aur support mein aapki madad kar sakti hoon.\n\nAaj main aapki kaise madad kar sakti hoon?`;
+      `Namaste 👋\n\nMain RK Mart Assistant hoon.\n\nRK Grocery Mart ki smart shopping assistant. 🌸\n\nMain products, orders, delivery aur support mein aapki madad kar sakti hoon.\n\nAaj main aapki kaise madad kar sakti hoon?`;
     appendMessage('bot', welcome);
     saveMessage('assistant', welcome);
   }

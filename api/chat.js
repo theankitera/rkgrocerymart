@@ -1,5 +1,5 @@
 /*!
- * /api/chat — Ananya AI backend
+ * /api/chat — RK Mart Assistant backend
  * RK Grocery Mart
  *
  * BUG FIX (Medium #9): In-memory rate limiter limitation documented clearly.
@@ -20,7 +20,7 @@ if (!SUPABASE_ANON_KEY) {
 }
 
 // ── Groq Qwen (FREE tier) — Gemini ki jagah ─────────────────────────────
-// Ananya ab Groq ke FREE Qwen model se chalti hai.
+// RK Mart Assistant ab Groq ke FREE Qwen model se chalti hai.
 // Model: qwen/qwen3.8-27b — Groq Free plan (free API key, koi card nahi):
 // 30 requests/min, 1,000 requests/day, 200,000 tokens/day (Nov 2026).
 // Vercel mein GROQ_API_KEY environment variable set karein (console.groq.com
@@ -84,7 +84,7 @@ const MAX_HISTORY_MESSAGES = 12;
 // min order, delivery radius/charge, contact) aur live coupons (Admin se
 // set — sirf wahi offers bataye jo database mein active hain) padhe jate
 // hain. Coupon code kabhi hardcode nahi hota — admin jo coupon banata hai,
-// Ananya wahi batati hai; koi active coupon na ho to "koi offer nahi"
+// RK Mart Assistant wahi batati hai; koi active coupon na ho to "koi offer nahi"
 // kehti hai, koi code invent nahi karti. Supabase read fail ho to neeche
 // buildStoreContext ke sahi static defaults use hote hain (purane galat
 // values nahi).
@@ -161,10 +161,10 @@ async function buildLiveSystemPrompt() {
   return buildSystemPrompt(buildStoreContext(settings, coupons));
 }
 
-function buildSystemPrompt(storeContext) { return `Tum "Ananya" ho — RK Grocery Mart ki AI shopping assistant. Tum ek real, helpful Hindi/Hinglish bolne wali assistant ki tarah baat karti ho, robot ki tarah nahi.
+function buildSystemPrompt(storeContext) { return `Tum "RK Mart Assistant" ho — RK Grocery Mart ki AI shopping assistant. Tum ek real, helpful Hindi/Hinglish bolne wali assistant ki tarah baat karti ho, robot ki tarah nahi.
 
 ═══ TUMHARI PEHCHAN (Identity) ═══
-- Tumhara naam Ananya hai. Jab koi poochta hai "tumhara naam kya hai" to seedha aur friendly jawab do: "Mera naam Ananya hai! 🌸"
+- Tumhara naam RK Mart Assistant hai. Jab koi poochta hai "tumhara naam kya hai" to seedha aur friendly jawab do: "Mera naam RK Mart Assistant hai! 🌸"
 - Tum RK Grocery Mart ki AI shopping assistant ho — yeh tumhari pehchan hai, isse kabhi mat chhupao.
 - Agar koi poochta hai "tum AI ho kya" ya "tum real ho ya bot" — honestly bolo ki haan, tum ek AI assistant ho, store ki taraf se banayi gayi ho taaki customers ki madad kar sako.
 - Agar koi poochta hai "kaisi ho" / "kya haal hai" — halka casual jawab do jaise "Main badhiya hoon, shukriya poochne ke liye! 😊 Aap batao, aaj kya madad kar sakti hoon?" — phir seedha kaam ki taraf le aao.
@@ -460,7 +460,7 @@ module.exports = async (req, res) => {
 
   try {
     // Live store knowledge (settings + Admin ke coupons) se system prompt
-    // banao — har request par fresh, taaki Ananya hamesha sahi jawab de.
+    // banao — har request par fresh, taaki RK Mart Assistant hamesha sahi jawab de.
     const systemPrompt = await buildLiveSystemPrompt();
     const isOrderQuestion = looksLikeOrderQuestion(message);
     let userId = null;

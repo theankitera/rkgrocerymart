@@ -487,7 +487,7 @@ function Footer({shopSettings,onNav}){
       </div>
       <a href="support.html"
         style={{display:'inline-flex',alignItems:'center',gap:7,color:'#fff',background:'rgba(255,255,255,0.16)',padding:'9px 20px',borderRadius:50,fontWeight:700,fontSize:'.78rem',textDecoration:'none',marginTop:10,transition:'transform .15s'}}>
-        <MessageCircle size={15}/> Help &amp; Support — Ananya AI
+        <MessageCircle size={15}/> Help &amp; Support — RK Mart Assistant
       </a>
       <div style={{marginTop:8,opacity:0.7}}>© {new Date().getFullYear()} {s.shop_name||'RK Grocery Mart'} — {s.footer_text||'Delivery in 5 minutes'}</div>
     </div>
@@ -724,7 +724,7 @@ function WhyChooseUs({productCount=0,catCount=0,s}){
     {icon:BadgePercent,title:'Best Prices',desc:'Market se saste — daily deals & coupons'},
     {icon:ShieldCheck,title:'100% Safe Payments',desc:'Online payment (Razorpay) + COD — secure checkout'},
     {icon:Package,title:'Wide Selection',desc:productCount>0?`${productCount}+ products, ${catCount>0?catCount+' categories':''} — sab kuch ek jagah`:'Sab kuch ek jagah — grocery, dairy, snacks'},
-    {icon:Headphones,title:'Help & Support',desc:`Subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9} — call, WhatsApp ya Ananya AI chat`},
+    {icon:Headphones,title:'Help & Support',desc:`Subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9} — call, WhatsApp ya RK Mart Assistant chat`},
   ];
   return(
     <div>
@@ -955,7 +955,7 @@ function AboutBody({s,pc}){
         '<strong style="color:var(--dark)">Quality check on every order</strong> — before picking, our team verifies expiry dates, packaging and freshness of each item.',
         '<strong style="color:var(--dark)">Supporting local vendors</strong> — we source from local farmers and distributors whenever possible, so you get fresher produce and they get a fair price.',
         '<strong style="color:var(--dark)">Easy payments</strong> — Online payment via Razorpay (UPI, cards, net banking) or Cash on Delivery — whatever is convenient for you.',
-        `<strong style="color:var(--dark)">Ananya AI support</strong> — a chat assistant (subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9}) that instantly answers order status, product and offer questions.`,
+        `<strong style="color:var(--dark)">RK Mart Assistant support</strong> — a chat assistant (subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9}) that instantly answers order status, product and offer questions.`,
       ]}/>
 
       <IHead icon={Zap}>By The Numbers</IHead>
@@ -975,7 +975,7 @@ function AboutBody({s,pc}){
       ]}/>
 
       <ICall title="Talk To Us" icon={MessageCircle}>
-        Any question, feedback or suggestion? Our team would love to hear from you. {s?.contact?<>📞 <strong>+91 {String(s.contact).replace(/(\d{5})(\d{5})/,'$1 $2')}</strong> · </>:null}📧 <strong>support@rkgrocerymart.com</strong> · or chat with Ananya AI directly on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Help &amp; Support</a> page.
+        Any question, feedback or suggestion? Our team would love to hear from you. {s?.contact?<>📞 <strong>+91 {String(s.contact).replace(/(\d{5})(\d{5})/,'$1 $2')}</strong> · </>:null}📧 <strong>support@rkgrocerymart.com</strong> · or chat with RK Mart Assistant directly on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Help &amp; Support</a> page.
       </ICall>
     </div>
   );
@@ -992,7 +992,7 @@ function PrivacyBody({s}){
         '<strong style="color:var(--dark)">Order information</strong> — what you ordered, order value, delivery slot, order history and preferences.',
         '<strong style="color:var(--dark)">Payment details</strong> — we only store the payment status and reference number. Card numbers, CVV or UPI PINs are never stored on our servers — payments are processed through trusted third-party payment gateways.',
         '<strong style="color:var(--dark)">Technical data</strong> — device type, browser, IP address, app version and crash logs (used to improve performance).',
-        '<strong style="color:var(--dark)">Communications</strong> — your conversations with us over WhatsApp, call, email or chat (Ananya AI), so that we can remember your history and serve you better.',
+        '<strong style="color:var(--dark)">Communications</strong> — your conversations with us over WhatsApp, call, email or chat (RK Mart Assistant), so that we can remember your history and serve you better.',
       ]}/>
 
       <IHead icon={FileText}>2. How We Use Information</IHead>
@@ -1174,7 +1174,7 @@ function ShippingBody({s}){
       <IBullets items={[
         'A confirmation SMS/WhatsApp arrives as soon as your order is confirmed.',
         'Picking → packed → out for delivery → delivered — a notification at every step.',
-        'Seeing a delay? Go straight to <a href="support.html" style="color:var(--primary);font-weight:700;text-decoration:underline">Help &amp; Support</a> and ask Ananya AI for the live status, or give us a call.',
+        'Seeing a delay? Go straight to <a href="support.html" style="color:var(--primary);font-weight:700;text-decoration:underline">Help &amp; Support</a> and ask RK Mart Assistant for the live status, or give us a call.',
       ]}/>
 
       <IHead icon={ShieldCheck}>If Delivery Fails</IHead>
@@ -1210,7 +1210,7 @@ function ShippingBody({s}){
       ]}/>
 
       <ICall title="Need Help With A Delivery?" icon={Truck}>
-        Order status, address change — anything. {s?.contact?<>📞 <strong>+91 {String(s.contact).replace(/(\d{5})(\d{5})/,'$1 $2')}</strong> · </>:null}📧 <strong>support@rkgrocerymart.com</strong> · or ask anything (subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9}) on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>Ananya AI chat</a>.
+        Order status, address change — anything. {s?.contact?<>📞 <strong>+91 {String(s.contact).replace(/(\d{5})(\d{5})/,'$1 $2')}</strong> · </>:null}📧 <strong>support@rkgrocerymart.com</strong> · or ask anything (subah ${shortH(s?.open_time)||8} se raat ${shortH(s?.close_time)||9}) on the <a href="support.html" style={{color:'var(--primary)',fontWeight:700,textDecoration:'underline'}}>RK Mart Assistant chat</a>.
       </ICall>
     </div>
   );
